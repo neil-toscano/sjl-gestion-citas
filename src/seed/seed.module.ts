@@ -9,9 +9,6 @@ import { SeedController } from './seed.controller';
 @Module({
   controllers: [SeedController],
   providers: [SeedService],
-  imports: [
-    ProductsModule,
-    AuthModule,
-  ]
+  imports: [ProductsModule, AuthModule],
 })
 export class SeedModule {}
