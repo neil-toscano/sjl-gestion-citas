@@ -23,7 +23,19 @@ export class SectionTypeDocumentService {
   }
 
   async findAll() {
-    
+    const result = await this.sectionTypeDocumentRepository.createQueryBuilder('sectionTypeDocument')
+  .leftJoinAndSelect('sectionTypeDocument.section', 'section')
+  .leftJoinAndSelect('sectionTypeDocument.typeDocument', 'typeDocument')
+  .select([
+    'sectionTypeDocument.id AS sectionTypeDocumentId', // Incluyendo el id de la tabla intermedia
+    'section.id AS sectionId',
+    'section.sectionName AS sectionName',
+    'typeDocument.id AS typeDocumentId',
+    'typeDocument.name AS typeDocumentName',
+  ])
+  .orderBy('section.sectionName', 'ASC')
+  .getRawMany();
+      return Object.values(this.organizeData(result));
   }
 
   findOne(id: number) {
