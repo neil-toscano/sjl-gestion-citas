@@ -33,11 +33,6 @@ export class AuthController {
   loginUser(@Body() loginUserDto: LoginUserDto) {
     return this.authService.login(loginUserDto);
   }
-  @Auth()
-  @Get('lookup')
-  lookup(@GetUser() user: User) {
-    return user;
-  }
 
   @Get('check-status')
   @Auth()

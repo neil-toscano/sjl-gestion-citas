@@ -8,6 +8,7 @@ import {
 } from 'typeorm';
 import { Product } from '../../products/entities';
 import { Type } from 'class-transformer';
+import { Document } from 'src/documents/entities/document.entity';
 
 @Entity('users')
 export class User {
@@ -63,6 +64,9 @@ export class User {
 
   @OneToMany(() => Product, (product) => product.user)
   product: Product;
+
+  @OneToMany(() => Document, (document) => document.user)
+  document: Document;
 
   @BeforeInsert()
   checkFieldsBeforeInsert() {

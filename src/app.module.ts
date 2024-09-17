@@ -10,6 +10,12 @@ import { CommonModule } from './common/common.module';
 import { SeedModule } from './seed/seed.module';
 import { FilesModule } from './files/files.module';
 import { AuthModule } from './auth/auth.module';
+import { DocumentsModule } from './documents/documents.module';
+import { SectionDocumentModule } from './section-document/section-document.module';
+import { TypeDocumentModule } from './type-document/type-document.module';
+import { TypeDocument } from './type-document/entities/type-document.entity';
+import { SectionDocument } from './section-document/entities/section-document.entity';
+import { SectionTypeDocumentModule } from './section-type-document/section-type-document.module';
 
 @Module({
   imports: [
@@ -43,6 +49,14 @@ import { AuthModule } from './auth/auth.module';
     FilesModule,
 
     AuthModule,
+
+    DocumentsModule,
+
+    SectionDocumentModule,
+
+    TypeDocumentModule,
+
+    SectionTypeDocumentModule,
   ],
 })
 export class AppModule {}
