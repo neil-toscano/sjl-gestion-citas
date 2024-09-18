@@ -33,10 +33,12 @@ export class DocumentsService {
         user: { id: id },
       });
     }
+
+    const globalPath = this.fileService.getFile(createDocumentDto.fileUrl);
     const newDocument = this.documentRepository.create({
       sectionTypeDocument: { id: createDocumentDto.sectionTypeId },
       user: user,
-      fileUrl: createDocumentDto.fileUrl,
+      fileUrl: globalPath,
     });
 
     return await this.documentRepository.save(newDocument);
