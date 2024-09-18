@@ -16,16 +16,17 @@ import { TypeDocumentModule } from './type-document/type-document.module';
 import { TypeDocument } from './type-document/entities/type-document.entity';
 import { SectionDocument } from './section-document/entities/section-document.entity';
 import { SectionTypeDocumentModule } from './section-type-document/section-type-document.module';
+import { UserModule } from './user/user.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot(),
 
     TypeOrmModule.forRoot({
-      // ssl: true,
-      // extra: {
-      //   ssl: true ? { rejectUnauthorized: false } : null,
-      // },
+      ssl: true,
+      extra: {
+        ssl: true ? { rejectUnauthorized: false } : null,
+      },
       type: 'postgres',
       host: process.env.DB_HOST,
       port: +process.env.DB_PORT,
@@ -57,6 +58,8 @@ import { SectionTypeDocumentModule } from './section-type-document/section-type-
     TypeDocumentModule,
 
     SectionTypeDocumentModule,
+
+    UserModule,
   ],
 })
 export class AppModule {}
