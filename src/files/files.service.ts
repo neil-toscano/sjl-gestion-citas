@@ -7,9 +7,7 @@ import { CreateDocumentDto } from 'src/documents/dto/create-document.dto';
 
 @Injectable()
 export class FilesService {
-  constructor() {
-
-  }
+  constructor() {}
 
   getStaticProductImage(imageName: string) {
     const path = join(__dirname, '../../static/products', imageName);
@@ -20,7 +18,7 @@ export class FilesService {
     return path;
   }
 
-  getFile(filename: string){
+  getFile(filename: string) {
     const path = join(__dirname, '../../static/pdf', filename);
 
     if (!existsSync(path))

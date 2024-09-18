@@ -1,4 +1,12 @@
-import { IsInt, IsString, IsUrl, IsNotEmpty, IsUUID, IsIn, IsOptional } from 'class-validator';
+import {
+  IsInt,
+  IsString,
+  IsUrl,
+  IsNotEmpty,
+  IsUUID,
+  IsIn,
+  IsOptional,
+} from 'class-validator';
 export class CreateDocumentDto {
   @IsUUID()
   sectionTypeId: string;
@@ -9,7 +17,10 @@ export class CreateDocumentDto {
 
   @IsString()
   @IsNotEmpty()
-  @IsIn(['EN PROCESO', 'VERIFICADO', 'OBSERVADO'], { message: 'Status must be one of the following values: EN PROCESO, VERIFICADO, OBSERVADO' })
+  @IsIn(['EN PROCESO', 'VERIFICADO', 'OBSERVADO'], {
+    message:
+      'Status must be one of the following values: EN PROCESO, VERIFICADO, OBSERVADO',
+  })
   status: string;
 
   @IsString()

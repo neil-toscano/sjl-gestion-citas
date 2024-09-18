@@ -22,16 +22,22 @@ export class DocumentsController {
   create(@GetUser() user: User, @Body() createDocumentDto: CreateDocumentDto) {
     return this.documentsService.create(user, createDocumentDto);
   }
-  
+
   @Get()
   @Auth()
   findAll(@GetUser() user: User) {
     return this.documentsService.findAll(user);
   }
 
+  @Get(":id")
+  @Auth()
+  findBySection(@Param('id', new ParseUUIDPipe()) id: string, @GetUser() user: User) {
+    return this.documentsService.findDocumentBySection(id, user);
+  }
+
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.documentsService.findOne(+id);
+    return this.documentsService.findOne(id);
   }
 
   @Patch(':id')

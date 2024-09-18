@@ -11,7 +11,7 @@ export class SectionDocument {
     unique: true,
   })
   sectionName: string;
-  
+
   @Column('text', {
     unique: true,
     nullable: true,

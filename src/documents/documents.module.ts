@@ -5,11 +5,17 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { Document } from './entities/document.entity';
 import { AuthModule } from 'src/auth/auth.module';
 import { FilesModule } from 'src/files/files.module';
+import { SectionTypeDocumentModule } from 'src/section-type-document/section-type-document.module';
 
 @Module({
   controllers: [DocumentsController],
   providers: [DocumentsService],
   exports: [TypeOrmModule],
-  imports: [TypeOrmModule.forFeature([Document]), AuthModule, FilesModule],
+  imports: [
+    TypeOrmModule.forFeature([Document]),
+    AuthModule,
+    FilesModule,
+    SectionTypeDocumentModule,
+  ],
 })
 export class DocumentsModule {}

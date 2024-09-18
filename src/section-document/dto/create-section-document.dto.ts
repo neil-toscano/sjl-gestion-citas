@@ -4,7 +4,7 @@ export class CreateSectionDocumentDto {
   @IsString()
   @IsNotEmpty()
   sectionName: string;
-  
+
   @IsString()
   @IsNotEmpty()
   @IsOptional()

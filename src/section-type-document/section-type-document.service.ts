@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateSectionTypeDocumentDto } from './dto/create-section-type-document.dto';
 import { UpdateSectionTypeDocumentDto } from './dto/update-section-type-document.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -23,24 +23,32 @@ export class SectionTypeDocumentService {
   }
 
   async findAll() {
-    const result = await this.sectionTypeDocumentRepository.createQueryBuilder('sectionTypeDocument')
-  .leftJoinAndSelect('sectionTypeDocument.section', 'section')
-  .leftJoinAndSelect('sectionTypeDocument.typeDocument', 'typeDocument')
-  .select([
-    'sectionTypeDocument.id AS sectionTypeDocumentId', // Incluyendo el id de la tabla intermedia
-    'section.id AS sectionId',
-    'section.sectionName AS sectionName',
-    'section.sectionSlug AS sectionSlug',
-    'typeDocument.id AS typeDocumentId',
-    'typeDocument.name AS typeDocumentName',
-  ])
-  .orderBy('section.sectionName', 'ASC')
-  .getRawMany();
-      return Object.values(this.organizeData(result));
+    const result = await this.sectionTypeDocumentRepository
+      .createQueryBuilder('sectionTypeDocument')
+      .leftJoinAndSelect('sectionTypeDocument.section', 'section')
+      .leftJoinAndSelect('sectionTypeDocument.typeDocument', 'typeDocument')
+      .select([
+        'sectionTypeDocument.id AS sectionTypeDocumentId', // Incluyendo el id de la tabla intermedia
+        'section.id AS sectionId',
+        'section.sectionName AS sectionName',
+        'section.sectionSlug AS sectionSlug',
+        'typeDocument.id AS typeDocumentId',
+        'typeDocument.name AS typeDocumentName',
+      ])
+      .orderBy('section.sectionName', 'ASC')
+      .getRawMany();
+    return Object.values(this.organizeData(result));
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} sectionTypeDocument`;
+  async findOne(id: string) {
+    const result = await this.sectionTypeDocumentRepository.findOneBy({
+      id: id,
+    });
+
+    if (!result) {
+      throw new NotFoundException(`Section-Type id ${id} not found`);
+    }
+    return result;
   }
 
   update(
@@ -56,24 +64,31 @@ export class SectionTypeDocumentService {
 
   organizeData(data: any) {
     return data.reduce((acc: any, item: any) => {
-      const { sectionid, sectionname, sectionslug, typedocumentid, typedocumentname, sectiontypedocumentid } = item;
-  
+      const {
+        sectionid,
+        sectionname,
+        sectionslug,
+        typedocumentid,
+        typedocumentname,
+        sectiontypedocumentid,
+      } = item;
+
       if (!acc[sectionid]) {
         acc[sectionid] = {
           sectionId: sectionid,
           sectionName: sectionname,
           sectionSlug: sectionslug,
-          typedocument: []
+          typedocument: [],
         };
       }
-  
+
       // Push the type document with its id, name, and sectionTypeDocumentId
       acc[sectionid].typedocument.push({
         id: typedocumentid,
         name: typedocumentname,
-        sectionTypeId: sectiontypedocumentid // Adding the id from the junction table
+        sectionTypeId: sectiontypedocumentid, // Adding the id from the junction table
       });
-  
+
       return acc;
     }, {});
   }

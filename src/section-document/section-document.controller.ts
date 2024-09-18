@@ -6,6 +6,7 @@ import {
   Patch,
   Param,
   Delete,
+  ParseUUIDPipe,
 } from '@nestjs/common';
 import { SectionDocumentService } from './section-document.service';
 import { CreateSectionDocumentDto } from './dto/create-section-document.dto';
@@ -28,7 +29,7 @@ export class SectionDocumentController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
+  findOne(@Param('id', new ParseUUIDPipe()) id: string) {
     return this.sectionDocumentService.findOne(+id);
   }
 

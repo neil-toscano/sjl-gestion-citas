@@ -29,7 +29,11 @@ export class Document {
   @Column({ type: 'varchar', length: 500 })
   fileUrl: string;
 
-  @Column({ type: 'enum', enum: ['EN PROCESO', 'VERIFICADO', 'OBSERVADO'], default: 'EN PROCESO' })
+  @Column({
+    type: 'enum',
+    enum: ['EN PROCESO', 'VERIFICADO', 'OBSERVADO'],
+    default: 'EN PROCESO',
+  })
   status: string;
 
   @Column({ type: 'text', nullable: true })
