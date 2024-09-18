@@ -34,11 +34,10 @@ export class DocumentsService {
       });
     }
 
-    const globalPath = this.fileService.getFile(createDocumentDto.fileUrl);
     const newDocument = this.documentRepository.create({
       sectionTypeDocument: { id: createDocumentDto.sectionTypeId },
       user: user,
-      fileUrl: globalPath,
+      fileUrl: createDocumentDto.fileUrl,
     });
 
     return await this.documentRepository.save(newDocument);
@@ -89,6 +88,8 @@ export class DocumentsService {
     }
     if(updateDocumentDto.fileUrl) {
       const response = await this.fileService.deleteFile(document.fileUrl);
+      const globalPath = this.fileService.getFile(updateDocumentDto.fileUrl);
+      updateDocumentDto.fileUrl = globalPath;
     }
 
 

@@ -22,7 +22,7 @@ export class FilesService {
     const path = join(__dirname, '../../static/pdf', filename);
 
     if (!existsSync(path))
-      throw new BadRequestException(`No product found with image ${filename}`);
+      throw new BadRequestException(`No file(pdf) found with name ${filename}`);
     return path;
   }
 
