@@ -88,8 +88,6 @@ export class DocumentsService {
     }
     if(updateDocumentDto.fileUrl) {
       const response = await this.fileService.deleteFile(document.fileUrl);
-      const globalPath = this.fileService.getFile(updateDocumentDto.fileUrl);
-      updateDocumentDto.fileUrl = globalPath;
     }
 
 
