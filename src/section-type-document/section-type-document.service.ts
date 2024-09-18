@@ -30,6 +30,7 @@ export class SectionTypeDocumentService {
     'sectionTypeDocument.id AS sectionTypeDocumentId', // Incluyendo el id de la tabla intermedia
     'section.id AS sectionId',
     'section.sectionName AS sectionName',
+    'section.sectionSlug AS sectionSlug',
     'typeDocument.id AS typeDocumentId',
     'typeDocument.name AS typeDocumentName',
   ])
@@ -55,12 +56,13 @@ export class SectionTypeDocumentService {
 
   organizeData(data: any) {
     return data.reduce((acc: any, item: any) => {
-      const { sectionid, sectionname, typedocumentid, typedocumentname, sectiontypedocumentid } = item;
+      const { sectionid, sectionname, sectionslug, typedocumentid, typedocumentname, sectiontypedocumentid } = item;
   
       if (!acc[sectionid]) {
         acc[sectionid] = {
           sectionId: sectionid,
           sectionName: sectionname,
+          sectionSlug: sectionslug,
           typedocument: []
         };
       }

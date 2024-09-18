@@ -4,11 +4,12 @@ import { DocumentsController } from './documents.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Document } from './entities/document.entity';
 import { AuthModule } from 'src/auth/auth.module';
+import { FilesModule } from 'src/files/files.module';
 
 @Module({
   controllers: [DocumentsController],
   providers: [DocumentsService],
   exports: [TypeOrmModule],
-  imports: [TypeOrmModule.forFeature([Document]), AuthModule],
+  imports: [TypeOrmModule.forFeature([Document]), AuthModule, FilesModule],
 })
 export class DocumentsModule {}

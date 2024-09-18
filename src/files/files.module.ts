@@ -9,5 +9,6 @@ import { AuthModule } from 'src/auth/auth.module';
   controllers: [FilesController],
   providers: [FilesService],
   imports: [ConfigModule, AuthModule],
+  exports: [FilesService]
 })
 export class FilesModule {}

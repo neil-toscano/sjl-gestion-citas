@@ -3,10 +3,6 @@ import { CreateDocumentDto } from './create-document.dto';
 import { IsIn, IsOptional, IsString, IsUUID } from 'class-validator';
 
 export class UpdateDocumentDto extends PartialType(CreateDocumentDto) {
-    @IsUUID()
-    @IsOptional()
-    sectionTypeId: string;
-  
     @IsString()
     @IsOptional()
     fileUrl?: string;
