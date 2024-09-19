@@ -15,8 +15,8 @@ import { UpdateProductDto } from './dto/update-product.dto';
 import { PaginationDto } from './../common/dtos/pagination.dto';
 
 import { Auth, GetUser } from '../auth/decorators';
-import { User } from '../auth/entities/user.entity';
 import { ValidRoles } from '../auth/interfaces';
+import { User } from 'src/user/entities/user.entity';
 
 @Controller('products')
 export class ProductsController {

@@ -14,7 +14,7 @@ import { PaginationDto } from 'src/common/dtos/pagination.dto';
 
 import { validate as isUUID } from 'uuid';
 import { ProductImage, Product } from './entities';
-import { User } from '../auth/entities/user.entity';
+import { User } from 'src/user/entities/user.entity';
 
 @Injectable()
 export class ProductsService {

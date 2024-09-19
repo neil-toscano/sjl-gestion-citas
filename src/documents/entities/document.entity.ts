@@ -1,7 +1,7 @@
-import { User } from 'src/auth/entities/user.entity';
 import { SectionDocument } from 'src/section-document/entities/section-document.entity';
 import { SectionTypeDocument } from 'src/section-type-document/entities/section-type-document.entity';
 import { TypeDocument } from 'src/type-document/entities/type-document.entity';
+import { User } from 'src/user/entities/user.entity';
 import {
   Entity,
   PrimaryGeneratedColumn,

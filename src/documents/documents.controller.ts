@@ -12,7 +12,7 @@ import { DocumentsService } from './documents.service';
 import { CreateDocumentDto } from './dto/create-document.dto';
 import { UpdateDocumentDto } from './dto/update-document.dto';
 import { Auth, GetUser } from 'src/auth/decorators';
-import { User } from 'src/auth/entities/user.entity';
+import { User } from 'src/user/entities/user.entity';
 
 @Controller('documents')
 export class DocumentsController {
@@ -29,10 +29,23 @@ export class DocumentsController {
     return this.documentsService.findAll(user);
   }
 
-  @Get(":id")
+  @Get(':id')
   @Auth()
-  findBySection(@Param('id', new ParseUUIDPipe()) id: string, @GetUser() user: User) {
+  findBySection(
+    @Param('id', new ParseUUIDPipe()) id: string,
+    @GetUser() user: User,
+  ) {
     return this.documentsService.findDocumentBySection(id, user);
+  }
+
+  @Get('super-user/:id')
+  findAllBySection(@Param('id', new ParseUUIDPipe()) id: string) {
+    return this.documentsService.findAllBySection(id);
+  }
+
+  @Get('super-user/sections/:id')
+  findAllDocumentsByUser(@Param('id', new ParseUUIDPipe()) id: string) {
+    return this.documentsService.findAllSectionsByUser(id);
   }
 
   @Get(':id')

@@ -2,7 +2,6 @@ import { existsSync, unlinkSync } from 'fs';
 import { join } from 'path';
 
 import { Injectable, BadRequestException } from '@nestjs/common';
-import { User } from 'src/auth/entities/user.entity';
 import { CreateDocumentDto } from 'src/documents/dto/create-document.dto';
 
 @Injectable()

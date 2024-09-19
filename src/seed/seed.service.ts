@@ -3,8 +3,8 @@ import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ProductsService } from './../products/products.service';
 import { initialData } from './data/seed-data';
-import { User } from '../auth/entities/user.entity';
-
+import { User } from 'src/user/entities/user.entity';
+import { Schedule } from 'src/schedule/entities/schedule.entity';
 @Injectable()
 export class SeedService {
   constructor(
@@ -12,6 +12,9 @@ export class SeedService {
 
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
+
+    @InjectRepository(Schedule)
+    private scheduleRepository: Repository<Schedule>,
   ) {}
 
   async runSeed() {
@@ -21,6 +24,19 @@ export class SeedService {
     await this.insertNewProducts(adminUser);
 
     return 'SEED EXECUTED';
+  }
+  
+  async runSeedSchedule() {
+    const schedules = [
+      { startTime: '08:00', endTime: '09:00', isAvailable: true },
+      { startTime: '09:00', endTime: '10:00', isAvailable: true },
+      // Agrega más horarios aquí
+    ];
+
+    for (const schedule of schedules) {
+      await this.scheduleRepository.save(schedule);
+    }
+    return "success";
   }
 
   private async deleteTables() {

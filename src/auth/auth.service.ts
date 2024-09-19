@@ -10,59 +10,31 @@ import { Repository } from 'typeorm';
 
 import * as bcrypt from 'bcrypt';
 
-import { User } from './entities/user.entity';
 import { LoginUserDto, CreateUserDto } from './dto';
 import { JwtPayload } from './interfaces/jwt-payload.interface';
+import { UserService } from 'src/user/user.service';
+import { User } from 'src/user/entities/user.entity';
 
 @Injectable()
 export class AuthService {
   constructor(
-    @InjectRepository(User)
-    private readonly userRepository: Repository<User>,
-
+    private readonly userService: UserService,
     private readonly jwtService: JwtService,
   ) {}
 
   async create(createUserDto: CreateUserDto) {
-    try {
-      const { password, ...userData } = createUserDto;
-
-      const user = this.userRepository.create({
-        ...userData,
-        password: bcrypt.hashSync(password, 10),
-      });
-
-      await this.userRepository.save(user);
-      delete user.password;
-
-      return {
-        ...user,
-        token: this.getJwtToken({ id: user.id }),
-      };
-      // TODO: Retornar el JWT de acceso
-    } catch (error) {
-      this.handleDBErrors(error);
-    }
+    const user = await this.userService.create(createUserDto);
+    const token = this.getJwtToken({ id: user.id });
+    return {
+      ...user,
+      token,
+    };
   }
 
   async login(loginUserDto: LoginUserDto) {
     const { password, dni } = loginUserDto;
 
-    const user = await this.userRepository.findOne({
-      where: { dni },
-      select: {
-        email: true,
-        password: true,
-        id: true,
-        roles: true,
-        dni: true,
-        firstName: true,
-        lastName: true,
-        province: true,
-        district: true,
-        mobileNumber: true,
-      }, //! OJO!
-    });
+    const user = await this.userService.findOneByDni(dni);
 
     if (!user)
       throw new UnauthorizedException('Credentials are not valid (dni)');

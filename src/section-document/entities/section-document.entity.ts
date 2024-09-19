@@ -1,4 +1,5 @@
 import { Document } from 'src/documents/entities/document.entity';
+import { Schedule } from 'src/schedule/entities/schedule.entity';
 import { SectionTypeDocument } from 'src/section-type-document/entities/section-type-document.entity';
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 
@@ -23,4 +24,7 @@ export class SectionDocument {
     (sectionTypeDocument) => sectionTypeDocument.section,
   )
   sectionTypeDocument: SectionTypeDocument[];
+
+  @OneToMany(() => Schedule, (schedule) => schedule.section)
+  schedules: Schedule[];
 }

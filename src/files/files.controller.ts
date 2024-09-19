@@ -63,7 +63,7 @@ export class FilesController {
 
     res.sendFile(path);
   }
-  
+
   @Get('pdf/:pdfName')
   getFile(@Res() res: Response, @Param('pdfName') pdfName: string) {
     const path = this.filesService.getFile(pdfName);
