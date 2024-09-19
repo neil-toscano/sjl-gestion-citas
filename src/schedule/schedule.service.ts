@@ -5,13 +5,16 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Schedule, ScheduleStatus } from './entities/schedule.entity';
 import { Repository } from 'typeorm';
 import { User } from 'src/user/entities/user.entity';
+import { SectionDocumentService } from 'src/section-document/section-document.service';
 
 @Injectable()
 export class ScheduleService {
   constructor(
     @InjectRepository(Schedule)
     private scheduleRepository: Repository<Schedule>,
+    private readonly sectionService: SectionDocumentService,
   ) {}
+
   create(createScheduleDto: CreateScheduleDto) {
     const schedule = this.scheduleRepository.create({
       ...createScheduleDto,
@@ -19,12 +22,18 @@ export class ScheduleService {
     return this.scheduleRepository.save(schedule);
   }
 
-  findAll() {
-    return this.scheduleRepository.find();
+  async findAll() {
+    return await this.scheduleRepository.find();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} schedule`;
+  async findOne(id: string) {
+    const schedule = await this.scheduleRepository.findOneBy({
+      id: id,
+    });
+
+    if (!schedule)
+      throw new NotFoundException(`schedule with id ${id} not found`);
+    return schedule;
   }
 
   async update(
@@ -53,11 +62,22 @@ export class ScheduleService {
     id: string,
     sectionId: string,
     user: User,
-  ): Promise<Schedule> {
-    const schedule = await this.scheduleRepository.findOneBy({ id });
-    if (!schedule || !schedule.isAvailable) {
+  ) {
+    const schedule = await this.findOne(id);
+    await this.sectionService.findOne(sectionId);
+
+    if (!schedule.isAvailable) {
       throw new NotFoundException(`Horario no disponible`);
     }
+
+    const { ok, msg } = await this.hasOpenScheduleBySection(sectionId,user.id);
+    if(ok) {
+      return {
+        ok,
+        message: msg
+      }
+    }
+
     await this.scheduleRepository.update(id, {
       isAvailable: false,
       reservedBy: user,
@@ -69,28 +89,28 @@ export class ScheduleService {
     return this.scheduleRepository.findOneBy({ id });
   }
 
-  async hasOpenScheduleSection(idSection: string, userId: string) {
+  async hasOpenScheduleBySection(sectionId: string, userId: string) {
     const schedule = await this.scheduleRepository.findOne({
       where: {
         section: {
-          id: idSection,
+          id: sectionId,
         },
         isAvailable: false,
         status: ScheduleStatus.OPEN,
         reservedBy: {
-          id: userId
-        }
+          id: userId,
+        },
       },
     });
 
     return schedule === null
       ? {
           ok: false,
-          msg: 'Aún no tiene reservaciones',
+          msg: 'Aún no tiene reservaciones en la sección',
         }
       : {
           ok: true,
-          msg: 'Ya tiene reserva',
+          msg: 'Ya tiene reserva en la sección',
           schedule,
         };
   }

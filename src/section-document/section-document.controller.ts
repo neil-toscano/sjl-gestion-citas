@@ -30,7 +30,7 @@ export class SectionDocumentController {
 
   @Get(':id')
   findOne(@Param('id', new ParseUUIDPipe()) id: string) {
-    return this.sectionDocumentService.findOne(+id);
+    return this.sectionDocumentService.findOne(id);
   }
 
   @Patch(':id')

@@ -2,6 +2,7 @@ import {
   BadRequestException,
   Injectable,
   InternalServerErrorException,
+  NotFoundException,
 } from '@nestjs/common';
 import { CreateSectionDocumentDto } from './dto/create-section-document.dto';
 import { UpdateSectionDocumentDto } from './dto/update-section-document.dto';
@@ -38,8 +39,14 @@ export class SectionDocumentService {
     return sections;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} sectionDocument`;
+  async findOne(id: string) {
+    const schedule = await this.sectionDocumentRepository.findOneBy({
+      id: id,
+    });
+
+    if (!schedule)
+      throw new NotFoundException(`Section-Document with id ${id} not found`);
+    return schedule;
   }
 
   update(id: number, updateSectionDocumentDto: UpdateSectionDocumentDto) {

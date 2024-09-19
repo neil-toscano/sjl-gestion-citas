@@ -18,7 +18,7 @@ export class CreateScheduleDto {
 
   @IsEnum(ScheduleStatus)
   @IsOptional()
-  status?: ScheduleStatus;
+  status?: ScheduleStatus = ScheduleStatus.OPEN;
 
   @IsBoolean()
   isAvailable: boolean;

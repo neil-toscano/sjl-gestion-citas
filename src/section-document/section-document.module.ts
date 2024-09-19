@@ -7,7 +7,7 @@ import { SectionDocument } from './entities/section-document.entity';
 @Module({
   controllers: [SectionDocumentController],
   providers: [SectionDocumentService],
-  exports: [TypeOrmModule],
+  exports: [TypeOrmModule, SectionDocumentService],
   imports: [TypeOrmModule.forFeature([SectionDocument])],
 })
 export class SectionDocumentModule {}

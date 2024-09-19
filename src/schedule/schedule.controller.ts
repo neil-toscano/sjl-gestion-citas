@@ -6,6 +6,7 @@ import {
   Patch,
   Param,
   Delete,
+  ParseUUIDPipe,
 } from '@nestjs/common';
 import { ScheduleService } from './schedule.service';
 import { CreateScheduleDto } from './dto/create-schedule.dto';
@@ -23,13 +24,14 @@ export class ScheduleController {
   }
 
   @Get()
+  @Auth()
   findAll() {
     return this.scheduleService.findAll();
   }
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.scheduleService.findOne(+id);
+    return this.scheduleService.findOne(id);
   }
 
   @Patch(':id/:sectionId')
@@ -51,19 +53,16 @@ export class ScheduleController {
   @Post('reserve/:id/:sectionId')
   @Auth()
   reserve(
-    @Param('id') id: string,
-    @Param('sectionId') sectionId: string,
+    @Param('id', new ParseUUIDPipe()) id: string,
+    @Param('sectionId', new ParseUUIDPipe()) sectionId: string,
     @GetUser() user: User,
   ) {
     return this.scheduleService.reserveSchedule(id, sectionId, user);
   }
-  
+
   @Get('verify/:id')
   @Auth()
-  verifySchedule(
-    @Param('id') id: string,
-    @GetUser() user: User,
-  ) {
-    return this.scheduleService.hasOpenScheduleSection(id, user.id);
+  verifySchedule(@Param('id') id: string, @GetUser() user: User) {
+    return this.scheduleService.hasOpenScheduleBySection(id, user.id);
   }
 }

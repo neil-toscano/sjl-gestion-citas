@@ -6,6 +6,7 @@ import { Document } from './entities/document.entity';
 import { AuthModule } from 'src/auth/auth.module';
 import { FilesModule } from 'src/files/files.module';
 import { SectionTypeDocumentModule } from 'src/section-type-document/section-type-document.module';
+import { SectionDocumentModule } from 'src/section-document/section-document.module';
 
 @Module({
   controllers: [DocumentsController],
@@ -16,6 +17,7 @@ import { SectionTypeDocumentModule } from 'src/section-type-document/section-typ
     AuthModule,
     FilesModule,
     SectionTypeDocumentModule,
+    SectionDocumentModule
   ],
 })
 export class DocumentsModule {}

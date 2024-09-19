@@ -7,6 +7,7 @@ import { Repository } from 'typeorm';
 import { FilesService } from 'src/files/files.service';
 import { SectionTypeDocumentService } from 'src/section-type-document/section-type-document.service';
 import { User } from 'src/user/entities/user.entity';
+import { SectionDocumentService } from 'src/section-document/section-document.service';
 
 @Injectable()
 export class DocumentsService {
@@ -15,6 +16,7 @@ export class DocumentsService {
     private readonly documentRepository: Repository<Document>,
     private readonly fileService: FilesService,
     private readonly sectionTypeService: SectionTypeDocumentService,
+    private readonly sectionService: SectionDocumentService,
   ) {}
 
   async create(user: User, createDocumentDto: CreateDocumentDto) {
@@ -130,6 +132,7 @@ export class DocumentsService {
   }
 
   async hasValidDocuments(id: string, user: User) {
+    await this.sectionService.findOne(id);
     const sectionDocuments = await this.findDocumentBySection(id, user);
     const result = await this.sectionTypeService.findAll();
     const sectionDocumentCount = this.getTypeDocumentCountBySectionId(
