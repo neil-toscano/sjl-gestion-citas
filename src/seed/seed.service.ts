@@ -25,18 +25,20 @@ export class SeedService {
 
     return 'SEED EXECUTED';
   }
-  
+
   async runSeedSchedule() {
     const schedules = [
       { startTime: '08:00', endTime: '09:00', isAvailable: true },
       { startTime: '09:00', endTime: '10:00', isAvailable: true },
+      { startTime: '11:00', endTime: '12:00', isAvailable: true },
+      { startTime: '13:00', endTime: '14:00', isAvailable: true },
       // Agrega más horarios aquí
     ];
 
     for (const schedule of schedules) {
       await this.scheduleRepository.save(schedule);
     }
-    return "success";
+    return 'success';
   }
 
   private async deleteTables() {

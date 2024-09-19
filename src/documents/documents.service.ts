@@ -129,35 +129,39 @@ export class DocumentsService {
     return `This action removes a #${id} document`;
   }
 
-  async hasValidDocuments(id:string, user:User) {
-    
+  async hasValidDocuments(id: string, user: User) {
     const sectionDocuments = await this.findDocumentBySection(id, user);
     const result = await this.sectionTypeService.findAll();
-    const sectionDocumentCount = this.getTypeDocumentCountBySectionId(result, id);
+    const sectionDocumentCount = this.getTypeDocumentCountBySectionId(
+      result,
+      id,
+    );
 
-    if(sectionDocuments.length !== sectionDocumentCount) {
+    if (sectionDocuments.length !== sectionDocumentCount) {
       return {
         ok: false,
-        msg: "No tiene subido todos los documentos en la sección"
-      }
+        msg: 'No tiene subido todos los documentos en la sección',
+      };
     }
 
-    const allVerified = sectionDocuments.every(document => document.status === 'VERIFICADO');
-    if(!allVerified) {
+    const allVerified = sectionDocuments.every(
+      (document) => document.status === 'VERIFICADO',
+    );
+    if (!allVerified) {
       return {
         ok: false,
-        msg: "Sus documentos aún no se encuentrarn verificados",
-      }
+        msg: 'Sus documentos aún no se encuentrarn verificados',
+      };
     }
 
     return {
       ok: true,
-      msg: "Se encuentra apto para hacer reserva de cita"
-    }
+      msg: 'Se encuentra apto para hacer reserva de cita',
+    };
   }
-  
+
   getTypeDocumentCountBySectionId(data: any[], sectionId: string): number {
-    const section = data.find(section => section.sectionId === sectionId);
+    const section = data.find((section) => section.sectionId === sectionId);
     if (section) {
       return section.typedocument.length;
     }

@@ -48,6 +48,15 @@ export class DocumentsController {
     return this.documentsService.findAllSectionsByUser(id);
   }
 
+  @Get('valid/:id')
+  @Auth()
+  validDocuments(
+    @Param('id', new ParseUUIDPipe()) id: string,
+    @GetUser() user: User,
+  ) {
+    return this.documentsService.hasValidDocuments(id, user);
+  }
+
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.documentsService.findOne(id);

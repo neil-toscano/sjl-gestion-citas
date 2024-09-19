@@ -80,6 +80,6 @@ export class User {
     this.checkFieldsBeforeInsert();
   }
 
-  @OneToMany(() => Schedule, schedule => schedule.reservedBy)
+  @OneToMany(() => Schedule, (schedule) => schedule.reservedBy)
   schedules: Schedule[];
 }

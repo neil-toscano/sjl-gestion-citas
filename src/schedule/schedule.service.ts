@@ -1,8 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateScheduleDto } from './dto/create-schedule.dto';
 import { UpdateScheduleDto } from './dto/update-schedule.dto';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Schedule } from './entities/schedule.entity';
+import { Schedule, ScheduleStatus } from './entities/schedule.entity';
 import { Repository } from 'typeorm';
 import { User } from 'src/user/entities/user.entity';
 
@@ -27,14 +27,18 @@ export class ScheduleService {
     return `This action returns a #${id} schedule`;
   }
 
-  async update(id: string, sectionId:string, updateScheduleDto: UpdateScheduleDto, user: User) {
-
-    await this.scheduleRepository.update( id, {
+  async update(
+    id: string,
+    sectionId: string,
+    updateScheduleDto: UpdateScheduleDto,
+    user: User,
+  ) {
+    await this.scheduleRepository.update(id, {
       ...updateScheduleDto,
       isAvailable: false,
       reservedBy: user,
       section: {
-        id: sectionId
+        id: sectionId,
       },
     });
 
@@ -45,13 +49,49 @@ export class ScheduleService {
     return `This action removes a #${id} schedule`;
   }
 
-  async reserveSchedule(id: string, userId: string): Promise<Schedule> {
-    const schedule = await this.scheduleRepository.findOneBy({id});
+  async reserveSchedule(
+    id: string,
+    sectionId: string,
+    user: User,
+  ): Promise<Schedule> {
+    const schedule = await this.scheduleRepository.findOneBy({ id });
     if (!schedule || !schedule.isAvailable) {
-      throw new Error('Schedule not available or not found');
+      throw new NotFoundException(`Horario no disponible`);
     }
-    schedule.isAvailable = false;
-    schedule.reservedBy = { id: userId } as any; // Type assertion for simplicity
-    return this.scheduleRepository.save(schedule);
+    await this.scheduleRepository.update(id, {
+      isAvailable: false,
+      reservedBy: user,
+      section: {
+        id: sectionId,
+      },
+    });
+
+    return this.scheduleRepository.findOneBy({ id });
+  }
+
+  async hasOpenScheduleSection(idSection: string, userId: string) {
+    const schedule = await this.scheduleRepository.findOne({
+      where: {
+        section: {
+          id: idSection,
+        },
+        isAvailable: false,
+        status: ScheduleStatus.OPEN,
+        reservedBy: {
+          id: userId
+        }
+      },
+    });
+
+    return schedule === null
+      ? {
+          ok: false,
+          msg: 'Aún no tiene reservaciones',
+        }
+      : {
+          ok: true,
+          msg: 'Ya tiene reserva',
+          schedule,
+        };
   }
 }

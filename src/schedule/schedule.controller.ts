@@ -35,7 +35,8 @@ export class ScheduleController {
   @Patch(':id/:sectionId')
   @Auth()
   update(
-    @Param('id') id: string, @Param('sectionId') sectionId: string,
+    @Param('id') id: string,
+    @Param('sectionId') sectionId: string,
     @Body() updateScheduleDto: UpdateScheduleDto,
     @GetUser() user: User,
   ) {
@@ -47,8 +48,22 @@ export class ScheduleController {
     return this.scheduleService.remove(+id);
   }
 
-  @Post('reserve/:id/:userId')
-  reserve(@Param('id') id: string, @Param('userId') userId: string) {
-    return this.scheduleService.reserveSchedule(id, userId);
+  @Post('reserve/:id/:sectionId')
+  @Auth()
+  reserve(
+    @Param('id') id: string,
+    @Param('sectionId') sectionId: string,
+    @GetUser() user: User,
+  ) {
+    return this.scheduleService.reserveSchedule(id, sectionId, user);
+  }
+  
+  @Get('verify/:id')
+  @Auth()
+  verifySchedule(
+    @Param('id') id: string,
+    @GetUser() user: User,
+  ) {
+    return this.scheduleService.hasOpenScheduleSection(id, user.id);
   }
 }

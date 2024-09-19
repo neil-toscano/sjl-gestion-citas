@@ -3,9 +3,9 @@ import { User } from 'src/user/entities/user.entity';
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm';
 
 export enum ScheduleStatus {
-    OPEN = 'ABIERTO',
-    CLOSED = 'FINALIZADO',
-  }
+  OPEN = 'ABIERTO',
+  CLOSED = 'FINALIZADO',
+}
 
 @Entity('schedule')
 export class Schedule {

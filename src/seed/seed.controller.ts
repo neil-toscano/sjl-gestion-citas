@@ -14,7 +14,7 @@ export class SeedController {
   executeSeed() {
     return this.seedService.runSeed();
   }
-  
+
   @Post('schedule')
   executeSeedSchedule() {
     return this.seedService.runSeedSchedule();
