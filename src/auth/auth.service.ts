@@ -24,6 +24,7 @@ export class AuthService {
 
   async create(createUserDto: CreateUserDto) {
     const user = await this.userService.create(createUserDto);
+    delete user.password;
     const token = this.getJwtToken({ id: user.id });
     return {
       ...user,

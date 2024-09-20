@@ -25,7 +25,6 @@ export class UserService {
         password: bcrypt.hashSync(password, 10),
       });
 
-      delete user.password;
       return await this.userRepository.save(user);
     } catch (error) {
       this.handleDBErrors(error);
