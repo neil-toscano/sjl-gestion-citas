@@ -5,7 +5,6 @@ import {
   Body,
   Patch,
   Param,
-  Delete,
   ParseUUIDPipe,
 } from '@nestjs/common';
 import { DocumentsService } from './documents.service';
@@ -23,12 +22,6 @@ export class DocumentsController {
     return this.documentsService.create(user, createDocumentDto);
   }
 
-  @Get()
-  @Auth()
-  findAll(@GetUser() user: User) {
-    return this.documentsService.findAll(user);
-  }
-
   @Get(':id')
   @Auth()
   findBySection(
@@ -36,30 +29,6 @@ export class DocumentsController {
     @GetUser() user: User,
   ) {
     return this.documentsService.findDocumentBySection(id, user);
-  }
-
-  @Get('super-user/:id')
-  findAllBySection(@Param('id', new ParseUUIDPipe()) id: string) {
-    return this.documentsService.findAllBySection(id);
-  }
-
-  @Get('super-user/sections/:id')
-  findAllDocumentsByUser(@Param('id', new ParseUUIDPipe()) id: string) {
-    return this.documentsService.findAllSectionsByUser(id);
-  }
-
-  @Get('valid/:id')
-  @Auth()
-  validDocuments(
-    @Param('id', new ParseUUIDPipe()) id: string,
-    @GetUser() user: User,
-  ) {
-    return this.documentsService.hasValidDocuments(id, user);
-  }
-
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.documentsService.findOne(id);
   }
 
   @Patch(':id')
@@ -71,8 +40,18 @@ export class DocumentsController {
     return this.documentsService.update(id, updateDocumentDto);
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.documentsService.remove(+id);
+  @Get('valid/:id')
+  @Auth()
+  validDocuments(
+    @Param('id', new ParseUUIDPipe()) id: string,
+    @GetUser() user: User,
+  ) {
+    return this.documentsService.hasValidDocuments(id, user);
   }
+
+  @Get('super-user/sections/:id')
+  findAllDocumentsByUser(@Param('id', new ParseUUIDPipe()) id: string) {
+    return this.documentsService.findAllSectionsByUser(id);
+  }
+
 }

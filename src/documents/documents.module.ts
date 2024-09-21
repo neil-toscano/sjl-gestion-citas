@@ -17,7 +17,7 @@ import { SectionDocumentModule } from 'src/section-document/section-document.mod
     AuthModule,
     FilesModule,
     SectionTypeDocumentModule,
-    SectionDocumentModule
+    SectionDocumentModule,
   ],
 })
 export class DocumentsModule {}

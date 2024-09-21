@@ -45,36 +45,13 @@ export class DocumentsService {
     return await this.documentRepository.save(newDocument);
   }
 
-  async findAll(user: User) {
-    return this.documentRepository.find({
-      where: { user: { id: user.id } },
-      relations: ['sectionTypeDocument'],
+  async findOne(id: string) {
+    const document = await this.documentRepository.findOneBy({
+      id: id,
     });
-  }
-
-  async findDocumentBySection(id: string, user: User) {
-    return this.documentRepository.find({
-      where: {
-        user: { id: user.id },
-        sectionTypeDocument: {
-          section: {
-            id: id,
-          },
-        },
-      },
-    });
-  }
-
-  async findAllBySection(id: string) {
-    return this.documentRepository.find({
-      where: {
-        sectionTypeDocument: {
-          section: {
-            id: id,
-          },
-        },
-      },
-    });
+    if (!document)
+      throw new NotFoundException(`Document with id ${id} not found`);
+    return document;
   }
 
   async findAllSectionsByUser(id: string) {
@@ -82,22 +59,13 @@ export class DocumentsService {
       .createQueryBuilder('document')
       .leftJoinAndSelect('document.sectionTypeDocument', 'sectionTypeDocument')
       .leftJoinAndSelect('sectionTypeDocument.section', 'sectionDocument')
-      .where('document.user.id = :userId') // Aquí se usa el placeholder :userId
-      .setParameters({ userId: id }) // Establece el parámetro para :userId
-      // .select([
-      //   'sectionDocument.id',
-      //   'sectionDocument.sectionName',
-      //   'sectionDocument.sectionSlug'
-      // ])
+      .where('document.user.id = :userId') 
+      .setParameters({ userId: id }) 
       .distinct(true)
       .getMany();
 
     const result = this.groupDocumentsBySection(documents);
     return result;
-  }
-
-  findOne(id: string) {
-    return `This action returns a #${id} document`;
   }
 
   async findOneBySectionTypeId(id: string, userId: string) {
@@ -112,23 +80,17 @@ export class DocumentsService {
   }
 
   async update(id: string, updateDocumentDto: UpdateDocumentDto) {
-    const document = await this.documentRepository.findOneBy({ id });
+    const document = await this.findOne(id);
 
-    if (!document) {
-      throw new NotFoundException(`Document with id ${id} not found`);
-    }
     if (Object.keys(updateDocumentDto).length === 0) {
       return { message: 'No data provided for update' };
     }
     if (updateDocumentDto.fileUrl) {
-      const response = await this.fileService.deleteFile(document.fileUrl);
+      const response = this.fileService.deleteFile(document.fileUrl);
     }
 
     await this.documentRepository.update(id, updateDocumentDto);
     return this.documentRepository.findOneBy({ id });
-  }
-  remove(id: number) {
-    return `This action removes a #${id} document`;
   }
 
   async hasValidDocuments(id: string, user: User) {
@@ -163,6 +125,30 @@ export class DocumentsService {
     };
   }
 
+  // async findDocumentBySection(id: string, user: User) {
+  //   return this.documentRepository.find({
+  //     where: {
+  //       user: { id: user.id },
+  //       sectionTypeDocument: {
+  //         section: {
+  //           id: id,
+  //         },
+  //       },
+  //     },
+  //   });
+  // }
+
+  async findDocumentBySection(id: string, user: User) {
+    return this.documentRepository
+    .createQueryBuilder('document')
+    .leftJoinAndSelect('document.sectionTypeDocument', 'sectionTypeDocument')
+    .leftJoinAndSelect('sectionTypeDocument.typeDocument', 'typeDocument') // Realiza el JOIN con typeDocument
+    .leftJoin('document.user', 'user') // Realiza el JOIN con la entidad User
+    .where('user.id = :userId', { userId: user.id }) // Filtra por el ID del usuario
+    .andWhere('sectionTypeDocument.section.id = :sectionId', { sectionId: id }) // Filtra por el ID de la sección
+    .getMany(); // O getOne() si esperas un solo resultado
+  }
+
   getTypeDocumentCountBySectionId(data: any[], sectionId: string): number {
     const section = data.find((section) => section.sectionId === sectionId);
     if (section) {
@@ -171,7 +157,7 @@ export class DocumentsService {
     return 0;
   }
 
-  groupDocumentsBySection(documents) {
+  groupDocumentsBySection(documents: any[]) { //Todo: verificar el section-slug
     // Agrupa los documentos por sección
     const groupedDocuments = documents.reduce((acc, document) => {
       const sectionSlug = document.sectionTypeDocument.section.sectionSlug;

@@ -58,11 +58,7 @@ export class ScheduleService {
     return `This action removes a #${id} schedule`;
   }
 
-  async reserveSchedule(
-    id: string,
-    sectionId: string,
-    user: User,
-  ) {
+  async reserveSchedule(id: string, sectionId: string, user: User) {
     const schedule = await this.findOne(id);
     await this.sectionService.findOne(sectionId);
 
@@ -70,12 +66,12 @@ export class ScheduleService {
       throw new NotFoundException(`Horario no disponible`);
     }
 
-    const { ok, msg } = await this.hasOpenScheduleBySection(sectionId,user.id);
-    if(ok) {
+    const { ok, msg } = await this.hasOpenScheduleBySection(sectionId, user.id);
+    if (ok) {
       return {
         ok,
-        message: msg
-      }
+        message: msg,
+      };
     }
 
     await this.scheduleRepository.update(id, {

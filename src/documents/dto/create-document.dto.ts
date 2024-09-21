@@ -1,7 +1,5 @@
 import {
-  IsInt,
   IsString,
-  IsUrl,
   IsNotEmpty,
   IsUUID,
   IsIn,

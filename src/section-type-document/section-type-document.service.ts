@@ -23,12 +23,13 @@ export class SectionTypeDocumentService {
   }
 
   async findAll() {
+    //TODO: Verificar detalladamente
     const result = await this.sectionTypeDocumentRepository
       .createQueryBuilder('sectionTypeDocument')
       .leftJoinAndSelect('sectionTypeDocument.section', 'section')
       .leftJoinAndSelect('sectionTypeDocument.typeDocument', 'typeDocument')
       .select([
-        'sectionTypeDocument.id AS sectionTypeDocumentId', // Incluyendo el id de la tabla intermedia
+        'sectionTypeDocument.id AS sectionTypeDocumentId',
         'section.id AS sectionId',
         'section.sectionName AS sectionName',
         'section.sectionSlug AS sectionSlug',
