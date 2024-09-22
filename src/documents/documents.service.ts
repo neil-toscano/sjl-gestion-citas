@@ -58,9 +58,10 @@ export class DocumentsService {
     const documents = await this.documentRepository
       .createQueryBuilder('document')
       .leftJoinAndSelect('document.sectionTypeDocument', 'sectionTypeDocument')
-      .leftJoinAndSelect('sectionTypeDocument.section', 'sectionDocument')
-      .where('document.user.id = :userId') 
-      .setParameters({ userId: id }) 
+      .leftJoinAndSelect('sectionTypeDocument.section', 'sectionDocument') // JOIN a la tabla section
+      .leftJoinAndSelect('sectionTypeDocument.typeDocument', 'typeDocument') // JOIN a la tabla typeDocument
+      .where('document.user.id = :userId')
+      .setParameters({ userId: id })
       .distinct(true)
       .getMany();
 
@@ -157,32 +158,33 @@ export class DocumentsService {
     return 0;
   }
 
-  groupDocumentsBySection(documents: any[]) { //Todo: verificar el section-slug
-    // Agrupa los documentos por sección
-    const groupedDocuments = documents.reduce((acc, document) => {
-      const sectionSlug = document.sectionTypeDocument.section.sectionSlug;
-
-      // Si la sección no está en el acumulador, créala
-      if (!acc[sectionSlug]) {
-        acc[sectionSlug] = {
-          sectionName: document.sectionTypeDocument.section.sectionName,
-          sectionSlug: sectionSlug,
+  groupDocumentsBySection(documents: Document[]) {
+    // Creamos un objeto para almacenar las secciones agrupadas
+    const groupedBySection: { [key: string]: any } = {};
+  
+    documents.forEach((doc) => {
+      const sectionId = doc.sectionTypeDocument.section.id;
+      const sectionName = doc.sectionTypeDocument.section.sectionName;
+      const typeDocumentName = doc.sectionTypeDocument.typeDocument.name;
+  
+      // Si la sección aún no existe en el objeto agrupado, la inicializamos
+      if (!groupedBySection[sectionId]) {
+        groupedBySection[sectionId] = {
+          sectionName: sectionName,
           documents: [],
         };
       }
-
-      // Agrega el documento al array de documentos de la sección correspondiente
-      acc[sectionSlug].documents.push({
-        id: document.id,
-        fileUrl: document.fileUrl,
-        status: document.status,
-        details: document.details,
+  
+      // Añadimos el documento a la lista de documentos de esa sección
+      groupedBySection[sectionId].documents.push({
+        id: doc.id,
+        fileUrl: doc.fileUrl,
+        status: doc.status,
+        typeDocument: typeDocumentName,
       });
-
-      return acc;
-    }, {});
-
-    // Convierte el objeto agrupado en un array de valores
-    return Object.values(groupedDocuments);
+    });
+  
+    // Convertimos el objeto agrupado a un array si se necesita un formato más accesible
+    return Object.values(groupedBySection);
   }
 }

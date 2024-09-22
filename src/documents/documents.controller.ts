@@ -53,5 +53,4 @@ export class DocumentsController {
   findAllDocumentsByUser(@Param('id', new ParseUUIDPipe()) id: string) {
     return this.documentsService.findAllSectionsByUser(id);
   }
-
 }
