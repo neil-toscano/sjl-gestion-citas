@@ -48,7 +48,7 @@ export class AppointmentController {
     return this.appointmentService.findAll();
   }
 
-  @Get(':adminId')
+  @Get('week/:adminId')
   @Auth()
   findByWeek(@Param('adminId') adminId: string, @Query() query: FindByWeekDto) {
     const inputDate = new Date(query.date);
