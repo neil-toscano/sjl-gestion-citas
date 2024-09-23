@@ -65,28 +65,29 @@ export class UserService {
   }
 
   async findOneAdmin(id: string) {
-    const admin = await this.userRepository.createQueryBuilder('user')
-  .where('user.id = :id', { id })
-  .andWhere(':role = ANY(user.roles)', { role: 'super-user' })  // Verifica si el rol está en el array
-  .getOne();
+    const admin = await this.userRepository
+      .createQueryBuilder('user')
+      .where('user.id = :id', { id })
+      .andWhere(':role = ANY(user.roles)', { role: 'super-user' }) // Verifica si el rol está en el array
+      .getOne();
 
+    if (!admin) {
+      throw new NotFoundException(`Admin with id ${id} not found`);
+    }
 
-  if (!admin) {
-    throw new NotFoundException(`Admin with id ${id} not found`);
+    return admin;
   }
 
-  return admin;
-  }
-  
   async findAdmins(): Promise<User[]> {
-    const admins = await this.userRepository.createQueryBuilder('user')
-      .where(':role = ANY(user.roles)', { role: 'super-user' })  // Verifica si el rol está en el array
-      .getMany();  // Obtiene todos los usuarios que coincidan
-  
+    const admins = await this.userRepository
+      .createQueryBuilder('user')
+      .where(':role = ANY(user.roles)', { role: 'super-user' }) // Verifica si el rol está en el array
+      .getMany(); // Obtiene todos los usuarios que coincidan
+
     if (admins.length === 0) {
       throw new NotFoundException(`No admins with the 'super-user' role found`);
     }
-  
+
     return admins;
   }
 

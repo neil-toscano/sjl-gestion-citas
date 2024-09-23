@@ -41,7 +41,11 @@ export class AppointmentService {
       };
     }
 
-    await this.isScheduleAvailable(scheduleId, createAppointmentDto.appointmentDate, adminId)
+    await this.isScheduleAvailable(
+      scheduleId,
+      createAppointmentDto.appointmentDate,
+      adminId,
+    );
 
     const appointment = this.appointmentRepository.create({
       ...createAppointmentDto,
@@ -54,7 +58,7 @@ export class AppointmentService {
       },
       assignedAdmin: {
         id: adminId,
-      }
+      },
     });
     return this.appointmentRepository.save(appointment);
   }
@@ -62,38 +66,38 @@ export class AppointmentService {
   findAll() {
     return this.appointmentRepository.find();
   }
-  
+
   async isScheduleAvailable(scheduleId: string, date: string, adminId: string) {
     const appointmentDate = new Date(date);
-    
+
     const existingAppointment = await this.appointmentRepository.findOne({
       where: {
         schedule: { id: scheduleId },
         appointmentDate: appointmentDate,
         assignedAdmin: {
           id: adminId,
-          }
+        },
       },
     });
-  
+
     if (existingAppointment) {
-      throw new NotFoundException(`The schedule is already booked for this admin`);
+      throw new NotFoundException(
+        `The schedule is already booked for this admin`,
+      );
     }
-  
-    return true;  // Si no hay cita existente, el horario está disponible
+
+    return true; // Si no hay cita existente, el horario está disponible
   }
-  
 
-  async findByWeek(date: Date, adminId:string): Promise<Appointment[]> {
-
+  async findByWeek(date: Date, adminId: string): Promise<Appointment[]> {
     return this.appointmentRepository.find({
       where: {
         appointmentDate: date,
         assignedAdmin: {
           id: adminId,
-        }
+        },
       },
-      relations: ['section', 'reservedBy', 'schedule'], 
+      relations: ['section', 'reservedBy', 'schedule'],
     });
   }
 

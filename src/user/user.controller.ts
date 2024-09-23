@@ -6,10 +6,12 @@ import {
   Patch,
   Param,
   Delete,
+  UseGuards,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { CreateUserDto } from 'src/auth/dto';
+import { AuthGuard } from '@nestjs/passport';
 import { Auth } from 'src/auth/decorators';
 
 @Controller('user')
@@ -30,8 +32,9 @@ export class UserController {
   findOne(@Param('id') id: string) {
     return this.userService.findOneByDni(id);
   }
-  
+
   @Get('roles/admins')
+  @Auth()
   findAdmins() {
     return this.userService.findAdmins();
   }

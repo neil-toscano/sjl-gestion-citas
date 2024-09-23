@@ -47,10 +47,10 @@ export class AppointmentController {
   findAll() {
     return this.appointmentService.findAll();
   }
-  
+
   @Get(':adminId/by-week')
   @Auth()
-  findByWeek(@Param('adminId') adminId: string, @Query() query: FindByWeekDto, ) {
+  findByWeek(@Param('adminId') adminId: string, @Query() query: FindByWeekDto) {
     const inputDate = new Date(query.date);
     if (isNaN(inputDate.getTime()) || inputDate.getDay() !== 5) {
       throw new BadRequestException('La fecha debe ser un sábado válido');
