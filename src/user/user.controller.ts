@@ -10,6 +10,7 @@ import {
 import { UserService } from './user.service';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { CreateUserDto } from 'src/auth/dto';
+import { Auth } from 'src/auth/decorators';
 
 @Controller('user')
 export class UserController {
@@ -28,6 +29,11 @@ export class UserController {
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.userService.findOneByDni(id);
+  }
+  
+  @Get('roles/admins')
+  findAdmins() {
+    return this.userService.findAdmins();
   }
 
   @Patch(':id')

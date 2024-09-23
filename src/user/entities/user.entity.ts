@@ -10,6 +10,7 @@ import { Product } from '../../products/entities';
 import { Type } from 'class-transformer';
 import { Document } from 'src/documents/entities/document.entity';
 import { Schedule } from 'src/schedule/entities/schedule.entity';
+import { Appointment } from 'src/appointment/entities/appointment.entity';
 
 @Entity('users')
 export class User {
@@ -80,6 +81,6 @@ export class User {
     this.checkFieldsBeforeInsert();
   }
 
-  @OneToMany(() => Schedule, (schedule) => schedule.reservedBy)
-  schedules: Schedule[];
+  @OneToMany(() => Appointment, (appointment) => appointment.reservedBy)
+  appointments: Appointment[];
 }

@@ -28,10 +28,10 @@ export class SeedService {
 
   async runSeedSchedule() {
     const schedules = [
-      { startTime: '08:00', endTime: '09:00', isAvailable: true },
-      { startTime: '09:00', endTime: '10:00', isAvailable: true },
-      { startTime: '10:00', endTime: '11:00', isAvailable: true },
-      { startTime: '11:00', endTime: '12:00', isAvailable: true },
+      { startTime: '08:00', endTime: '09:00' },
+      { startTime: '09:00', endTime: '10:00' },
+      { startTime: '10:00', endTime: '11:00' },
+      { startTime: '11:00', endTime: '12:00' },
       // Agrega más horarios aquí
     ];
 

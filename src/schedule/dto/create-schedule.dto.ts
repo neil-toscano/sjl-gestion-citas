@@ -1,12 +1,4 @@
-import {
-  IsNotEmpty,
-  IsString,
-  IsBoolean,
-  IsEnum,
-  IsOptional,
-  IsUUID,
-} from 'class-validator';
-import { ScheduleStatus } from '../entities/schedule.entity';
+import { IsNotEmpty, IsString } from 'class-validator';
 
 export class CreateScheduleDto {
   @IsString()
@@ -15,11 +7,4 @@ export class CreateScheduleDto {
   @IsNotEmpty()
   @IsString()
   endTime: string;
-
-  @IsEnum(ScheduleStatus)
-  @IsOptional()
-  status?: ScheduleStatus = ScheduleStatus.OPEN;
-
-  @IsBoolean()
-  isAvailable: boolean;
 }

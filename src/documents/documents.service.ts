@@ -141,13 +141,15 @@ export class DocumentsService {
 
   async findDocumentBySection(id: string, user: User) {
     return this.documentRepository
-    .createQueryBuilder('document')
-    .leftJoinAndSelect('document.sectionTypeDocument', 'sectionTypeDocument')
-    .leftJoinAndSelect('sectionTypeDocument.typeDocument', 'typeDocument') // Realiza el JOIN con typeDocument
-    .leftJoin('document.user', 'user') // Realiza el JOIN con la entidad User
-    .where('user.id = :userId', { userId: user.id }) // Filtra por el ID del usuario
-    .andWhere('sectionTypeDocument.section.id = :sectionId', { sectionId: id }) // Filtra por el ID de la sección
-    .getMany(); // O getOne() si esperas un solo resultado
+      .createQueryBuilder('document')
+      .leftJoinAndSelect('document.sectionTypeDocument', 'sectionTypeDocument')
+      .leftJoinAndSelect('sectionTypeDocument.typeDocument', 'typeDocument') // Realiza el JOIN con typeDocument
+      .leftJoin('document.user', 'user') // Realiza el JOIN con la entidad User
+      .where('user.id = :userId', { userId: user.id }) // Filtra por el ID del usuario
+      .andWhere('sectionTypeDocument.section.id = :sectionId', {
+        sectionId: id,
+      }) // Filtra por el ID de la sección
+      .getMany(); // O getOne() si esperas un solo resultado
   }
 
   getTypeDocumentCountBySectionId(data: any[], sectionId: string): number {
@@ -161,12 +163,12 @@ export class DocumentsService {
   groupDocumentsBySection(documents: Document[]) {
     // Creamos un objeto para almacenar las secciones agrupadas
     const groupedBySection: { [key: string]: any } = {};
-  
+
     documents.forEach((doc) => {
       const sectionId = doc.sectionTypeDocument.section.id;
       const sectionName = doc.sectionTypeDocument.section.sectionName;
       const typeDocumentName = doc.sectionTypeDocument.typeDocument.name;
-  
+
       // Si la sección aún no existe en el objeto agrupado, la inicializamos
       if (!groupedBySection[sectionId]) {
         groupedBySection[sectionId] = {
@@ -174,7 +176,7 @@ export class DocumentsService {
           documents: [],
         };
       }
-  
+
       // Añadimos el documento a la lista de documentos de esa sección
       groupedBySection[sectionId].documents.push({
         id: doc.id,
@@ -183,7 +185,7 @@ export class DocumentsService {
         typeDocument: typeDocumentName,
       });
     });
-  
+
     // Convertimos el objeto agrupado a un array si se necesita un formato más accesible
     return Object.values(groupedBySection);
   }

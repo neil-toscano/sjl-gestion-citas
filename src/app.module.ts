@@ -18,6 +18,7 @@ import { SectionDocument } from './section-document/entities/section-document.en
 import { SectionTypeDocumentModule } from './section-type-document/section-type-document.module';
 import { UserModule } from './user/user.module';
 import { ScheduleModule } from './schedule/schedule.module';
+import { AppointmentModule } from './appointment/appointment.module';
 
 @Module({
   imports: [
@@ -63,6 +64,8 @@ import { ScheduleModule } from './schedule/schedule.module';
     UserModule,
 
     ScheduleModule,
+
+    AppointmentModule,
   ],
 })
 export class AppModule {}

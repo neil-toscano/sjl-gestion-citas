@@ -42,27 +42,11 @@ export class ScheduleController {
     @Body() updateScheduleDto: UpdateScheduleDto,
     @GetUser() user: User,
   ) {
-    return this.scheduleService.update(id, sectionId, updateScheduleDto, user);
+    return this.scheduleService.update();
   }
 
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.scheduleService.remove(+id);
-  }
-
-  @Post('reserve/:id/:sectionId')
-  @Auth()
-  reserve(
-    @Param('id', new ParseUUIDPipe()) id: string,
-    @Param('sectionId', new ParseUUIDPipe()) sectionId: string,
-    @GetUser() user: User,
-  ) {
-    return this.scheduleService.reserveSchedule(id, sectionId, user);
-  }
-
-  @Get('verify/:id')
-  @Auth()
-  verifySchedule(@Param('id') id: string, @GetUser() user: User) {
-    return this.scheduleService.hasOpenScheduleBySection(id, user.id);
   }
 }
