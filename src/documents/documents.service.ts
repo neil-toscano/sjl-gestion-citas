@@ -252,10 +252,7 @@ export class DocumentsService {
       }
     }
   
-    return {
-      ok: true,
-      users: validUsers,  // Devolverá un array vacío si no hay usuarios válidos
-    };
+    return validUsers.length > 0 ? [validUsers[0]] : [];
   }
 
 }
