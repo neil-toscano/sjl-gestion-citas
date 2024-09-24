@@ -42,8 +42,9 @@ export class SectionTypeDocumentService {
   }
 
   async findOne(id: string) {
-    const result = await this.sectionTypeDocumentRepository.findOneBy({
-      id: id,
+    const result = await this.sectionTypeDocumentRepository.findOne({
+      where: { id: id },
+      relations: ['section'], // Incluir la relación con la entidad Section
     });
 
     if (!result) {

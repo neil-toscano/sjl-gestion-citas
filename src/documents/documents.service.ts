@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { forwardRef, Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateDocumentDto } from './dto/create-document.dto';
 import { UpdateDocumentDto } from './dto/update-document.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -8,6 +8,7 @@ import { FilesService } from 'src/files/files.service';
 import { SectionTypeDocumentService } from 'src/section-type-document/section-type-document.service';
 import { User } from 'src/user/entities/user.entity';
 import { SectionDocumentService } from 'src/section-document/section-document.service';
+import { UserService } from 'src/user/user.service';
 
 @Injectable()
 export class DocumentsService {
@@ -17,6 +18,7 @@ export class DocumentsService {
     private readonly fileService: FilesService,
     private readonly sectionTypeService: SectionTypeDocumentService,
     private readonly sectionService: SectionDocumentService,
+    private readonly userService: UserService,
   ) {}
 
   async create(user: User, createDocumentDto: CreateDocumentDto) {
@@ -126,6 +128,38 @@ export class DocumentsService {
     };
   }
 
+  async verifyDocumentsComplete(user: User, sectionId: string) {
+
+    await this.sectionService.findOne(sectionId);
+    const sectionDocuments = await this.findDocumentBySection(sectionId, user);
+    const result = await this.sectionTypeService.findAll();
+    const sectionDocumentCount = this.getTypeDocumentCountBySectionId(
+      result,
+      sectionId,
+    );
+
+    if (sectionDocuments.length !== sectionDocumentCount) {
+      return {
+        ok: false,
+        msg: 'No tiene subido todos los documentos en la sección',
+      };
+    }
+
+    const allVerified = sectionDocuments.every(
+      (document) => document.status === 'EN PROCESO',
+    );
+    if (!allVerified) {
+      return {
+        ok: false,
+        msg: 'Sus documentos ya pasaron la etapa de "EN PROCESO"',
+      };
+    }
+
+    return {
+      ok: true,
+      msg: 'Esta listo para ser asignado a un admin'
+    }
+  }
   // async findDocumentBySection(id: string, user: User) {
   //   return this.documentRepository.find({
   //     where: {
@@ -189,4 +223,39 @@ export class DocumentsService {
     // Convertimos el objeto agrupado a un array si se necesita un formato más accesible
     return Object.values(groupedBySection);
   }
+
+  async readyForReviewBySection(idSection: string) {
+    await this.sectionService.findOne(idSection);
+
+    const users = await this.userService.findAll();
+
+    const sectionTypes = await this.sectionTypeService.findAll();
+    const sectionDocumentCount = this.getTypeDocumentCountBySectionId(
+      sectionTypes,
+      idSection,
+    );
+
+    const validUsers = [];
+    for (const user of users) {
+      const sectionDocuments = await this.findDocumentBySection(idSection, user);
+  
+      if (sectionDocuments.length !== sectionDocumentCount) {
+        continue;
+      }
+  
+      const allVerified = sectionDocuments.every(
+        (document) => document.status === 'EN PROCESO',
+      );
+  
+      if (allVerified) {
+        validUsers.push(user);
+      }
+    }
+  
+    return {
+      ok: true,
+      users: validUsers,  // Devolverá un array vacío si no hay usuarios válidos
+    };
+  }
+
 }

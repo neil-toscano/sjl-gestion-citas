@@ -19,6 +19,8 @@ import { SectionTypeDocumentModule } from './section-type-document/section-type-
 import { UserModule } from './user/user.module';
 import { ScheduleModule } from './schedule/schedule.module';
 import { AppointmentModule } from './appointment/appointment.module';
+import { AssignmentsModule } from './assignments/assignments.module';
+import { AdminModule } from './admin/admin.module';
 
 @Module({
   imports: [
@@ -66,6 +68,10 @@ import { AppointmentModule } from './appointment/appointment.module';
     ScheduleModule,
 
     AppointmentModule,
+
+    AssignmentsModule,
+
+    AdminModule,
   ],
 })
 export class AppModule {}

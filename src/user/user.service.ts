@@ -1,5 +1,7 @@
 import {
   BadRequestException,
+  forwardRef,
+  Inject,
   Injectable,
   InternalServerErrorException,
   NotFoundException,
@@ -11,11 +13,14 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { CreateUserDto } from 'src/auth/dto';
 
 import * as bcrypt from 'bcrypt';
+import { Document } from 'src/documents/entities/document.entity';
+import { DocumentsService } from 'src/documents/documents.service';
 @Injectable()
 export class UserService {
   constructor(
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
+    
   ) {}
   async create(createUserDto: CreateUserDto) {
     try {
@@ -35,9 +40,12 @@ export class UserService {
   async findAll() {
     return await this.userRepository
       .createQueryBuilder('user')
-      .where(':role = ANY(user.roles)', { role: 'user' }) // Usa el operador ANY para buscar dentro del array
+      .where(':role = ANY(user.roles)', { role: 'user' }) 
       .getMany();
   }
+  
+  
+  
 
   async findOneByDni(dni: string) {
     const user = await this.userRepository.findOne({

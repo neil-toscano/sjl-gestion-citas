@@ -1,4 +1,5 @@
 import { Appointment } from 'src/appointment/entities/appointment.entity';
+import { Assignment } from 'src/assignments/entities/assignment.entity';
 import { Document } from 'src/documents/entities/document.entity';
 import { Schedule } from 'src/schedule/entities/schedule.entity';
 import { SectionTypeDocument } from 'src/section-type-document/entities/section-type-document.entity';
@@ -28,4 +29,5 @@ export class SectionDocument {
 
   @OneToMany(() => Appointment, (appointment) => appointment.section)
   appointments: Appointment[];
+
 }
