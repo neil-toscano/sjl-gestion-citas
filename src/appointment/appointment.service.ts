@@ -90,6 +90,7 @@ export class AppointmentService {
   }
 
   async findByWeek(date: Date, adminId: string): Promise<Appointment[]> {
+    await this.userService.findOneAdmin(adminId);
     return this.appointmentRepository.find({
       where: {
         appointmentDate: date,
