@@ -63,8 +63,18 @@ export class AppointmentService {
     return this.appointmentRepository.save(appointment);
   }
 
-  findAll() {
-    return this.appointmentRepository.find();
+  findAll(user: User) {
+    return this.appointmentRepository.find({
+      where: {
+        assignedAdmin: {
+          id: user.id
+        }
+      },
+      relations: ['section', 'reservedBy', 'schedule'],
+      order: {
+        appointmentDate: 'ASC',
+      },
+    });
   }
 
   async isScheduleAvailable(scheduleId: string, date: string, adminId: string) {

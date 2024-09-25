@@ -44,8 +44,9 @@ export class AppointmentController {
   }
 
   @Get()
-  findAll() {
-    return this.appointmentService.findAll();
+  @Auth()
+  findAll(@GetUser() user: User) {
+    return this.appointmentService.findAll(user);
   }
 
   @Get('week/:adminId')
