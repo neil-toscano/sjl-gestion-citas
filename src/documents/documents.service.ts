@@ -288,4 +288,50 @@ export class DocumentsService {
 
     return validUsers.length > 0 ? [validUsers[0]] : [];
   }
+  async getUsersWithCorrectedDocuments(idSection: string) {
+    await this.sectionService.findOne(idSection);
+
+    const users = await this.userService.findAll();
+
+    const sectionTypes = await this.sectionTypeService.findAll();
+    const sectionDocumentCount = this.getTypeDocumentCountBySectionId(
+      sectionTypes,
+      idSection,
+    );
+
+    const validUsers = [];
+    for (const user of users) {
+      const assignmentExists =
+        await this.assignmentService.findOneByUserAndSection(
+          user.id,
+          idSection,
+        );
+
+      if (assignmentExists) {
+        continue;
+      }
+      const sectionDocuments = await this.findDocumentBySection(
+        idSection,
+        user,
+      );
+
+      if (sectionDocuments.length !== sectionDocumentCount) {
+        continue;
+      }
+
+      const hasVerifiedDocument = sectionDocuments.some(
+        (document) => document.status === 'VERIFICADO',
+      );
+      
+      const noObservedDocuments = sectionDocuments.every(
+        (document) => document.status !== 'OBSERVADO',
+      );
+      
+      if (hasVerifiedDocument && noObservedDocuments) {
+        validUsers.push(user);
+      }
+    }
+
+    return validUsers.length > 0 ? [validUsers[0]] : [];
+  }
 }

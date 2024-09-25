@@ -21,6 +21,7 @@ import { ScheduleModule } from './schedule/schedule.module';
 import { AppointmentModule } from './appointment/appointment.module';
 import { AssignmentsModule } from './assignments/assignments.module';
 import { AdminModule } from './admin/admin.module';
+import { EmailModule } from './email/email.module';
 
 @Module({
   imports: [
@@ -72,6 +73,8 @@ import { AdminModule } from './admin/admin.module';
     AssignmentsModule,
 
     AdminModule,
+
+    EmailModule,
   ],
 })
 export class AppModule {}

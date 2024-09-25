@@ -32,6 +32,12 @@ export class AdminService {
     await this.assignmentService.remove(admin.id);
     return await this.documentService.readyForReviewBySection(idSection);
   }
+
+  async getUsersWithCorrectedDocuments(idSection: string, admin: User) {
+    await this.assignmentService.remove(admin.id);
+    return await this.documentService.getUsersWithCorrectedDocuments(idSection);
+  }
+  
   async findDocumentBySection(idSection: string, idUser: string, adminUser: User) {
     await this.sectionService.findOne(idSection);
     await this.userService.findOne(idUser);
