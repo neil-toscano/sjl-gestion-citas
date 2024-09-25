@@ -31,7 +31,10 @@ export class EmailService {
       throw new BadRequestException(`Error al enviar el correo`);
     }
 
-    return "Correo enviado correctamente";
+    return {
+      ok: true,
+      msg: "Correo enviado correctamente",
+    };
   
   }
   findAll() {
