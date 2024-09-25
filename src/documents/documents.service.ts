@@ -9,6 +9,7 @@ import { SectionTypeDocumentService } from 'src/section-type-document/section-ty
 import { User } from 'src/user/entities/user.entity';
 import { SectionDocumentService } from 'src/section-document/section-document.service';
 import { UserService } from 'src/user/user.service';
+import { AssignmentsService } from 'src/assignments/assignments.service';
 
 @Injectable()
 export class DocumentsService {
@@ -19,6 +20,7 @@ export class DocumentsService {
     private readonly sectionTypeService: SectionTypeDocumentService,
     private readonly sectionService: SectionDocumentService,
     private readonly userService: UserService,
+    private readonly assignmentService: AssignmentsService,
   ) {}
 
   async create(user: User, createDocumentDto: CreateDocumentDto) {
@@ -69,6 +71,23 @@ export class DocumentsService {
 
     const result = this.groupDocumentsBySection(documents);
     return result;
+  }
+  
+  async findSectionDocumentsByUser(idSection: string, idUser: string) {
+    await this.sectionService.findOne(idSection);
+    await this.userService.findOne(idUser);
+    const documents = await this.documentRepository
+      .createQueryBuilder('document')
+      .leftJoinAndSelect('document.sectionTypeDocument', 'sectionTypeDocument')
+      .leftJoinAndSelect('sectionTypeDocument.section', 'sectionDocument')
+      .leftJoinAndSelect('sectionTypeDocument.typeDocument', 'typeDocument')
+      .where('document.user.id = :userId', { userId: idUser })
+      .andWhere('sectionDocument.id = :sectionId', { sectionId: idSection }) // Filtrar por sección
+      .distinct(true)
+      .getMany();
+  
+    // const result = this.groupDocumentsBySection(documents);
+    return documents;
   }
 
   async findOneBySectionTypeId(id: string, userId: string) {
@@ -237,6 +256,14 @@ export class DocumentsService {
 
     const validUsers = [];
     for (const user of users) {
+      const assignmentExists = await this.assignmentService.findOneByUserAndSection(
+        user.id,
+        idSection,
+      );
+  
+      if (assignmentExists) {
+        continue;
+      }
       const sectionDocuments = await this.findDocumentBySection(idSection, user);
   
       if (sectionDocuments.length !== sectionDocumentCount) {

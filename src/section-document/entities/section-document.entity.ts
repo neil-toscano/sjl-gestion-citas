@@ -30,4 +30,7 @@ export class SectionDocument {
   @OneToMany(() => Appointment, (appointment) => appointment.section)
   appointments: Appointment[];
 
+  @OneToMany(() => Assignment, (assignment) => assignment.sectionDocument)
+  assignments: Assignment[];
+
 }

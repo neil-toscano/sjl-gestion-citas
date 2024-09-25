@@ -1,5 +1,6 @@
 import { Entity, PrimaryGeneratedColumn, ManyToOne, Column } from 'typeorm';
 import { User } from 'src/user/entities/user.entity';
+import { SectionDocument } from 'src/section-document/entities/section-document.entity';
 
 export enum AssignmentStatus {
     PENDING = 'PENDIENTE',
@@ -13,7 +14,13 @@ export class Assignment {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
- @Column({
+  @ManyToOne(() => User, (user) => user.assignments)
+  user: User;
+
+  @ManyToOne(() => SectionDocument, (sectionDocument) => sectionDocument.assignments)
+  sectionDocument: SectionDocument;
+
+  @Column({
     type: 'enum',
     enum: AssignmentStatus,
     default: AssignmentStatus.PENDING,
@@ -21,5 +28,8 @@ export class Assignment {
   status: AssignmentStatus;
 
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
-  assignedAt: Date;
+  createdAt: Date;
+
+  @Column({ type: 'timestamp', nullable: true })
+  updatedAt: Date;
 }

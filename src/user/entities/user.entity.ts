@@ -11,6 +11,7 @@ import { Type } from 'class-transformer';
 import { Document } from 'src/documents/entities/document.entity';
 import { Schedule } from 'src/schedule/entities/schedule.entity';
 import { Appointment } from 'src/appointment/entities/appointment.entity';
+import { Assignment } from 'src/assignments/entities/assignment.entity';
 
 @Entity('users')
 export class User {
@@ -83,4 +84,7 @@ export class User {
 
   @OneToMany(() => Appointment, (appointment) => appointment.reservedBy)
   appointments: Appointment[];
+
+  @OneToMany(() => Assignment, (assignment) => assignment.user)
+  assignments: Assignment[];
 }

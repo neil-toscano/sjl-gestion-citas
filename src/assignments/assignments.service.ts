@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateAssignmentDto } from './dto/create-assignment.dto';
 import { UpdateAssignmentDto } from './dto/update-assignment.dto';
 import { Assignment } from './entities/assignment.entity';
@@ -12,13 +12,36 @@ export class AssignmentsService {
 
   }
   async create(createAssignmentDto: CreateAssignmentDto) {
-    const newAssignment = this.assignmentRepository.create(createAssignmentDto);
-    await this.assignmentRepository.save(newAssignment);
-    return newAssignment;
+    const newAssignment = this.assignmentRepository.create({
+      sectionDocument: {
+        id: createAssignmentDto.sectionDocumentId
+      },
+      user: {
+        id: createAssignmentDto.userId
+      }
+    });
+    return await this.assignmentRepository.save(newAssignment);
+
   }
 
+  
   findAll() {
     return `This action returns all assignments`;
+  }
+  
+  async findOneByUserAndSection(userId: string, idSection: string) {
+    console.log(userId, idSection);
+    const assignment = await this.assignmentRepository.findOne({
+      where: {
+        sectionDocument: {
+          id: idSection
+        },
+        user: {
+          id: userId
+        }
+      }
+    })
+    return assignment? true: false;
   }
 
   findOne(id: number) {

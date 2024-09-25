@@ -6,9 +6,6 @@ export class CreateAssignmentDto {
   userId: string;
   
   @IsUUID()
-  adminId: string;
-
-  @IsUUID()
   sectionDocumentId: string;
 
   @IsEnum(AssignmentStatus)

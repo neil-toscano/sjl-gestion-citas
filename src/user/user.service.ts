@@ -71,6 +71,15 @@ export class UserService {
     const user = await this.userRepository.findOneBy({ id });
     return user;
   }
+ 
+  async findOne(id: string) {
+    const user = await this.userRepository.findOneBy({ id });
+    if (!user) {
+      throw new NotFoundException(`user with id ${id} not found`);
+    }
+
+    return user;
+  }
 
   async findOneAdmin(id: string) {
     const admin = await this.userRepository

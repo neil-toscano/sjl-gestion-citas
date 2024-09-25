@@ -5,6 +5,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { DocumentsService } from 'src/documents/documents.service';
 import { Repository } from 'typeorm';
 import { Admin } from './entities/admin.entity';
+import { AssignmentsService } from 'src/assignments/assignments.service';
 
 @Injectable()
 export class AdminService {
@@ -12,6 +13,7 @@ export class AdminService {
     @InjectRepository(Admin)
     private adminRepository: Repository<Admin>,
     private readonly documentService: DocumentsService,
+    private readonly assignmentService: AssignmentsService,
 
   ) {
 
@@ -26,6 +28,13 @@ export class AdminService {
 
   async findBySection(idSection:string) {
     return await this.documentService.readyForReviewBySection(idSection)
+  }
+  async findDocumentBySection(idSection:string, idUser:string) {
+    await this.assignmentService.create({
+      sectionDocumentId: idSection,
+      userId: idUser
+    });
+    return await this.documentService.findSectionDocumentsByUser(idSection, idUser);
   }
   findOne(id: number) {
     return `This action returns a #${id} admin`;

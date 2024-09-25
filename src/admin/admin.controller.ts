@@ -22,6 +22,11 @@ export class AdminController {
   findUserBySection(@Param('id') idSection: string) {
     return this.adminService.findBySection(idSection);
   }
+  
+  @Get('section/documents/:idSection/:idUser')
+  findDocumentBySection(@Param('idSection') idSection: string, @Param('idUser') idUser: string) {
+    return this.adminService.findDocumentBySection(idSection, idUser);
+  }
 
   @Get(':id')
   findOne(@Param('id') id: string) {
