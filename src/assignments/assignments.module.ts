@@ -8,11 +8,7 @@ import { AuthModule } from 'src/auth/auth.module';
 @Module({
   controllers: [AssignmentsController],
   providers: [AssignmentsService],
-  imports: [
-    TypeOrmModule.forFeature([Assignment]),
-    AuthModule,
-    
-  ],
+  imports: [TypeOrmModule.forFeature([Assignment]), AuthModule],
   exports: [AssignmentsService, TypeOrmModule],
 })
 export class AssignmentsModule {}

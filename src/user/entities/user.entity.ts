@@ -87,4 +87,7 @@ export class User {
 
   @OneToMany(() => Assignment, (assignment) => assignment.user)
   assignments: Assignment[];
+
+  @OneToMany(() => Assignment, (assignment) => assignment.admin)
+  adminAssignments: Assignment[];
 }

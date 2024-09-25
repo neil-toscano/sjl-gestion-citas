@@ -32,5 +32,4 @@ export class SectionDocument {
 
   @OneToMany(() => Assignment, (assignment) => assignment.sectionDocument)
   assignments: Assignment[];
-
 }

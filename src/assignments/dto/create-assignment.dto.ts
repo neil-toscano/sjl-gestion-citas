@@ -4,7 +4,7 @@ import { AssignmentStatus } from '../entities/assignment.entity';
 export class CreateAssignmentDto {
   @IsUUID()
   userId: string;
-  
+
   @IsUUID()
   sectionDocumentId: string;
 

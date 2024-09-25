@@ -3,11 +3,11 @@ import { User } from 'src/user/entities/user.entity';
 import { SectionDocument } from 'src/section-document/entities/section-document.entity';
 
 export enum AssignmentStatus {
-    PENDING = 'PENDIENTE',
-    COMPLETED = 'COMPLETADO',
-    IN_PROGRESS = 'EN_PROGRESO',
-    REJECTED = 'RECHAZADO',
-  }
+  PENDING = 'PENDIENTE',
+  COMPLETED = 'COMPLETADO',
+  IN_PROGRESS = 'EN_PROGRESO',
+  REJECTED = 'RECHAZADO',
+}
 
 @Entity('assignments')
 export class Assignment {
@@ -17,7 +17,13 @@ export class Assignment {
   @ManyToOne(() => User, (user) => user.assignments)
   user: User;
 
-  @ManyToOne(() => SectionDocument, (sectionDocument) => sectionDocument.assignments)
+  @ManyToOne(() => User, (admin) => admin.adminAssignments)
+  admin: User;
+
+  @ManyToOne(
+    () => SectionDocument,
+    (sectionDocument) => sectionDocument.assignments,
+  )
   sectionDocument: SectionDocument;
 
   @Column({

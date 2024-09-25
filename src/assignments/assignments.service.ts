@@ -7,41 +7,41 @@ import { InjectRepository } from '@nestjs/typeorm';
 
 @Injectable()
 export class AssignmentsService {
-  constructor(@InjectRepository(Assignment)
-  private readonly assignmentRepository: Repository<Assignment>,) {
-
-  }
-  async create(createAssignmentDto: CreateAssignmentDto) {
+  constructor(
+    @InjectRepository(Assignment)
+    private readonly assignmentRepository: Repository<Assignment>,
+  ) {}
+  async create(createAssignmentDto: CreateAssignmentDto, adminId: string) {
     const newAssignment = this.assignmentRepository.create({
       sectionDocument: {
-        id: createAssignmentDto.sectionDocumentId
+        id: createAssignmentDto.sectionDocumentId,
       },
       user: {
-        id: createAssignmentDto.userId
+        id: createAssignmentDto.userId,
+      },
+      admin: {
+        id: adminId
       }
     });
     return await this.assignmentRepository.save(newAssignment);
-
   }
 
-  
   findAll() {
     return `This action returns all assignments`;
   }
-  
+
   async findOneByUserAndSection(userId: string, idSection: string) {
-    console.log(userId, idSection);
     const assignment = await this.assignmentRepository.findOne({
       where: {
         sectionDocument: {
-          id: idSection
+          id: idSection,
         },
         user: {
-          id: userId
-        }
-      }
-    })
-    return assignment? true: false;
+          id: userId,
+        },
+      },
+    });
+    return assignment ? true : false;
   }
 
   findOne(id: number) {
@@ -52,7 +52,15 @@ export class AssignmentsService {
     return `This action updates a #${id} assignment`;
   }
 
-  remove(id: number) {
+  
+  async remove(id: string) {
+    await this.assignmentRepository
+    .createQueryBuilder()
+    .delete()
+    .from(Assignment)
+    .where("admin = :id", { id: id }) // Reemplaza 1 por el valor dinámico que desees
+    .execute();
+    this.assignmentRepository.delete(id);
     return `This action removes a #${id} assignment`;
   }
 }

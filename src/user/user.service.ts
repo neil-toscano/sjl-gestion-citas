@@ -20,7 +20,6 @@ export class UserService {
   constructor(
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
-    
   ) {}
   async create(createUserDto: CreateUserDto) {
     try {
@@ -40,12 +39,9 @@ export class UserService {
   async findAll() {
     return await this.userRepository
       .createQueryBuilder('user')
-      .where(':role = ANY(user.roles)', { role: 'user' }) 
+      .where(':role = ANY(user.roles)', { role: 'user' })
       .getMany();
   }
-  
-  
-  
 
   async findOneByDni(dni: string) {
     const user = await this.userRepository.findOne({
@@ -71,7 +67,7 @@ export class UserService {
     const user = await this.userRepository.findOneBy({ id });
     return user;
   }
- 
+
   async findOne(id: string) {
     const user = await this.userRepository.findOneBy({ id });
     if (!user) {

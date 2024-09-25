@@ -5,11 +5,20 @@ import { Admin } from './entities/admin.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { DocumentsModule } from 'src/documents/documents.module';
 import { AssignmentsModule } from 'src/assignments/assignments.module';
+import { SectionDocumentModule } from 'src/section-document/section-document.module';
+import { UserModule } from 'src/user/user.module';
+import { AuthModule } from 'src/auth/auth.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Admin]), DocumentsModule, AssignmentsModule],
+  imports: [
+    TypeOrmModule.forFeature([Admin]),
+    DocumentsModule,
+    AssignmentsModule,
+    SectionDocumentModule,
+    UserModule,
+    AuthModule
+  ],
   controllers: [AdminController],
   providers: [AdminService],
-
 })
 export class AdminModule {}

@@ -1,4 +1,9 @@
-import { forwardRef, Inject, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  forwardRef,
+  Inject,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateDocumentDto } from './dto/create-document.dto';
 import { UpdateDocumentDto } from './dto/update-document.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -72,7 +77,7 @@ export class DocumentsService {
     const result = this.groupDocumentsBySection(documents);
     return result;
   }
-  
+
   async findSectionDocumentsByUser(idSection: string, idUser: string) {
     await this.sectionService.findOne(idSection);
     await this.userService.findOne(idUser);
@@ -85,8 +90,7 @@ export class DocumentsService {
       .andWhere('sectionDocument.id = :sectionId', { sectionId: idSection }) // Filtrar por sección
       .distinct(true)
       .getMany();
-  
-    // const result = this.groupDocumentsBySection(documents);
+
     return documents;
   }
 
@@ -148,7 +152,6 @@ export class DocumentsService {
   }
 
   async verifyDocumentsComplete(user: User, sectionId: string) {
-
     await this.sectionService.findOne(sectionId);
     const sectionDocuments = await this.findDocumentBySection(sectionId, user);
     const result = await this.sectionTypeService.findAll();
@@ -176,8 +179,8 @@ export class DocumentsService {
 
     return {
       ok: true,
-      msg: 'Esta listo para ser asignado a un admin'
-    }
+      msg: 'Esta listo para ser asignado a un admin',
+    };
   }
   // async findDocumentBySection(id: string, user: User) {
   //   return this.documentRepository.find({
@@ -256,30 +259,33 @@ export class DocumentsService {
 
     const validUsers = [];
     for (const user of users) {
-      const assignmentExists = await this.assignmentService.findOneByUserAndSection(
-        user.id,
-        idSection,
-      );
-  
+      const assignmentExists =
+        await this.assignmentService.findOneByUserAndSection(
+          user.id,
+          idSection,
+        );
+
       if (assignmentExists) {
         continue;
       }
-      const sectionDocuments = await this.findDocumentBySection(idSection, user);
-  
+      const sectionDocuments = await this.findDocumentBySection(
+        idSection,
+        user,
+      );
+
       if (sectionDocuments.length !== sectionDocumentCount) {
         continue;
       }
-  
+
       const allVerified = sectionDocuments.every(
         (document) => document.status === 'EN PROCESO',
       );
-  
+
       if (allVerified) {
         validUsers.push(user);
       }
     }
-  
+
     return validUsers.length > 0 ? [validUsers[0]] : [];
   }
-
 }

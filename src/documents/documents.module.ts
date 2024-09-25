@@ -21,7 +21,7 @@ import { AssignmentsModule } from 'src/assignments/assignments.module';
     SectionTypeDocumentModule,
     SectionDocumentModule,
     UserModule,
-    AssignmentsModule
+    AssignmentsModule,
   ],
 })
 export class DocumentsModule {}

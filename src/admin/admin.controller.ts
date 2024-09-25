@@ -1,8 +1,18 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  ParseUUIDPipe,
+} from '@nestjs/common';
 import { AdminService } from './admin.service';
 import { CreateAdminDto } from './dto/create-admin.dto';
 import { UpdateAdminDto } from './dto/update-admin.dto';
-import { Auth } from 'src/auth/decorators';
+import { Auth, GetUser } from 'src/auth/decorators';
+import { User } from 'src/user/entities/user.entity';
 
 @Controller('admin')
 export class AdminController {
@@ -19,13 +29,19 @@ export class AdminController {
   }
 
   @Get('section/:id')
-  findUserBySection(@Param('id') idSection: string) {
-    return this.adminService.findBySection(idSection);
+  @Auth()
+  findUserBySection(@Param('id', new ParseUUIDPipe()) idSection: string, @GetUser() admin: User,) {
+    return this.adminService.findBySection(idSection, admin);
   }
-  
+
   @Get('section/documents/:idSection/:idUser')
-  findDocumentBySection(@Param('idSection') idSection: string, @Param('idUser') idUser: string) {
-    return this.adminService.findDocumentBySection(idSection, idUser);
+  @Auth()
+  findDocumentBySection(
+    @Param('idSection', new ParseUUIDPipe()) idSection: string,
+    @Param('idUser', new ParseUUIDPipe()) idUser: string,
+    @GetUser() user: User,
+  ) {
+    return this.adminService.findDocumentBySection(idSection, idUser, user);
   }
 
   @Get(':id')
