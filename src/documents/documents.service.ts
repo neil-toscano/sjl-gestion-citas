@@ -320,14 +320,18 @@ export class DocumentsService {
       }
 
       const hasVerifiedDocument = sectionDocuments.some(
-        (document) => document.status === 'VERIFICADO',
+        (document) => document.status === 'VERIFICADO'
+      );
+      
+      const hasInProcessDocument = sectionDocuments.some(
+        (document) => document.status === 'PROCESO'
       );
       
       const noObservedDocuments = sectionDocuments.every(
-        (document) => document.status !== 'OBSERVADO',
+        (document) => document.status !== 'OBSERVADO'
       );
       
-      if (hasVerifiedDocument && noObservedDocuments) {
+      if (hasVerifiedDocument && hasInProcessDocument && noObservedDocuments) {
         validUsers.push(user);
       }
     }
