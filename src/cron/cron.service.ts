@@ -17,7 +17,7 @@ export class CronService {
 
   }
   onModuleInit() {
-    this.job = new CronJob('*/5 * * * *', async() => {
+    this.job = new CronJob('0 0 * * *', async() => {
       const date = new Date();
       const limaTime = new Intl.DateTimeFormat('es-PE', {
         timeZone: 'America/Lima',
@@ -25,7 +25,6 @@ export class CronService {
         timeStyle: 'long',
       }).format(date);
 
-      console.log(`Cron job ejecutado a la medianoche en Lima: ${limaTime}`);
       
       await this.expiredAppoinments();
     }, null, true, 'America/Lima'); // Establece la zona horaria de Lima
