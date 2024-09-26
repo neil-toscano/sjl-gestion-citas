@@ -3,6 +3,7 @@ import { CreateCronDto } from './dto/create-cron.dto';
 import { UpdateCronDto } from './dto/update-cron.dto';
 import { CronJob } from 'cron';
 import { AppointmentService } from 'src/appointment/appointment.service';
+import { AdminService } from 'src/admin/admin.service';
 
 
 @Injectable()
@@ -11,11 +12,12 @@ export class CronService {
 
   constructor(
     private readonly appointmentService: AppointmentService,
+    private readonly adminService: AdminService,
   ) {
 
   }
   onModuleInit() {
-    this.job = new CronJob('0 0 * * *', () => {
+    this.job = new CronJob('*/5 * * * *', async() => {
       const date = new Date();
       const limaTime = new Intl.DateTimeFormat('es-PE', {
         timeZone: 'America/Lima',
@@ -25,7 +27,7 @@ export class CronService {
 
       console.log(`Cron job ejecutado a la medianoche en Lima: ${limaTime}`);
       
-      // Aquí va tu lógica de negocio
+      await this.expiredAppoinments();
     }, null, true, 'America/Lima'); // Establece la zona horaria de Lima
 
     this.job.start();
@@ -33,7 +35,16 @@ export class CronService {
 
   async expiredAppoinments() {
     const expiredAppointments = await this.appointmentService.expiredAppointments();
-    return expiredAppointments;
+    expiredAppointments.forEach(async (appointment) => {
+      const sectionId = appointment.section.id;
+      const userId = appointment.reservedBy.id;
+  
+      await this.adminService.finalizeAndRemoveAll(userId,sectionId);
+    });
+    return {
+      ok: true,
+      msg: 'Se removió todos los documentos y citas'
+    };
   }
 
   create(createCronDto: CreateCronDto) {

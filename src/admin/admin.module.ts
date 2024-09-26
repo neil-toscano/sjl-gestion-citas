@@ -22,5 +22,6 @@ import { AppointmentModule } from 'src/appointment/appointment.module';
   ],
   controllers: [AdminController],
   providers: [AdminService],
+  exports: [AdminService],
 })
 export class AdminModule {}
