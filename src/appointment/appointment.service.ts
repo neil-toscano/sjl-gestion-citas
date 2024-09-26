@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateAppointmentDto } from './dto/create-appointment.dto';
 import { UpdateAppointmentDto } from './dto/update-appointment.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -143,6 +143,30 @@ export class AppointmentService {
     return `This action removes a #${id} appointment`;
   }
 
+  async removeBySection(userId: string, sectionId: string) {
+    const appointment = await this.appointmentRepository.findOne({
+      where: {
+        reservedBy: { id: userId },
+        section: { id: sectionId },
+      },
+    });
+
+    if (!appointment) {
+      throw new NotFoundException('Appointment not found.');
+    }
+
+    const now = new Date();
+    const hoursDiff = (appointment.appointmentDate.getTime() - now.getTime()) / 3600000;
+
+    if (hoursDiff <= 48) {
+      throw new BadRequestException('Ya no puede modificar la fecha de la cita ya que quedan menos de 48 horas');
+    }
+
+    await this.appointmentRepository.remove(appointment);
+
+    return `La cita ${sectionId} ha sido removido correctamente`;
+  }
+
   async reserveAppointment(id: string, sectionId: string, user: User) {
     const appointment = await this.findOne(id);
     await this.sectionService.findOne(sectionId);
@@ -173,7 +197,7 @@ export class AppointmentService {
   }
 
   async hasOpenAppointmentBySection(sectionId: string, userId: string) {
-    const schedule = await this.appointmentRepository.findOne({
+    const appointment = await this.appointmentRepository.findOne({
       where: {
         section: {
           id: sectionId,
@@ -183,9 +207,10 @@ export class AppointmentService {
           id: userId,
         },
       },
+      relations: ['schedule'],
     });
 
-    return schedule === null
+    return appointment === null
       ? {
           ok: false,
           msg: 'Aún no tiene reservaciones en la sección',
@@ -193,7 +218,7 @@ export class AppointmentService {
       : {
           ok: true,
           msg: 'Ya tiene reserva en la sección',
-          schedule,
+          appointment,
         };
   }
 }

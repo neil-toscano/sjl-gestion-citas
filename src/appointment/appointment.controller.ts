@@ -99,6 +99,12 @@ export class AppointmentController {
     return this.appointmentService.remove(+id);
   }
 
+  @Delete('section/:id')
+  @Auth()
+  removeBySection(@Param('id') sectionId: string, @GetUser() user: User,) {
+    return this.appointmentService.removeBySection(user.id,  sectionId);
+  }
+
   @Get('verify/:id')
   @Auth()
   verifyAppointmentBySection(@Param('id') id: string, @GetUser() user: User) {
