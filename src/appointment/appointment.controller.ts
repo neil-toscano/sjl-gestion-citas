@@ -34,6 +34,16 @@ export class AppointmentController {
     if (isNaN(inputDate.getTime()) || inputDate.getUTCDay() !== 6) {
       throw new BadRequestException('La fecha debe ser un sábado válido');
     }
+
+    const currentDate = new Date(); 
+
+    currentDate.setHours(0, 0, 0, 0);
+    inputDate.setHours(0, 0, 0, 0);
+
+    if (inputDate < currentDate) {
+      throw new BadRequestException('La fecha de la cita debe ser mayor o igual a la fecha actual.');
+    }
+
     return this.appointmentService.create(
       sectionId,
       scheduleId,
