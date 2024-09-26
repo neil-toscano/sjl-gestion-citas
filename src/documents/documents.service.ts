@@ -334,4 +334,8 @@ export class DocumentsService {
 
     return validUsers.length > 0 ? [validUsers[0]] : [];
   }
+
+  async removeDocuments(documents: Document[]) {
+    return await this.documentRepository.remove(documents);
+  }
 }

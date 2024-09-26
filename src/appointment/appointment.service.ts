@@ -139,8 +139,24 @@ export class AppointmentService {
     return this.appointmentRepository.findOneBy({ id });
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} appointment`;
+  remove(id:number) {
+    return "remove";
+  }
+  async removeByUser(userId: string, sectionId: string) {
+    const appointment = await this.appointmentRepository.findOne({
+      where: {
+        reservedBy: { id: userId },
+        section: { id: sectionId },
+      },
+      relations:['schedule'],
+    });
+
+    if (!appointment) {
+      throw new NotFoundException('Appointment not found.');
+    }
+
+    await this.appointmentRepository.remove(appointment);
+
   }
 
   async removeBySection(userId: string, sectionId: string) {

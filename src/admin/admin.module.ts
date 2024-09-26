@@ -8,6 +8,7 @@ import { AssignmentsModule } from 'src/assignments/assignments.module';
 import { SectionDocumentModule } from 'src/section-document/section-document.module';
 import { UserModule } from 'src/user/user.module';
 import { AuthModule } from 'src/auth/auth.module';
+import { AppointmentModule } from 'src/appointment/appointment.module';
 
 @Module({
   imports: [
@@ -16,7 +17,8 @@ import { AuthModule } from 'src/auth/auth.module';
     AssignmentsModule,
     SectionDocumentModule,
     UserModule,
-    AuthModule
+    AuthModule,
+    AppointmentModule
   ],
   controllers: [AdminController],
   providers: [AdminService],

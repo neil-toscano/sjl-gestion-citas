@@ -64,4 +64,10 @@ export class AdminController {
   remove(@Param('id') id: string) {
     return this.adminService.remove(+id);
   }
+  
+  @Delete('finalize/:userId/:sectionId')
+  @Auth()
+  finalizeAndRemoveAll(@Param('userId') userId: string, @Param('sectionId') sectionId: string, @GetUser() user: User,) {
+    return this.adminService.finalizeAndRemoveAll(userId, sectionId, user.id);
+  }
 }
