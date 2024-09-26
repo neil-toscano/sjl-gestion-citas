@@ -149,14 +149,18 @@ export class AppointmentService {
         reservedBy: { id: userId },
         section: { id: sectionId },
       },
+      relations:['schedule'],
     });
 
     if (!appointment) {
       throw new NotFoundException('Appointment not found.');
     }
+    const appointmentDateTime = new Date(appointment.appointmentDate);
+    const [startHour, startMinute, startSecond] = appointment.schedule.startTime.split(':').map(Number);
 
+    appointmentDateTime.setHours(startHour, startMinute, startSecond);
     const now = new Date();
-    const hoursDiff = (appointment.appointmentDate.getTime() - now.getTime()) / 3600000;
+    const hoursDiff = (appointmentDateTime.getTime() - now.getTime()) / 3600000;
 
     if (hoursDiff <= 48) {
       throw new BadRequestException('Ya no puede modificar la fecha de la cita ya que quedan menos de 48 horas');
@@ -164,7 +168,7 @@ export class AppointmentService {
 
     await this.appointmentRepository.remove(appointment);
 
-    return `La cita ${sectionId} ha sido removido correctamente`;
+    return `La cita ha sido eliminado correctamente`;
   }
 
   async reserveAppointment(id: string, sectionId: string, user: User) {
