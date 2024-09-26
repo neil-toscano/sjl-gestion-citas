@@ -68,6 +68,6 @@ export class AdminController {
   @Delete('finalize/:userId/:sectionId')
   @Auth()
   finalizeAndRemoveAll(@Param('userId') userId: string, @Param('sectionId') sectionId: string, @GetUser() user: User,) {
-    return this.adminService.finalizeAndRemoveAll(userId, sectionId, user.id);
+    return this.adminService.finalizeAndRemoveAll(userId, sectionId);
   }
 }

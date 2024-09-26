@@ -65,7 +65,7 @@ export class AdminService {
     return `This action removes a #${id} admin`;
   }
   
-  async finalizeAndRemoveAll(userId: string, sectionId: string, adminId: string) {
+  async finalizeAndRemoveAll(userId: string, sectionId: string ) {
     
     await this.appointmentService.removeByUser(userId, sectionId);
     const documents = await this.documentService.findSectionDocumentsByUser(sectionId, userId);

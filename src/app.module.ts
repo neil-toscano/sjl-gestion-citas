@@ -22,6 +22,7 @@ import { AppointmentModule } from './appointment/appointment.module';
 import { AssignmentsModule } from './assignments/assignments.module';
 import { AdminModule } from './admin/admin.module';
 import { EmailModule } from './email/email.module';
+import { CronModule } from './cron/cron.module';
 
 @Module({
   imports: [
@@ -75,6 +76,8 @@ import { EmailModule } from './email/email.module';
     AdminModule,
 
     EmailModule,
+
+    CronModule,
   ],
 })
 export class AppModule {}

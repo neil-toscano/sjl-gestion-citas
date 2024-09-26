@@ -241,4 +241,20 @@ export class AppointmentService {
           appointment,
         };
   }
+  async expiredAppointments() {
+    const date = new Date();
+  const limaOffset = -5; // Lima es UTC-5
+  const currentLimaTime = new Date(date.getTime() + limaOffset * 60 * 60 * 1000);
+
+
+  const appointments = await this.appointmentRepository
+  .createQueryBuilder('appointment')
+  .where('appointment.appointmentDate < :currentTime', { currentTime: currentLimaTime })
+  .leftJoinAndSelect('appointment.reservedBy', 'user')
+  .leftJoinAndSelect('appointment.section', 'section')
+  .getMany();
+
+  return appointments;
+  }
+  
 }
