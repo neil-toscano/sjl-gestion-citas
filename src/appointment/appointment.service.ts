@@ -178,8 +178,8 @@ export class AppointmentService {
     const now = new Date();
     const hoursDiff = (appointmentDateTime.getTime() - now.getTime()) / 3600000;
 
-    if (hoursDiff <= 48) {
-      throw new BadRequestException('Ya no puede modificar la fecha de la cita ya que quedan menos de 48 horas');
+    if (hoursDiff <= 24) {
+      throw new BadRequestException('Ya no puede modificar la fecha de la cita ya que quedan menos de 24 horas');
     }
 
     await this.appointmentRepository.remove(appointment);
