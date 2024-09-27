@@ -184,7 +184,10 @@ export class AppointmentService {
 
     await this.appointmentRepository.remove(appointment);
 
-    return `La cita ha sido eliminado correctamente`;
+    return {
+      ok: true,
+      msg: 'La cita ha sido eliminado correctamente'
+    };
   }
 
   async reserveAppointment(id: string, sectionId: string, user: User) {

@@ -19,4 +19,18 @@ export class SeedController {
   executeSeedSchedule() {
     return this.seedService.runSeedSchedule();
   }
+  
+  @Post('sections')
+  executeSeedSections() {
+    return this.seedService.runSeedSections();
+  }
+  
+  @Post('type-documents')
+  executeTypeDocuments() {
+    return this.seedService.runSeedTypeDocument();
+  }
+  @Post('section-types')
+  executeSectionTypes() {
+    return this.seedService.runSeedSectionTypeDocuments();
+  }
 }

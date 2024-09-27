@@ -8,7 +8,7 @@ import { AuthModule } from 'src/auth/auth.module';
 @Module({
   controllers: [TypeDocumentController],
   providers: [TypeDocumentService],
-  exports: [TypeOrmModule],
+  exports: [TypeOrmModule, TypeDocumentService],
   imports: [TypeOrmModule.forFeature([TypeDocument]), AuthModule],
 })
 export class TypeDocumentModule {}
