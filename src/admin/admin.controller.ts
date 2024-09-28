@@ -40,6 +40,12 @@ export class AdminController {
   async findUsersWithCorrectedDocuments(@Param('id', new ParseUUIDPipe()) idSection: string, @GetUser() admin: User) {
     return this.adminService.getUsersWithCorrectedDocuments(idSection, admin);
   }
+  
+  @Get('section/all-pending/:id')
+  @Auth()
+  async findAllUsersWithCorrectedDocuments(@Param('id', new ParseUUIDPipe()) idSection: string, @GetUser() admin: User) {
+    return this.adminService.getAllUsersWithCorrectedDocuments(idSection, admin);
+  }
 
   @Get('section/documents/:idSection/:idUser')
   @Auth()

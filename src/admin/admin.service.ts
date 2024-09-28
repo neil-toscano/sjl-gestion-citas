@@ -39,6 +39,11 @@ export class AdminService {
 
   async getUsersWithCorrectedDocuments(idSection: string, admin: User) {
     await this.assignmentService.remove(admin.id);
+    const validUsers =  await this.documentService.getUsersWithCorrectedDocuments(idSection);
+    return validUsers.length > 0 ? [validUsers[0]] : [];
+  }
+  async getAllUsersWithCorrectedDocuments(idSection: string, admin: User) {
+    await this.assignmentService.remove(admin.id);
     return await this.documentService.getUsersWithCorrectedDocuments(idSection);
   }
   
