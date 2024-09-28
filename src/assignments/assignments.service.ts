@@ -58,9 +58,8 @@ export class AssignmentsService {
     .createQueryBuilder()
     .delete()
     .from(Assignment)
-    .where("admin = :id", { id: id }) // Reemplaza 1 por el valor dinámico que desees
+    .where("admin = :adminId", { adminId: id }) // elimina filas donde el campo admin coincide con el adminId
     .execute();
-    this.assignmentRepository.delete(id);
     return `This action removes a #${id} assignment`;
   }
 }
