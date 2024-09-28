@@ -46,6 +46,12 @@ export class AdminController {
   async findAllUsersWithCorrectedDocuments(@Param('id', new ParseUUIDPipe()) idSection: string, @GetUser() admin: User) {
     return this.adminService.getAllUsersWithCorrectedDocuments(idSection, admin);
   }
+  
+  @Get('section/unresolved-documents/:id')
+  @Auth()
+  async findAllUsersWithUnresolvedDocuments(@Param('id', new ParseUUIDPipe()) idSection: string, @GetUser() admin: User) {
+    return this.adminService.getAllUsersWithUnresolvedDocuments(idSection, admin);
+  }
 
   @Get('section/documents/:idSection/:idUser')
   @Auth()

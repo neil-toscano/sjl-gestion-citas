@@ -46,6 +46,10 @@ export class AdminService {
     await this.assignmentService.remove(admin.id);
     return await this.documentService.getUsersWithCorrectedDocuments(idSection);
   }
+  async getAllUsersWithUnresolvedDocuments(idSection: string, admin: User) {
+    await this.assignmentService.remove(admin.id);
+    return await this.documentService.getUsersWithObservedDocuments(idSection);
+  }
   
   async findDocumentBySection(idSection: string, idUser: string, adminUser: User) {
     await this.sectionService.findOne(idSection);
