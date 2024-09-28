@@ -23,9 +23,10 @@ export class AdminController {
     return this.adminService.create(createAdminDto);
   }
 
-  @Get()
-  findAll() {
-    return this.adminService.findAll();
+  @Get(':id')
+  @Auth()
+  findAll(@Param('id') id: string, @GetUser() admin: User) {
+    return this.adminService.findAllCompleted(id, admin);
   }
 
   @Get('section/:id')
@@ -50,10 +51,6 @@ export class AdminController {
     return this.adminService.findDocumentBySection(idSection, idUser, user);
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.adminService.findOne(+id);
-  }
 
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateAdminDto: UpdateAdminDto) {

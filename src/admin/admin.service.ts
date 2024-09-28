@@ -26,13 +26,15 @@ export class AdminService {
     return 'This action adds a new admin';
   }
 
-  findAll() {
-    return `This action returns all admin`;
+  async findAllCompleted(id:string, admin: User) {
+    await this.assignmentService.remove(admin.id);
+    return await this.documentService.readyForReviewBySection(id);
   }
 
   async findBySection(idSection: string, admin: User) {
     await this.assignmentService.remove(admin.id);
-    return await this.documentService.readyForReviewBySection(idSection);
+    const validUsers = await this.documentService.readyForReviewBySection(idSection);
+    return validUsers.length > 0 ? [validUsers[0]] : [];
   }
 
   async getUsersWithCorrectedDocuments(idSection: string, admin: User) {

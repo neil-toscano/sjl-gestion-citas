@@ -286,7 +286,7 @@ export class DocumentsService {
       }
     }
 
-    return validUsers.length > 0 ? [validUsers[0]] : [];
+    return validUsers;
   }
   async getUsersWithCorrectedDocuments(idSection: string) {
     await this.sectionService.findOne(idSection);
