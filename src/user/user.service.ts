@@ -62,6 +62,7 @@ export class UserService {
         province: true,
         district: true,
         mobileNumber: true,
+        isVerified: true,
       }, //! OJO!
     });
 
