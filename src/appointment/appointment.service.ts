@@ -92,7 +92,7 @@ export class AppointmentService {
 
     if (existingAppointment) {
       throw new NotFoundException(
-        `The schedule is already booked for this admin`,
+        `El horario para dicha fecha ya se encuentra reservada`,
       );
     }
 
@@ -118,25 +118,8 @@ export class AppointmentService {
     });
 
     if (!appointment)
-      throw new NotFoundException(`schedule with id ${id} not found`);
+      throw new NotFoundException(`Cita con id ${id} no encontrado`);
     return appointment;
-  }
-
-  async update(
-    id: string,
-    sectionId: string,
-    updateScheduleDto: UpdateAppointmentDto,
-    user: User,
-  ) {
-    await this.appointmentRepository.update(id, {
-      ...updateScheduleDto,
-      reservedBy: user,
-      section: {
-        id: sectionId,
-      },
-    });
-
-    return this.appointmentRepository.findOneBy({ id });
   }
 
   remove(id:number) {
@@ -152,11 +135,10 @@ export class AppointmentService {
     });
 
     if (!appointment) {
-      throw new NotFoundException('Appointment not found.');
+      throw new NotFoundException('Cita no encontrado en la sección');
     }
 
     await this.appointmentRepository.remove(appointment);
-
   }
 
   async removeBySection(userId: string, sectionId: string) {
@@ -169,7 +151,7 @@ export class AppointmentService {
     });
 
     if (!appointment) {
-      throw new NotFoundException('Appointment not found.');
+      throw new NotFoundException('Ya borró la cita, Intenta actualizar');
     }
     const appointmentDateTime = new Date(appointment.appointmentDate);
     const [startHour, startMinute, startSecond] = appointment.schedule.startTime.split(':').map(Number);
@@ -188,35 +170,6 @@ export class AppointmentService {
       ok: true,
       msg: 'La cita ha sido eliminado correctamente'
     };
-  }
-
-  async reserveAppointment(id: string, sectionId: string, user: User) {
-    const appointment = await this.findOne(id);
-    await this.sectionService.findOne(sectionId);
-
-    // if (!appointment.isAvailable) {
-    //   throw new NotFoundException(`Horario no disponible`);
-    // }
-
-    const { ok, msg } = await this.hasOpenAppointmentBySection(
-      sectionId,
-      user.id,
-    );
-    if (ok) {
-      return {
-        ok,
-        message: msg,
-      };
-    }
-
-    await this.appointmentRepository.update(id, {
-      reservedBy: user,
-      section: {
-        id: sectionId,
-      },
-    });
-
-    return this.appointmentRepository.findOneBy({ id });
   }
 
   async hasOpenAppointmentBySection(sectionId: string, userId: string) {

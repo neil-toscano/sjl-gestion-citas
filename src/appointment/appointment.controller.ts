@@ -78,32 +78,6 @@ export class AppointmentController {
     return this.appointmentService.findOne(id);
   }
 
-  @Patch(':id/:sectionId')
-  @Auth()
-  update(
-    @Param('id') id: string,
-    @Param('sectionId') sectionId: string,
-    @Body() updateScheduleDto: UpdateAppointmentDto,
-    @GetUser() user: User,
-  ) {
-    return this.appointmentService.update(
-      id,
-      sectionId,
-      updateScheduleDto,
-      user,
-    );
-  }
-
-  @Post('reserve/:id/:sectionId')
-  @Auth()
-  reserve(
-    @Param('id', new ParseUUIDPipe()) id: string,
-    @Param('sectionId', new ParseUUIDPipe()) sectionId: string,
-    @GetUser() user: User,
-  ) {
-    return this.appointmentService.reserveAppointment(id, sectionId, user);
-  }
-
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.appointmentService.remove(+id);
