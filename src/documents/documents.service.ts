@@ -15,6 +15,7 @@ import { User } from 'src/user/entities/user.entity';
 import { SectionDocumentService } from 'src/section-document/section-document.service';
 import { UserService } from 'src/user/user.service';
 import { AssignmentsService } from 'src/assignments/assignments.service';
+import { groupDocumentsBySection } from './utils/organize-documents';
 
 @Injectable()
 export class DocumentsService {
@@ -74,7 +75,7 @@ export class DocumentsService {
       .distinct(true)
       .getMany();
 
-    const result = this.groupDocumentsBySection(documents);
+    const result = groupDocumentsBySection(documents);
     return result;
   }
 
@@ -182,19 +183,7 @@ export class DocumentsService {
       msg: 'Esta listo para ser asignado a un admin',
     };
   }
-  // async findDocumentBySection(id: string, user: User) {
-  //   return this.documentRepository.find({
-  //     where: {
-  //       user: { id: user.id },
-  //       sectionTypeDocument: {
-  //         section: {
-  //           id: id,
-  //         },
-  //       },
-  //     },
-  //   });
-  // }
-
+ 
   async findDocumentBySection(id: string, user: User) {
     return this.documentRepository
       .createQueryBuilder('document')
@@ -214,36 +203,6 @@ export class DocumentsService {
       return section.typedocument.length;
     }
     return 0;
-  }
-
-  groupDocumentsBySection(documents: Document[]) {
-    // Creamos un objeto para almacenar las secciones agrupadas
-    const groupedBySection: { [key: string]: any } = {};
-
-    documents.forEach((doc) => {
-      const sectionId = doc.sectionTypeDocument.section.id;
-      const sectionName = doc.sectionTypeDocument.section.sectionName;
-      const typeDocumentName = doc.sectionTypeDocument.typeDocument.name;
-
-      // Si la sección aún no existe en el objeto agrupado, la inicializamos
-      if (!groupedBySection[sectionId]) {
-        groupedBySection[sectionId] = {
-          sectionName: sectionName,
-          documents: [],
-        };
-      }
-
-      // Añadimos el documento a la lista de documentos de esa sección
-      groupedBySection[sectionId].documents.push({
-        id: doc.id,
-        fileUrl: doc.fileUrl,
-        status: doc.status,
-        typeDocument: typeDocumentName,
-      });
-    });
-
-    // Convertimos el objeto agrupado a un array si se necesita un formato más accesible
-    return Object.values(groupedBySection);
   }
 
   async readyForReviewBySection(idSection: string) {
