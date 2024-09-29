@@ -2,7 +2,6 @@ import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestj
 import { EmailService } from './email.service';
 import { CreateEmailDto } from './dto/create-email.dto';
 import { UpdateEmailDto } from './dto/update-email.dto';
-import { Auth } from 'src/auth/decorators';
 
 @Controller('email')
 export class EmailController {
@@ -14,12 +13,15 @@ export class EmailController {
   }
   
   @Post('send')
-  @Auth()
-  sendEmail(@Query('email') email: string) {
-    return this.emailService.sendEmail(email);
+  sendSurvey(@Query('email') email: string) {
+    return this.emailService.sendSurvey(email);
   }
-
-
+  
+  @Post('verify')
+  verifyEmail(@Query('email') email: string) {
+    const url = 'http';
+    return this.emailService.sendVerificationEmail(email, url);
+  }
 
   @Get()
   findAll() {

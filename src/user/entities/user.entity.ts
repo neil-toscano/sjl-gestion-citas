@@ -51,6 +51,9 @@ export class User {
   @Column('text')
   district: string;
 
+  @Column({ default: false })
+  isVerified: boolean;
+
   @Column('text')
   mobileNumber: string;
 

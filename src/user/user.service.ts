@@ -30,7 +30,12 @@ export class UserService {
         password: bcrypt.hashSync(password, 10),
       });
 
-      return await this.userRepository.save(user);
+      const newUser = await this.userRepository.save(user);
+
+      return newUser;
+
+
+
     } catch (error) {
       this.handleDBErrors(error);
     }
@@ -104,7 +109,15 @@ export class UserService {
     return admins;
   }
 
-  update(id: number, updateUserDto: UpdateUserDto) {
+  async updateVerify(user: User) {
+  await this.userRepository.save(user);
+  return {
+    statusCode: 201,
+    message: 'Email verificado correctamente',
+  };
+  }
+
+  async update(id: string, updateUserDto: UpdateUserDto) {
     return `This action updates a #${id} user`;
   }
 

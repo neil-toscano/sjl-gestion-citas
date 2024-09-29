@@ -6,6 +6,7 @@ import {
   UseGuards,
   Req,
   Headers,
+  Query,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { IncomingHttpHeaders } from 'http';
@@ -31,6 +32,11 @@ export class AuthController {
   @Post('login')
   loginUser(@Body() loginUserDto: LoginUserDto) {
     return this.authService.login(loginUserDto);
+  }
+  
+  @Post('verify-email')
+  verifyEmail(@Query('token') token: string) {
+    return this.authService.verifyToken(token);
   }
 
   @Get('check-status')
