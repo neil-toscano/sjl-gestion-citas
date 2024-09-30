@@ -78,6 +78,21 @@ export class AuthService {
       throw new UnauthorizedException('El token ha expirado, genere nuevo Url');
     }
   }
+  
+  async resetPassword(email: string) {
+    const user = await this.userService.findByEmail(email);
+
+    const token = this.getJwtToken({ id: user.id });
+    const verificationLink = `${process.env.APP_URL}/auth/reset-password?token=${token}`;
+  
+    return await this.emailService.resetPassword(user.email, verificationLink);
+  }
+  
+  async setPassword(token: string, password: string) {
+    const decoded = this.jwtService.verify(token);
+    const user = await this.userService.findOne(decoded.id); 
+    return await this.userService.updatePassword(user, password);
+  }
 
   async checkAuthStatus(user: User) {
     return {

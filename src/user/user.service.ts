@@ -82,6 +82,14 @@ export class UserService {
 
     return user;
   }
+  async findByEmail(email: string) {
+    const user = await this.userRepository.findOneBy({ email });
+    if (!user) {
+      throw new NotFoundException(`user with email ${email} not found`);
+    }
+
+    return user;
+  }
 
   async findOneAdmin(id: string) {
     const admin = await this.userRepository
@@ -116,6 +124,17 @@ export class UserService {
     statusCode: 201,
     message: 'Email verificado correctamente',
   };
+  }
+  
+  async updatePassword(user: User, password: string) {
+
+  user.password = bcrypt.hashSync(password, 10);
+  await this.userRepository.save(user);
+  return {
+    statusCode: 201,
+    message: 'Contraseña modificado correctamente',
+  };
+  
   }
 
   async update(id: string, updateUserDto: UpdateUserDto) {

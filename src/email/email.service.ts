@@ -164,9 +164,49 @@ async sendVerificationEmail(email: string, url: string) {
 
   return await this.sendEmail(mailOptions);
 }
+async resetPassword(email: string, url: string) {
+  const mailOptions = {
+    from: '"Municipalidad de San Juan de Lurigancho" <luriganchomunicipalidad@gmail.com>',
+    to: email,
+    subject: 'Restablecer contraseña',
+    html: `
+      <div style="font-family: Arial, sans-serif; color: #333; line-height: 1.6;">
+        <div style="max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #ddd; border-radius: 10px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);">
+          
+          <!-- Encabezado -->
+          <header style="background-color: #5cb85c; text-align: center; padding: 20px; border-bottom: 1px solid #eee;">
+            <img src="https://web.munisjl.gob.pe/web/images/mdsjl-cambia-contigo.png" alt="Logo" style="max-height: 60px;">
+            <p style="font-size: 16px; color: white;">Restablecer Contraseña</p>
+          </header>
+          
+          <!-- Cuerpo del correo -->
+          <main style="padding: 20px 0;">
+            <p style="font-size: 16px; color: #333;">Estimado(a) ciudadano(a),</p>
+            <p style="font-size: 16px; color: #333;">
+              Hemos recibido una solicitud para restablecer la contraseña de su cuenta en la Municipalidad de San Juan de Lurigancho. Para proceder, haga clic en el siguiente botón:
+            </p>
+            <div style="text-align: center; margin: 30px 0;">
+              <a href="${url}" style="background-color: #5cb85c; color: #fff; padding: 10px 20px; text-decoration: none; border-radius: 5px; font-size: 16px;">
+                Restablecer contraseña
+              </a>
+            </div>
+            <p style="font-size: 16px; color: #333;">Si no solicitó este restablecimiento, puede ignorar este correo.</p>
+          </main>
+          
+          <!-- Pie de página -->
+          <footer style="background-color: #5cb85c; text-align: center; padding: 20px; font-size: 12px; color: white; border-top: 1px solid #eee;">
+            <p>© 2024 Municipalidad de San Juan de Lurigancho</p>
+            <p>
+              Dirección: Av. Próceres de la Independencia 1564, San Juan de Lurigancho, Lima, Perú
+            </p>
+          </footer>
+        </div>
+      </div>
+    `,
+  };
 
-
-  
+  return await this.sendEmail(mailOptions);
+}
 
   async sendEmail(mailOptions: any) {
 
