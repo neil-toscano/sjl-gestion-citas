@@ -21,14 +21,14 @@ import { FindByWeekDto } from 'src/common/dtos/date.dto';
 export class AppointmentController {
   constructor(private readonly appointmentService: AppointmentService) {}
 
-  @Post(':sectionId/:scheduleId/:adminId')
+  @Post(':sectionId/:scheduleId/:userId')
   @Auth()
   create(
     @Body() createAppointmentDto: CreateAppointmentDto,
-    @GetUser() user: User,
+    @GetUser() admin: User,
     @Param('sectionId') sectionId: string,
     @Param('scheduleId') scheduleId: string,
-    @Param('adminId') adminId: string,
+    @Param('userId') userId: string,
   ) {
     const inputDate = new Date(createAppointmentDto.appointmentDate);
     if (isNaN(inputDate.getTime()) || inputDate.getUTCDay() !== 6) {
@@ -44,12 +44,13 @@ export class AppointmentController {
       throw new BadRequestException('La fecha de la cita debe ser mayor o igual a la fecha actual.');
     }
 
+
     return this.appointmentService.create(
       sectionId,
       scheduleId,
-      adminId,
+      userId,
       createAppointmentDto,
-      user,
+      admin,
     );
   }
 

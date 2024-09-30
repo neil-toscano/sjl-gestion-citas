@@ -8,6 +8,7 @@ import { SectionDocumentService } from 'src/section-document/section-document.se
 import { User } from 'src/user/entities/user.entity';
 import { UserService } from 'src/user/user.service';
 import { ScheduleService } from 'src/schedule/schedule.service';
+import { EmailService } from 'src/email/email.service';
 
 @Injectable()
 export class AppointmentService {
@@ -17,22 +18,23 @@ export class AppointmentService {
     private readonly sectionService: SectionDocumentService,
     private readonly userService: UserService,
     private readonly scheduleService: ScheduleService,
+    private readonly emailService: EmailService,
   ) {}
 
   async create(
     sectionId: string,
     scheduleId: string,
-    adminId: string,
+    userId: string,
     createAppointmentDto: CreateAppointmentDto,
-    user: User,
+    admin: User,
   ) {
-    await this.sectionService.findOne(sectionId);
-    await this.scheduleService.findOne(scheduleId);
-    await this.userService.findOneAdmin(adminId);
+    const section = await this.sectionService.findOne(sectionId);
+    const schedule = await this.scheduleService.findOne(scheduleId);
+    await this.userService.findOneAdmin(admin.id);
 
     const { ok, msg } = await this.hasOpenAppointmentBySection(
       sectionId,
-      user.id,
+      userId,
     );
     if (ok) {
       return {
@@ -44,8 +46,10 @@ export class AppointmentService {
     await this.isScheduleAvailable(
       scheduleId,
       createAppointmentDto.appointmentDate,
-      adminId,
+      admin.id,
     );
+
+    const user= await this.userService.findOne(userId);
 
     const appointment = this.appointmentRepository.create({
       ...createAppointmentDto,
@@ -57,9 +61,18 @@ export class AppointmentService {
         id: scheduleId,
       },
       assignedAdmin: {
-        id: adminId,
+        id: admin.id,
       },
     });
+    await this.emailService.sendAppointmentConfirmation({
+      appointmentDate: createAppointmentDto.appointmentDate,
+      appointmentTime: `${schedule.startTime} - ${schedule.endTime}`,
+      email: user.email,
+      person: `${admin.firstName} ${admin.lastName} `,
+      service: section.sectionName,
+      recipientName: `${user.firstName} ${user.lastName}`,
+    });
+
     return this.appointmentRepository.save(appointment);
   }
 
