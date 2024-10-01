@@ -42,10 +42,12 @@ export class AdminService {
     const validUsers =  await this.documentService.getUsersWithCorrectedDocuments(idSection);
     return validUsers.length > 0 ? [validUsers[0]] : [];
   }
+
   async getAllUsersWithCorrectedDocuments(idSection: string, admin: User) {
     await this.assignmentService.remove(admin.id);
     return await this.documentService.getUsersWithCorrectedDocuments(idSection);
   }
+
   async getAllUsersWithUnresolvedDocuments(idSection: string, admin: User) {
     await this.assignmentService.remove(admin.id);
     return await this.documentService.getUsersWithObservedDocuments(idSection);
@@ -53,17 +55,24 @@ export class AdminService {
   
   async findDocumentBySection(idSection: string, idUser: string, adminUser: User) {
     await this.sectionService.findOne(idSection);
-    await this.userService.findOne(idUser);
+    const user = await this.userService.findOne(idUser);
 
     await this.assignmentService.create({
       sectionDocumentId: idSection,
       userId: idUser,
     }, adminUser.id);
-    return await this.documentService.findSectionDocumentsByUser(
+    const documents = await this.documentService.findSectionDocumentsByUser(
       idSection,
       idUser,
     );
+    const documentsWithUser = documents.map(doc => ({
+      ...doc,
+      user: user,
+    }));
+    
+    return documentsWithUser;
   }
+  
   findOne(id: number) {
     return `This action returns a #${id} admin`;
   }

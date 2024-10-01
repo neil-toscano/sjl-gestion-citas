@@ -1,6 +1,4 @@
 import {
-  forwardRef,
-  Inject,
   Injectable,
   NotFoundException,
   UnprocessableEntityException,
@@ -164,14 +162,6 @@ export class DocumentsService {
  
   async findDocumentBySection(id: string, user: User) {
     return await this.verifySectionDocumentsUploaded(user, id);
-  }
-
-  getTypeDocumentCountBySectionId(data: any[], sectionId: string): number {
-    const section = data.find((section) => section.sectionId === sectionId);
-    if (section) {
-      return section.typedocument.length;
-    }
-    return 0;
   }
 
   async readyForReviewBySection(idSection: string) {

@@ -31,6 +31,7 @@ export class UserController {
   }
 
   @Get('find-term')
+  @Auth()
   findByTerm(@Body() termDto: TermDto) {
     return this.userService.findByTerm(termDto);
   }
