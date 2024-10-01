@@ -3,6 +3,7 @@ import {
   Inject,
   Injectable,
   NotFoundException,
+  UnprocessableEntityException,
 } from '@nestjs/common';
 import { CreateDocumentDto } from './dto/create-document.dto';
 import { UpdateDocumentDto } from './dto/update-document.dto';
@@ -120,21 +121,8 @@ export class DocumentsService {
     return this.documentRepository.findOneBy({ id });
   }
 
-  async hasValidDocuments(id: string, user: User) {
-    await this.sectionService.findOne(id);
-    const sectionDocuments = await this.findDocumentBySection(id, user);
-    const result = await this.sectionTypeService.findAll();
-    const sectionDocumentCount = this.getTypeDocumentCountBySectionId(
-      result,
-      id,
-    );
-
-    if (sectionDocuments.length !== sectionDocumentCount) {
-      return {
-        ok: false,
-        msg: 'No tiene subido todos los documentos en la sección',
-      };
-    }
+  async hasValidDocuments(sectionId: string, user: User) {
+    const sectionDocuments = await this.verifySectionDocumentsUploaded(user, sectionId);
 
     const allVerified = sectionDocuments.every(
       (document) => document.status === 'VERIFICADO',
@@ -152,39 +140,21 @@ export class DocumentsService {
     };
   }
 
-  async verifyDocumentsComplete(user: User, sectionId: string) {
-    await this.sectionService.findOne(sectionId);
+  async verifySectionDocumentsUploaded(user: User, sectionId: string) {
+
+    const section = await this.sectionService.findOne(sectionId);
     const sectionDocuments = await this.findDocumentBySection(sectionId, user);
-    const result = await this.sectionTypeService.findAll();
-    const sectionDocumentCount = this.getTypeDocumentCountBySectionId(
-      result,
-      sectionId,
-    );
 
-    if (sectionDocuments.length !== sectionDocumentCount) {
-      return {
-        ok: false,
-        msg: 'No tiene subido todos los documentos en la sección',
-      };
+
+    if (sectionDocuments.length !== section.requiredDocumentsCount) {
+      throw new UnprocessableEntityException('No tiene subido todos los documentos en la sección');
     }
-
-    const allVerified = sectionDocuments.every(
-      (document) => document.status === 'EN PROCESO',
-    );
-    if (!allVerified) {
-      return {
-        ok: false,
-        msg: 'Sus documentos ya pasaron la etapa de "EN PROCESO"',
-      };
-    }
-
-    return {
-      ok: true,
-      msg: 'Esta listo para ser asignado a un admin',
-    };
+    return sectionDocuments;
   }
  
   async findDocumentBySection(id: string, user: User) {
+    await this.verifySectionDocumentsUploaded(user, id);
+
     return this.documentRepository
       .createQueryBuilder('document')
       .leftJoinAndSelect('document.sectionTypeDocument', 'sectionTypeDocument')
@@ -210,11 +180,7 @@ export class DocumentsService {
 
     const users = await this.userService.findAll();
 
-    const sectionTypes = await this.sectionTypeService.findAll();
-    const sectionDocumentCount = this.getTypeDocumentCountBySectionId(
-      sectionTypes,
-      idSection,
-    );
+    const section = await this.sectionService.findOne(idSection);
 
     const validUsers = [];
     for (const user of users) {
@@ -232,7 +198,7 @@ export class DocumentsService {
         user,
       );
 
-      if (sectionDocuments.length !== sectionDocumentCount) {
+      if (sectionDocuments.length !== section.requiredDocumentsCount) {
         continue;
       }
 
@@ -247,16 +213,13 @@ export class DocumentsService {
 
     return validUsers;
   }
+
   async getUsersWithCorrectedDocuments(idSection: string) {
     await this.sectionService.findOne(idSection);
 
     const users = await this.userService.findAll();
 
-    const sectionTypes = await this.sectionTypeService.findAll();
-    const sectionDocumentCount = this.getTypeDocumentCountBySectionId(
-      sectionTypes,
-      idSection,
-    );
+    const section = await this.sectionService.findOne(idSection);
 
     const validUsers = [];
     for (const user of users) {
@@ -274,57 +237,7 @@ export class DocumentsService {
         user,
       );
 
-      if (sectionDocuments.length !== sectionDocumentCount) {
-        continue;
-      }
-
-      const hasVerifiedDocument = sectionDocuments.some(
-        (document) => document.status === 'VERIFICADO'
-      );
-      
-      const hasInProcessDocument = sectionDocuments.some(
-        (document) => document.status === 'EN PROCESO'
-      );
-      
-      const noObservedDocuments = sectionDocuments.every(
-        (document) => document.status !== 'OBSERVADO'
-      );
-      
-      if (hasVerifiedDocument && hasInProcessDocument) {
-        validUsers.push(user);
-      }
-    }
-
-    return validUsers;
-  }
-  async getUsersWithUnresolvedDocuments(idSection: string) {
-    await this.sectionService.findOne(idSection);
-
-    const users = await this.userService.findAll();
-
-    const sectionTypes = await this.sectionTypeService.findAll();
-    const sectionDocumentCount = this.getTypeDocumentCountBySectionId(
-      sectionTypes,
-      idSection,
-    );
-
-    const validUsers = [];
-    for (const user of users) {
-      const assignmentExists =
-        await this.assignmentService.findOneByUserAndSection(
-          user.id,
-          idSection,
-        );
-
-      if (assignmentExists) {
-        continue;
-      }
-      const sectionDocuments = await this.findDocumentBySection(
-        idSection,
-        user,
-      );
-
-      if (sectionDocuments.length !== sectionDocumentCount) {
+      if (sectionDocuments.length !== section.requiredDocumentsCount) {
         continue;
       }
 
@@ -353,11 +266,7 @@ export class DocumentsService {
   
     const users = await this.userService.findAll();
   
-    const sectionTypes = await this.sectionTypeService.findAll();
-    const sectionDocumentCount = this.getTypeDocumentCountBySectionId(
-      sectionTypes,
-      idSection,
-    );
+    const section = await this.sectionService.findOne(idSection);
   
     const validUsers = [];
   
@@ -376,7 +285,7 @@ export class DocumentsService {
         user,
       );
   
-      if (sectionDocuments.length !== sectionDocumentCount) {
+      if (sectionDocuments.length !== section.requiredDocumentsCount) {
         continue;
       }
   

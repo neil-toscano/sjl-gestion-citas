@@ -21,6 +21,12 @@ export class SectionDocument {
   })
   sectionSlug?: string;
 
+  @Column('int', {
+    default: 0,
+    nullable: false,
+  })
+  requiredDocumentsCount: number;
+
   @OneToMany(
     () => SectionTypeDocument,
     (sectionTypeDocument) => sectionTypeDocument.section,

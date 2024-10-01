@@ -1,7 +1,6 @@
 import {
   BadRequestException,
-  forwardRef,
-  Inject,
+  ConflictException,
   Injectable,
   InternalServerErrorException,
   NotFoundException,
@@ -13,15 +12,38 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { CreateUserDto } from 'src/auth/dto';
 
 import * as bcrypt from 'bcrypt';
-import { Document } from 'src/documents/entities/document.entity';
-import { DocumentsService } from 'src/documents/documents.service';
+import { TermDto } from 'src/common/dtos/term.dto';
 @Injectable()
 export class UserService {
+
   constructor(
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
   ) {}
+
   async create(createUserDto: CreateUserDto) {
+    const { dni, email } = createUserDto;
+
+    const existUserByDni = await this.userRepository.findOne({
+      where: {
+        dni
+      }
+    });
+    
+    if (existUserByDni) {
+      throw new ConflictException('El DNI ya está registrado.');
+    }
+    
+    const existUserByEmail= await this.userRepository.findOne({
+      where: {
+        email
+      }
+    });
+
+    if (existUserByEmail) {
+      throw new ConflictException('El correo ya está registrado.');
+    }
+
     try {
       const { password, ...userData } = createUserDto;
 
@@ -33,9 +55,6 @@ export class UserService {
       const newUser = await this.userRepository.save(user);
 
       return newUser;
-
-
-
     } catch (error) {
       this.handleDBErrors(error);
     }
@@ -48,29 +67,15 @@ export class UserService {
       .getMany();
   }
 
-  async findOneByDni(dni: string) {
-    const user = await this.userRepository.findOne({
-      where: { dni },
-      select: {
-        email: true,
-        password: true,
-        id: true,
-        roles: true,
-        dni: true,
-        firstName: true,
-        lastName: true,
-        province: true,
-        district: true,
-        mobileNumber: true,
-        isVerified: true,
-      }, //! OJO!
-    });
 
-    return user;
-  }
+  async findByTerm(termDto: TermDto): Promise<User | undefined> {
+    const { field, value } = termDto;
 
-  async findOneBy(id: string) {
-    const user = await this.userRepository.findOneBy({ id });
+    const user = await this.userRepository.findOne({ where: { [field]: value } });
+    if (!user) {
+        throw new NotFoundException(`Usuario con ${field} ${value} no encontrado`);
+    }
+    
     return user;
   }
 
@@ -78,14 +83,6 @@ export class UserService {
     const user = await this.userRepository.findOneBy({ id });
     if (!user) {
       throw new NotFoundException(`user with id ${id} not found`);
-    }
-
-    return user;
-  }
-  async findByEmail(email: string) {
-    const user = await this.userRepository.findOneBy({ email });
-    if (!user) {
-      throw new NotFoundException(`user with email ${email} not found`);
     }
 
     return user;
@@ -134,7 +131,7 @@ export class UserService {
     statusCode: 201,
     message: 'Contraseña modificado correctamente',
   };
-  
+
   }
 
   async update(id: string, updateUserDto: UpdateUserDto) {

@@ -13,6 +13,7 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { CreateUserDto } from 'src/auth/dto';
 import { AuthGuard } from '@nestjs/passport';
 import { Auth } from 'src/auth/decorators';
+import { TermDto } from 'src/common/dtos/term.dto';
 
 @Controller('user')
 export class UserController {
@@ -29,9 +30,9 @@ export class UserController {
     return this.userService.findAll();
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.userService.findOneByDni(id);
+  @Get('find-term')
+  findByTerm(@Body() termDto: TermDto) {
+    return this.userService.findByTerm(termDto);
   }
 
   @Get('roles/admins')

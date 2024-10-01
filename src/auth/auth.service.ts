@@ -39,11 +39,13 @@ export class AuthService {
   async login(loginUserDto: LoginUserDto) {
     const { password, dni } = loginUserDto;
 
-    const user = await this.userService.findOneByDni(dni);
+    const user = await this.userService.findByTerm({
+      field: 'dni',
+      value: dni,
+    });
 
     if (!user)
       throw new UnauthorizedException('Credentials are not valid (dni)');
-
     if (!bcrypt.compareSync(password, user.password))
       throw new UnauthorizedException('Credentials are not valid (password)');
     if (!user.isVerified) {
@@ -80,7 +82,10 @@ export class AuthService {
   }
   
   async resetPassword(email: string) {
-    const user = await this.userService.findByEmail(email);
+    const user = await this.userService.findByTerm({
+      field: 'email',
+      value: email,
+    })
 
     const token = this.getJwtToken({ id: user.id });
     const verificationLink = `${process.env.APP_URL}/auth/reset-password?token=${token}`;
