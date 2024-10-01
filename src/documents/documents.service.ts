@@ -124,6 +124,11 @@ export class DocumentsService {
   async hasValidDocuments(sectionId: string, user: User) {
     const sectionDocuments = await this.verifySectionDocumentsUploaded(user, sectionId);
 
+    const section = await this.sectionService.findOne(sectionId);
+    if (sectionDocuments.length !== section.requiredDocumentsCount) {
+      throw new UnprocessableEntityException('No tiene subido todos los documentos en la sección');
+    }
+
     const allVerified = sectionDocuments.every(
       (document) => document.status === 'VERIFICADO',
     );
@@ -142,7 +147,6 @@ export class DocumentsService {
 
   async verifySectionDocumentsUploaded(user: User, sectionId: string) {
 
-    const section = await this.sectionService.findOne(sectionId);
     const sectionDocuments = await this.documentRepository
     .createQueryBuilder('document')
     .leftJoinAndSelect('document.sectionTypeDocument', 'sectionTypeDocument')
@@ -154,13 +158,17 @@ export class DocumentsService {
     }) // Filtra por el ID de la sección
     .getMany(); // O getOne() si esperas un solo resultado
 
-    if (sectionDocuments.length !== section.requiredDocumentsCount) {
-      throw new UnprocessableEntityException('No tiene subido todos los documentos en la sección');
-    }
+    
     return sectionDocuments;
   }
  
   async findDocumentBySection(id: string, user: User) {
+    const sectionDocuments = await this.verifySectionDocumentsUploaded(user, id);
+    const section = await this.sectionService.findOne(id);
+
+    if (sectionDocuments.length !== section.requiredDocumentsCount) {
+      throw new UnprocessableEntityException('No tiene subido todos los documentos en la sección');
+    }
     return await this.verifySectionDocumentsUploaded(user, id);
   }
 
