@@ -143,8 +143,16 @@ export class DocumentsService {
   async verifySectionDocumentsUploaded(user: User, sectionId: string) {
 
     const section = await this.sectionService.findOne(sectionId);
-    const sectionDocuments = await this.findDocumentBySection(sectionId, user);
-
+    const sectionDocuments = await this.documentRepository
+    .createQueryBuilder('document')
+    .leftJoinAndSelect('document.sectionTypeDocument', 'sectionTypeDocument')
+    .leftJoinAndSelect('sectionTypeDocument.typeDocument', 'typeDocument') // Realiza el JOIN con typeDocument
+    .leftJoin('document.user', 'user') // Realiza el JOIN con la entidad User
+    .where('user.id = :userId', { userId: user.id }) // Filtra por el ID del usuario
+    .andWhere('sectionTypeDocument.section.id = :sectionId', {
+      sectionId: sectionId,
+    }) // Filtra por el ID de la sección
+    .getMany(); // O getOne() si esperas un solo resultado
 
     if (sectionDocuments.length !== section.requiredDocumentsCount) {
       throw new UnprocessableEntityException('No tiene subido todos los documentos en la sección');
@@ -153,18 +161,7 @@ export class DocumentsService {
   }
  
   async findDocumentBySection(id: string, user: User) {
-    await this.verifySectionDocumentsUploaded(user, id);
-
-    return this.documentRepository
-      .createQueryBuilder('document')
-      .leftJoinAndSelect('document.sectionTypeDocument', 'sectionTypeDocument')
-      .leftJoinAndSelect('sectionTypeDocument.typeDocument', 'typeDocument') // Realiza el JOIN con typeDocument
-      .leftJoin('document.user', 'user') // Realiza el JOIN con la entidad User
-      .where('user.id = :userId', { userId: user.id }) // Filtra por el ID del usuario
-      .andWhere('sectionTypeDocument.section.id = :sectionId', {
-        sectionId: id,
-      }) // Filtra por el ID de la sección
-      .getMany(); // O getOne() si esperas un solo resultado
+    return await this.verifySectionDocumentsUploaded(user, id);
   }
 
   getTypeDocumentCountBySectionId(data: any[], sectionId: string): number {
@@ -181,7 +178,6 @@ export class DocumentsService {
     const users = await this.userService.findAll();
 
     const section = await this.sectionService.findOne(idSection);
-
     const validUsers = [];
     for (const user of users) {
       const assignmentExists =
@@ -193,6 +189,7 @@ export class DocumentsService {
       if (assignmentExists) {
         continue;
       }
+
       const sectionDocuments = await this.findDocumentBySection(
         idSection,
         user,
