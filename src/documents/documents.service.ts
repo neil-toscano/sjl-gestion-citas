@@ -15,6 +15,7 @@ import { SectionDocumentService } from 'src/section-document/section-document.se
 import { UserService } from 'src/user/user.service';
 import { AssignmentsService } from 'src/assignments/assignments.service';
 import { groupDocumentsBySection } from './utils/organize-documents';
+import { AppointmentService } from 'src/appointment/appointment.service';
 
 @Injectable()
 export class DocumentsService {
@@ -26,6 +27,7 @@ export class DocumentsService {
     private readonly sectionService: SectionDocumentService,
     private readonly userService: UserService,
     private readonly assignmentService: AssignmentsService,
+    private readonly AppointmentService: AppointmentService,
   ) {}
 
   async create(user: User, createDocumentDto: CreateDocumentDto) {
@@ -289,6 +291,49 @@ export class DocumentsService {
   
     return validUsers;
   }
+  
+  async getUsersWithoutAppointmentsButVerified() {
+    // Obtener todas las secciones y usuarios en paralelo
+    const [sections, users] = await Promise.all([
+      this.sectionService.findAll(),
+      this.userService.findAll(),
+    ]);
+  
+    const validUsers = [];
+  
+    // Procesar usuarios en paralelo usando Promise.all
+    await Promise.all(users.map(async (user) => {
+      // Para cada usuario, procesar cada sección
+      await Promise.all(sections.map(async (section) => {
+        // Verificar si el usuario ya tiene una asignación de cita para la sección
+        const { ok } = await this.AppointmentService.hasOpenAppointmentBySection(section.id, user.id);
+  
+        if (ok) return; // Si tiene cita, continuar con la siguiente sección
+  
+        // Obtener los documentos del usuario para la sección actual
+        const sectionDocuments = await this.findDocumentBySection(section.id, user);
+  
+        // Verificar si el usuario tiene el número correcto de documentos requeridos
+        if (sectionDocuments.length !== section.requiredDocumentsCount) return;
+  
+        // Verificar si todos los documentos están en estado 'VERIFICADO'
+        const allDocumentsVerified = sectionDocuments.every(
+          (document) => document.status === 'VERIFICADO'
+        );
+  
+        if (allDocumentsVerified) {
+          validUsers.push({ user, section });
+        }
+      }));
+    }));
+  
+    // Devolver los usuarios que cumplen con los requisitos en diferentes secciones
+    return validUsers;
+  }
+  
+  
+  
+  
   
   async removeDocuments(documents: Document[]) {
     return await this.documentRepository.remove(documents);

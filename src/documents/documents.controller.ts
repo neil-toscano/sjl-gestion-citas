@@ -48,6 +48,14 @@ export class DocumentsController {
   ) {
     return this.documentsService.hasValidDocuments(id, user);
   }
+  
+  @Get('all-valid/without-appointment')
+  @Auth()
+  validDocumentsWithoutAppointmen(
+    @GetUser() user: User,
+  ) {
+    return this.documentsService.getUsersWithoutAppointmentsButVerified();
+  }
 
   @Get('super-user/sections/:id')
   findAllDocumentsByUser(@Param('id', new ParseUUIDPipe()) id: string) {
