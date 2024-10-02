@@ -33,8 +33,8 @@ export class AdminService {
 
   async findBySection(idSection: string, admin: User) {
     await this.assignmentService.remove(admin.id);
-    const validUsers = await this.documentService.readyForReviewBySection(idSection);
-    return validUsers.length > 0 ? [validUsers[0]] : [];
+    const user = await this.documentService.findFirstUserReadyForReviewBySection(idSection, admin.id);
+    return user;
   }
 
   async getUsersWithCorrectedDocuments(idSection: string, admin: User) {
@@ -57,10 +57,6 @@ export class AdminService {
     await this.sectionService.findOne(idSection);
     const user = await this.userService.findOne(idUser);
 
-    await this.assignmentService.create({
-      sectionDocumentId: idSection,
-      userId: idUser,
-    }, adminUser.id);
     const documents = await this.documentService.findSectionDocumentsByUser(
       idSection,
       idUser,

@@ -205,6 +205,45 @@ export class DocumentsService {
     return validUsers;
   }
 
+  async findFirstUserReadyForReviewBySection(idSection: string, adminId: string) {
+    await this.sectionService.findOne(idSection);
+  
+    const users = await this.userService.findAll();
+    const section = await this.sectionService.findOne(idSection);
+  
+    for (const user of users) {
+      const assignmentExists = await this.assignmentService.findOneByUserAndSection(
+        user.id,
+        idSection,
+      );
+  
+      if (assignmentExists) {
+        continue;
+      }
+  
+      const sectionDocuments = await this.findDocumentBySection(idSection, user);
+  
+      if (sectionDocuments.length !== section.requiredDocumentsCount) {
+        continue;
+      }
+  
+      const allVerified = sectionDocuments.every(
+        (document) => document.status === 'EN PROCESO',
+      );
+  
+      if (allVerified) {
+        await this.assignmentService.create({
+          sectionDocumentId: idSection,
+          userId: user.id,
+        }, adminId);
+
+        return user; // Devuelve el primer usuario que cumpla los requisitos
+      }
+    }
+  
+    return [];
+  }
+  
   async getUsersWithCorrectedDocuments(idSection: string) {
     await this.sectionService.findOne(idSection);
 
@@ -291,7 +330,7 @@ export class DocumentsService {
   
     return validUsers;
   }
-  
+
   async getUsersWithoutAppointmentsButVerified() {
     // Obtener todas las secciones y usuarios en paralelo
     const [sections, users] = await Promise.all([

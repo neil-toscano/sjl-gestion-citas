@@ -19,4 +19,8 @@ export class CreateAppointmentDto {
   @IsEnum(AppointmentStatus)
   @IsOptional()
   status: AppointmentStatus;
+
+  @IsBoolean()
+  @IsOptional()
+  isReschedule: boolean = false;
 }
