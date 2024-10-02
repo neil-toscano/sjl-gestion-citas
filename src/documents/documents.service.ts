@@ -283,13 +283,59 @@ export class DocumentsService {
         (document) => document.status !== 'OBSERVADO'
       );
       
-      if (hasVerifiedDocument && hasInProcessDocument) {
+      if (hasVerifiedDocument && hasInProcessDocument && noObservedDocuments) {
         validUsers.push(user);
       }
     }
 
     return validUsers;
   }
+  async findFirstUserWithCorrectedDocuments(idSection: string, adminId: string) {
+    await this.sectionService.findOne(idSection);
+  
+    const users = await this.userService.findAll();
+    const section = await this.sectionService.findOne(idSection);
+  
+    for (const user of users) {
+      const assignmentExists = await this.assignmentService.findOneByUserAndSection(
+        user.id,
+        idSection,
+      );
+  
+      if (assignmentExists) {
+        continue;
+      }
+  
+      const sectionDocuments = await this.findDocumentBySection(idSection, user);
+  
+      if (sectionDocuments.length !== section.requiredDocumentsCount) {
+        continue;
+      }
+  
+      const hasVerifiedDocument = sectionDocuments.some(
+        (document) => document.status === 'VERIFICADO',
+      );
+  
+      const hasInProcessDocument = sectionDocuments.some(
+        (document) => document.status === 'EN PROCESO',
+      );
+  
+      const noObservedDocuments = sectionDocuments.every(
+        (document) => document.status !== 'OBSERVADO',
+      );
+  
+      if (hasVerifiedDocument && hasInProcessDocument && noObservedDocuments) {
+        await this.assignmentService.create({
+          sectionDocumentId: idSection,
+          userId: user.id,
+        }, adminId);
+        return [user]; 
+      }
+    }
+  
+    return []; // Si ningún usuario es válido, devolver null o un valor vacío
+  }
+  
 
   async getUsersWithObservedDocuments(idSection: string) {
     await this.sectionService.findOne(idSection);
