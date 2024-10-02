@@ -237,7 +237,7 @@ export class DocumentsService {
           userId: user.id,
         }, adminId);
 
-        return user; // Devuelve el primer usuario que cumpla los requisitos
+        return [user]; // Devuelve el primer usuario que cumpla los requisitos
       }
     }
   
