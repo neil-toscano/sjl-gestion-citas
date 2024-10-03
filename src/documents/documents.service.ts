@@ -179,7 +179,7 @@ export class DocumentsService {
     const section = await this.sectionService.findOne(id);
     
     const documents = await this.verifySectionDocumentsUploaded(user, id);
-    if(section.requiredDocumentsCount === documents.length) {
+    if(section.requiredDocumentsCount !== documents.length) {
       
       throw new UnprocessableEntityException('No tiene subido todos los documentos en la sección');
       
