@@ -28,7 +28,7 @@ export class DocumentsController {
     @Param('id', new ParseUUIDPipe()) id: string,
     @GetUser() user: User,
   ) {
-    return this.documentsService.findDocumentBySection(id, user);
+    return this.documentsService.findCompleteDocumentBySection(id, user);
   }
 
   @Patch(':id')
