@@ -16,6 +16,7 @@ import { UserService } from 'src/user/user.service';
 import { AssignmentsService } from 'src/assignments/assignments.service';
 import { groupDocumentsBySection } from './utils/organize-documents';
 import { AppointmentService } from 'src/appointment/appointment.service';
+import { SectionType } from 'src/section-type-document/interfaces/document';
 
 @Injectable()
 export class DocumentsService {
@@ -64,6 +65,25 @@ export class DocumentsService {
       throw new NotFoundException(`Document with id ${id} not found`);
     return document;
   }
+
+  async findCountsBySection() {
+    const sectionTypeDocuments = await this.sectionTypeService.findAll();
+
+    const result = await Promise.all(
+        sectionTypeDocuments.map(async (section: any) => {
+            const users = await this.readyForReviewBySection(section.sectionId);
+
+            return {
+                section,
+                count: {
+                    newDocuments: users.length,
+                },
+            };
+        })
+    );
+
+    return result;
+}
 
   async findAllSectionsByUser(id: string) {
     const documents = await this.documentRepository
@@ -180,11 +200,18 @@ export class DocumentsService {
     
     const documents = await this.verifySectionDocumentsUploaded(user, id);
     if(section.requiredDocumentsCount !== documents.length) {
-      
-      throw new UnprocessableEntityException('No tiene subido todos los documentos en la sección');
+      return {
+        statusCode: 422,
+        message: "No tiene cargado todos los documentos en la sección",
+        documents
+      }
       
     }
-    return documents;
+    return {
+      statusCode: 400,
+      message: "Tiene cargado todos sus documentos",
+      documents
+    }
   }
 
   async readyForReviewBySection(idSection: string) {

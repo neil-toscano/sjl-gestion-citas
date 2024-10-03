@@ -56,6 +56,14 @@ export class DocumentsController {
   ) {
     return this.documentsService.getUsersWithoutAppointmentsButVerified();
   }
+  
+  @Get('all-section/count-documents')
+  // @Auth()
+  findCountsDocumentsBySection(
+    // @GetUser() user: User,
+  ) {
+    return this.documentsService.findCountsBySection();
+  }
 
   @Get('super-user/sections/:id')
   findAllDocumentsByUser(@Param('id', new ParseUUIDPipe()) id: string) {

@@ -4,6 +4,7 @@ import { UpdateSectionTypeDocumentDto } from './dto/update-section-type-document
 import { InjectRepository } from '@nestjs/typeorm';
 import { SectionTypeDocument } from './entities/section-type-document.entity';
 import { Repository } from 'typeorm';
+import { SectionType } from './interfaces/document';
 
 @Injectable()
 export class SectionTypeDocumentService {
@@ -22,7 +23,7 @@ export class SectionTypeDocumentService {
     return this.sectionTypeDocumentRepository.save(newSectionTypeDocument);
   }
 
-  async findAll() {
+  async findAll(): Promise<SectionType[]> {
     //TODO: Verificar detalladamente
     const result = await this.sectionTypeDocumentRepository
       .createQueryBuilder('sectionTypeDocument')
