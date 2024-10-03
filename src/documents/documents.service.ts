@@ -156,6 +156,7 @@ export class DocumentsService {
     .andWhere('sectionTypeDocument.section.id = :sectionId', {
       sectionId: sectionId,
     }) // Filtra por el ID de la sección
+    .orderBy('typeDocument.name', 'ASC')
     .getMany(); // O getOne() si esperas un solo resultado
 
     
