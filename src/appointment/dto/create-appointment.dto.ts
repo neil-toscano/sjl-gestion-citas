@@ -22,5 +22,5 @@ export class CreateAppointmentDto {
 
   @IsBoolean()
   @IsOptional()
-  isReschedule: boolean = false;
+  isFirstTime: boolean = false;
 }

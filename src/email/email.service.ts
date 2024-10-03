@@ -20,13 +20,21 @@ export class EmailService {
   }
 
   async sendAppointmentConfirmation(appointment: AppointmentDetails) {
-    const { email, appointmentDate, appointmentTime, person, service, recipientName } = appointment;
+    const {isFirstTime, email, appointmentDate, appointmentTime, person, service, recipientName } = appointment;
     
+    let subject = '';
+    if(isFirstTime) {
+      subject = 'Confirmación de Cita Reservada';
+    }
+    else {
+      subject = 'Reprogramación de cita';
+    }
+
     const appointmentConfirmation = {
       from: '"Municipalidad de San Juan de Lurigancho" <luriganchomunicipalidad@gmail.com>',
       to: email,
-      subject: "Confirmación de Cita Reservada",
-      text: `Estimado(a) administrado(a) ${recipientName},\n\nSu cita ha sido programada con éxito. A continuación, encontrará los detalles de su cita:\n\n- Fecha: ${appointmentDate}\n- Hora: ${appointmentTime}\n- Persona de contacto: ${person}\n- Servicio: ${service}\n\nPor favor, asegúrese de llegar 10 minutos antes de la hora programada.\n\nGracias por confiar en nosotros.\n\nSaludos cordiales,\nEl equipo de la Municipalidad de San Juan de Lurigancho`,
+      subject: subject,
+      text: `Estimado(a) administrado(a) ${recipientName},\n\nSu cita ha sido ${ isFirstTime? 'programada con éxito': 'reprogramado'}. A continuación, encontrará los detalles de su cita:\n\n- Fecha: ${appointmentDate}\n- Hora: ${appointmentTime}\n- Persona de contacto: ${person}\n- Servicio: ${service}\n\nPor favor, asegúrese de llegar 10 minutos antes de la hora programada.\n\nGracias por confiar en nosotros.\n\nSaludos cordiales,\nEl equipo de la Municipalidad de San Juan de Lurigancho`,
       html: `
         <div style="font-family: Arial, sans-serif; color: #333; line-height: 1.6;">
           <div style="max-width: 600px; margin: 0 auto; border: 1px solid #e0e0e0; border-radius: 8px; overflow: hidden; background-color: #ffffff;">
@@ -34,14 +42,14 @@ export class EmailService {
             <!-- Encabezado -->
             <div style="background-color: #00aaff; padding: 20px; text-align: center; color: white;">
               <img src="https://web.munisjl.gob.pe/web/images/mdsjl-cambia-contigo.png" alt="Logo" style="max-height: 60px;">  
-              <p style="font-size: 18px;">Confirmación de Cita Reservada</p>
+              <p style="font-size: 18px;">${subject}</p>
             </div>
             
             <!-- Cuerpo del correo -->
             <div style="padding: 20px;">
               <h3 style="color: #00aaff; font-size: 20px; margin-top: 0;">Detalles de su Cita</h3>
               <p>Estimado(a) <strong>${recipientName}</strong>,</p>
-              <p>Nos complace informarle que su cita ha sido reservada exitosamente. Aquí están los detalles importantes de su cita:</p>
+              <p>Nos complace informarle que su cita ha sido ${isFirstTime? 'reservada exitosamente.': '<strong>reprogramada</strong>.'}  Aquí están los detalles importantes de su cita:</p>
               <ul style="list-style-type: none; padding: 0; font-size: 16px; color: #000;">
                 <li><strong>📅 Fecha:</strong> ${appointmentDate}</li>
                 <li><strong>⏰ Hora:</strong> ${appointmentTime}</li>

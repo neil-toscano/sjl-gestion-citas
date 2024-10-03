@@ -65,6 +65,7 @@ export class AppointmentService {
       },
     });
     await this.emailService.sendAppointmentConfirmation({
+      isFirstTime: createAppointmentDto.isFirstTime,
       appointmentDate: createAppointmentDto.appointmentDate,
       appointmentTime: `${schedule.startTime} - ${schedule.endTime}`,
       email: user.email,
