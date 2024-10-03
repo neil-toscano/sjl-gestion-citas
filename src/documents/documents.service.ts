@@ -163,14 +163,14 @@ export class DocumentsService {
   }
  
   async findDocumentBySection(id: string, user: User) {
-    const section = await this.sectionService.findOne(id);
+    // const section = await this.sectionService.findOne(id);
     
     const documents = await this.verifySectionDocumentsUploaded(user, id);
-    if(section.requiredDocumentsCount === documents.length) {
+    // if(section.requiredDocumentsCount === documents.length) {
       
-      throw new UnprocessableEntityException('No tiene subido todos los documentos en la sección');
+    //   throw new UnprocessableEntityException('No tiene subido todos los documentos en la sección');
       
-    }
+    // }
     return documents;
   }
 
