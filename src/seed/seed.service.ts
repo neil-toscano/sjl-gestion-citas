@@ -71,7 +71,9 @@ export class SeedService {
       { name: 'Copia literal insertada en la sucesión intestada'},
       { name: 'Copia literal o partida electrónica todos los asientos'},
       { name: 'Copia literal de las unidades subdivididas o membretadas'},
-      { name: 'DNI de los herederos'},
+      { name: 'Suceción intentastada inscrita en sunarp'},
+      { name: 'Documento que acredite la titularidad del fallecido'},
+      { name: 'Copia de DNI de los herederos'},
     ];
   
     const createdTypeDocuments = [];
@@ -88,8 +90,8 @@ export class SeedService {
   
     // Asocia secciones con documentos
     const associations = [
-      { section: sections[0].sectionDocument, typeDocuments: [typeDocuments[2].sectionDocument, typeDocuments[5].sectionDocument] }, // Acceder a sectionDocument de ambos
-      { section: sections[1].sectionDocument, typeDocuments: [typeDocuments[3].sectionDocument, typeDocuments[4].sectionDocument, typeDocuments[5].sectionDocument] },
+      { section: sections[0].sectionDocument, typeDocuments: [typeDocuments[5].sectionDocument, typeDocuments[6].sectionDocument, typeDocuments[7].sectionDocument] }, // Acceder a sectionDocument de ambos
+      { section: sections[1].sectionDocument, typeDocuments: [typeDocuments[3].sectionDocument, typeDocuments[4].sectionDocument, typeDocuments[7].sectionDocument] },
       { section: sections[2].sectionDocument, typeDocuments: [typeDocuments[3].sectionDocument, typeDocuments[1].sectionDocument, typeDocuments[0].sectionDocument] },
     ];
   

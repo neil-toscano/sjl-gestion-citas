@@ -25,7 +25,6 @@ export class SectionTypeDocumentController {
   }
 
   @Get()
-  @Auth()
   findAll() {
     return this.sectionTypeDocumentService.findAll();
   }
