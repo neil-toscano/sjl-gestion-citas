@@ -36,8 +36,9 @@ export class DocumentsController {
   update(
     @Param('id', new ParseUUIDPipe()) id: string,
     @Body() updateDocumentDto: UpdateDocumentDto,
+    @GetUser() user: User,
   ) {
-    return this.documentsService.update(id, updateDocumentDto);
+    return this.documentsService.update(id, updateDocumentDto, user);
   }
 
   @Get('valid/:id')

@@ -17,6 +17,7 @@ import { AssignmentsService } from 'src/assignments/assignments.service';
 import { groupDocumentsBySection } from './utils/organize-documents';
 import { AppointmentService } from 'src/appointment/appointment.service';
 import { SectionType } from 'src/section-type-document/interfaces/document';
+import { EmailService } from 'src/email/email.service';
 
 @Injectable()
 export class DocumentsService {
@@ -29,6 +30,7 @@ export class DocumentsService {
     private readonly userService: UserService,
     private readonly assignmentService: AssignmentsService,
     private readonly AppointmentService: AppointmentService,
+    private readonly emailService: EmailService,
   ) {}
 
   async create(user: User, createDocumentDto: CreateDocumentDto) {
@@ -127,15 +129,29 @@ export class DocumentsService {
     return { isDocumentExists: true };
   }
 
-  async update(id: string, updateDocumentDto: UpdateDocumentDto) {
+  async update(id: string, updateDocumentDto: UpdateDocumentDto, user: User) {
     const document = await this.findOne(id);
 
     if (Object.keys(updateDocumentDto).length === 0) {
       return { message: 'No data provided for update' };
     }
-    if (updateDocumentDto.fileUrl) {
-      const response = this.fileService.deleteFile(document.fileUrl);
-    }
+    const promises = [];
+
+  if (updateDocumentDto.fileUrl) {
+    promises.push(this.fileService.deleteFile(document.fileUrl));
+  }
+
+  if (updateDocumentDto.status === 'OBSERVADO') {
+    promises.push(
+      this.emailService.createTemporaryEmail(user.email).catch(error => {
+        // Manejar el error, por ejemplo, loguearlo
+        console.error(`Error sending email to ${user.email}:`, error);
+        return null; // O puedes lanzar el error si prefieres
+      })
+    );
+  }
+
+  await Promise.all(promises);
 
     await this.documentRepository.update(id, updateDocumentDto);
     return this.documentRepository.findOneBy({ id });

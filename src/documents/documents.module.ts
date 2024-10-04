@@ -10,6 +10,7 @@ import { SectionDocumentModule } from 'src/section-document/section-document.mod
 import { UserModule } from 'src/user/user.module';
 import { AssignmentsModule } from 'src/assignments/assignments.module';
 import { AppointmentModule } from 'src/appointment/appointment.module';
+import { EmailModule } from 'src/email/email.module';
 
 @Module({
   controllers: [DocumentsController],
@@ -23,7 +24,8 @@ import { AppointmentModule } from 'src/appointment/appointment.module';
     SectionDocumentModule,
     UserModule,
     AssignmentsModule,
-    AppointmentModule
+    AppointmentModule,
+    EmailModule
   ],
 })
 export class DocumentsModule {}

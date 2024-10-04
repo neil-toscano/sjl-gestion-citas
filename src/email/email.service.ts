@@ -3,10 +3,16 @@ import { CreateEmailDto } from './dto/create-email.dto';
 import { UpdateEmailDto } from './dto/update-email.dto';
 import * as nodemailer from 'nodemailer';
 import { AppointmentDetails } from './interface/appointment-confirm';
+import { InjectRepository } from '@nestjs/typeorm';
+import { TemporaryEmail } from './entities/temporary-email.entity';
+import { Repository } from 'typeorm';
 @Injectable()
 export class EmailService {
   transporter: any;
-  constructor() {
+  constructor(
+    @InjectRepository(TemporaryEmail)
+    private readonly temporaryEmailRepository: Repository<TemporaryEmail>,
+  ) {
     this.transporter = nodemailer.createTransport({
       service: 'gmail',
       auth: {
@@ -18,6 +24,75 @@ export class EmailService {
   create(createEmailDto: CreateEmailDto) {
     return 'This action adds a new email';
   }
+  async createTemporaryEmail(email: string) {
+    const temporaryEmail = this.temporaryEmailRepository.create({ email });
+    return await this.temporaryEmailRepository.save(temporaryEmail);
+  }
+
+  async notifyObservedUsers() {
+    const temporaryEmails = await this.temporaryEmailRepository.find();
+    
+    const uniqueEmails = [...new Set(temporaryEmails.map(email => email.email))];
+
+    for (const email of uniqueEmails) {
+        await this.temporaryEmailRepository.delete({ email });
+    }
+
+    const emailPromises = uniqueEmails.map(email => this.sendStateChangeNotification(email));
+    await Promise.all(emailPromises);
+
+    return uniqueEmails; // Retornar los correos únicos si es necesario
+}
+
+async sendStateChangeNotification(email: string) {
+  const notification = {
+    from: '"Municipalidad de San Juan de Lurigancho" <luriganchomunicipalidad@gmail.com>',
+    to: email,
+    subject: "Revisar Estado de Su Trámite",
+    text: `Estimado(a) administrado(a),\n\nHemos observado que su trámite requiere atención. Por favor, visite nuestra página web para revisar el estado de su trámite y realizar las correcciones necesarias.\n\n¡Gracias por su colaboración!\n\nSaludos,\nEl equipo de San Juan de Lurigancho`,
+    html: `
+      <div style="font-family: Arial, sans-serif; color: #333; line-height: 1.6;">
+        <div style="max-width: 600px; margin: 0 auto; border: 1px solid #e0e0e0; border-radius: 8px; overflow: hidden; background-color: #f4f4f4;">
+          
+          <!-- Encabezado -->
+          <div style="background-color: #2b8cbe; padding: 20px; text-align: center; color: black;">
+            <img src="https://web.munisjl.gob.pe/web/images/mdsjl-cambia-contigo.png" alt="Logo" style="max-height: 60px;">  
+            <p style="font-size: 16px;">Atención a su Trámite</p>
+          </div>
+          
+          <!-- Cuerpo del correo -->
+          <div style="padding: 20px; background-color: #ffffff;">
+            <h3 style="color: #333; font-size: 18px; margin-top: 0;">Acción Requerida</h3>
+            <p>Estimado(a) administrado(a),</p>
+            <p>
+              Hemos observado que su trámite requiere atención. Le invitamos a revisar el estado de su trámite y realizar las correcciones necesarias.
+            </p>
+            <div style="text-align: center; margin: 30px 0;">
+              <a href="https://su-web.com/revisar-tramite" target="_blank" style="background-color: #2b8cbe; color: white; text-decoration: none; padding: 15px 30px; border-radius: 5px; font-weight: bold; font-size: 16px;">
+                Revisar Estado de Trámite
+              </a>
+            </div>
+            <p>¡Gracias por su atención!</p>
+            <p>Saludos cordiales,</p>
+            <p><strong>El equipo de la Municipalidad de San Juan de Lurigancho</strong></p>
+          </div>
+          
+          <!-- Pie de página -->
+          <div style="background-color: #2b8cbe; padding: 10px; text-align: center; color: black;">
+            <p style="font-size: 12px; margin: 0;">Municipalidad de San Juan de Lurigancho © 2024</p>
+            <p style="font-size: 12px; margin: 0;">Todos los derechos reservados</p>
+          </div>
+          
+        </div>
+      </div>
+    `,
+  };
+
+  return await this.sendEmail(notification);
+}
+
+
+
 
   async sendAppointmentConfirmation(appointment: AppointmentDetails) {
     const {isFirstTime, email, appointmentDate, appointmentTime, person, service, recipientName } = appointment;

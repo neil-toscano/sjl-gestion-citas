@@ -4,6 +4,7 @@ import { UpdateCronDto } from './dto/update-cron.dto';
 import { CronJob } from 'cron';
 import { AppointmentService } from 'src/appointment/appointment.service';
 import { AdminService } from 'src/admin/admin.service';
+import { EmailService } from 'src/email/email.service';
 
 
 @Injectable()
@@ -13,6 +14,7 @@ export class CronService {
   constructor(
     private readonly appointmentService: AppointmentService,
     private readonly adminService: AdminService,
+    private readonly emailService: EmailService,
   ) {
 
   }
@@ -30,6 +32,14 @@ export class CronService {
     }, null, true, 'America/Lima'); // Establece la zona horaria de Lima
 
     this.job.start();
+
+
+    const jobEveryMinute = new CronJob('*/2 * * * *', async () => {
+      console.log('Se ejecuta cada minuto');
+      await this.notifyObservedUsers();
+    }, null, true, 'America/Lima');
+    jobEveryMinute.start();
+
   }
 
   async expiredAppoinments() {
@@ -44,6 +54,10 @@ export class CronService {
       ok: true,
       msg: 'Se removió todos los documentos y citas'
     };
+  }
+
+  async notifyObservedUsers() {
+    await this.emailService.notifyObservedUsers();
   }
 
   create(createCronDto: CreateCronDto) {
