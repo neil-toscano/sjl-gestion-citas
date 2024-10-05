@@ -23,7 +23,7 @@ export class ProcessStatusService {
       section: {
         id: createProcessStatusDto.sectionDocumentId
       },
-      status: ProcessStatusEnum.INCOMPLETE,
+      status: createProcessStatusDto.status,
     });
     await this.processStatusRepository.save(processStatus);
   }
@@ -66,7 +66,9 @@ export class ProcessStatusService {
     return processStatus; 
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} processStatus`;
+  async remove(id: string) {
+    const processStatus = await this.processStatusRepository.findOneBy({ id });
+    await this.processStatusRepository.remove(processStatus);
+    return `Se eliminó correctamente`;
   }
 }

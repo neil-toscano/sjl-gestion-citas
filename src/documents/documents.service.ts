@@ -90,13 +90,19 @@ export class DocumentsService {
         }
       }
       });
-    
-    if(section.requiredDocumentsCount === documents.length) {
-      await this.processStatusService.create({
+  const processStatus = await this.processStatusService.findOneByUserSection(sectionId, user);
+  if(processStatus) {
+    await this.processStatusService.remove(processStatus.id);
+  }
+  if(section.requiredDocumentsCount === documents.length) {
+    await this.processStatusService.create({
       sectionDocumentId: sectionId,
       status: ProcessStatusEnum.COMPLETE,
-      }, user);
-
+    }, user);
+    
+  }
+  else {
+      console.log(documents);
       await this.processStatusService.create({
       sectionDocumentId: sectionId,
       status: ProcessStatusEnum.INCOMPLETE,
@@ -297,23 +303,19 @@ const processStatus = await this.processStatusService.findOneByUserSection(updat
     return documents;
   }
 
-  async findCompleteDocumentBySection(id: string, user: User) {
-    const section = await this.sectionService.findOne(id);
-    
-    const documents = await this.verifySectionDocumentsUploaded(user, id);
-    if(section.requiredDocumentsCount !== documents.length) {
-      return {
-        statusCode: 422,
-        message: "No tiene cargado todos los documentos en la sección",
-        documents
+  async findCompleteDocumentBySection(sectionId: string, user: User) {
+    const section = await this.sectionService.findOne(sectionId);
+    const documents = await this.documentRepository.find({
+      where: {
+        section: {
+          id: sectionId
+        },
+        user: {
+          id: user.id
+        }
       }
-      
-    }
-    return {
-      statusCode: 400,
-      message: "Tiene cargado todos sus documentos",
-      documents
-    }
+    })
+    return documents;
   }
 
   async readyForReviewBySection(idSection: string) {

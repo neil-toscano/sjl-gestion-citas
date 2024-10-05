@@ -33,6 +33,6 @@ export class ProcessStatusController {
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.processStatusService.remove(+id);
+    return this.processStatusService.remove(id);
   }
 }

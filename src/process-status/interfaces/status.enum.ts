@@ -1,6 +1,6 @@
 export enum ProcessStatusEnum {
-    INCOMPLETE = 'incompleto', 
-    COMPLETE = 'completo', 
-    UNDER_OBSERVATION = 'observado', 
-    VERIFIED = 'verificado',
+    INCOMPLETE = 'INCOMPLETO', 
+    COMPLETE = 'COMPLETO', 
+    UNDER_OBSERVATION = 'OBSERVADO', 
+    VERIFIED = 'VERIFICADO',
 }
