@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateProcessStatusDto } from './dto/create-process-status.dto';
 import { UpdateProcessStatusDto } from './dto/update-process-status.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -32,8 +32,8 @@ export class ProcessStatusService {
     return `This action returns all processStatus`;
   }
 
-  findOneByUserSection(sectionId: string, user: User) {
-    return this.processStatusRepository.findOne({
+  async findOneByUserSection(sectionId: string, user: User) {
+    const processStatus = await this.processStatusRepository.findOne({
       where: {
         user: {
           id: user.id
@@ -43,6 +43,13 @@ export class ProcessStatusService {
         }
       }
     });
+
+    if(!processStatus) {
+      if (!processStatus) {
+        throw new NotFoundException(`Aún no tiene proceso iniciado`);
+      }
+    }
+    return processStatus;
   }
 
   async update(id: string, updateProcessStatusDto: UpdateProcessStatusDto) {

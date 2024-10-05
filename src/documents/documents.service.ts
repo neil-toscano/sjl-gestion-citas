@@ -140,13 +140,6 @@ export class DocumentsService {
     return result;
 }
 
-  async findCountDocumentsBySection(sectionId: string, user: User) {
-    const countDocuments = await this.documentRepository.find({
-      where: {
-        
-      }
-    })
-  }
 
   async findAllSectionsByUser(id: string) {
     const documents = await this.documentRepository
