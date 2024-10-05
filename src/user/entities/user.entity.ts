@@ -12,6 +12,7 @@ import { Document } from 'src/documents/entities/document.entity';
 import { Schedule } from 'src/schedule/entities/schedule.entity';
 import { Appointment } from 'src/appointment/entities/appointment.entity';
 import { Assignment } from 'src/assignments/entities/assignment.entity';
+import { ProcessStatus } from 'src/process-status/entities/process-status.entity';
 
 @Entity('users')
 export class User {
@@ -91,4 +92,7 @@ export class User {
 
   @OneToMany(() => Assignment, (assignment) => assignment.admin)
   adminAssignments: Assignment[];
+
+  @OneToMany(() => ProcessStatus, processStatus => processStatus.user)
+  processStatus: ProcessStatus[];
 }

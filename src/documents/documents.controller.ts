@@ -41,13 +41,13 @@ export class DocumentsController {
     return this.documentsService.update(id, updateDocumentDto, user);
   }
 
-  @Get('valid/:id')
+  @Get('valid/:sectionId')
   @Auth()
   validDocuments(
-    @Param('id', new ParseUUIDPipe()) id: string,
+    @Param('sectionId', new ParseUUIDPipe()) sectionId: string,
     @GetUser() user: User,
   ) {
-    return this.documentsService.hasValidDocuments(id, user);
+    return this.documentsService.hasValidDocuments(sectionId, user);
   }
   
   @Get('all-valid/without-appointment')

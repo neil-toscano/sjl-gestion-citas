@@ -1,6 +1,7 @@
 import { Appointment } from 'src/appointment/entities/appointment.entity';
 import { Assignment } from 'src/assignments/entities/assignment.entity';
 import { Document } from 'src/documents/entities/document.entity';
+import { ProcessStatus } from 'src/process-status/entities/process-status.entity';
 import { Schedule } from 'src/schedule/entities/schedule.entity';
 import { SectionTypeDocument } from 'src/section-type-document/entities/section-type-document.entity';
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
@@ -38,4 +39,10 @@ export class SectionDocument {
 
   @OneToMany(() => Assignment, (assignment) => assignment.sectionDocument)
   assignments: Assignment[];
+
+  @OneToMany(() => ProcessStatus, processStatus => processStatus.section)
+  processStatus: ProcessStatus[];
+
+  @OneToMany(() => Document, (document) => document.section)
+  documents: Document[];
 }

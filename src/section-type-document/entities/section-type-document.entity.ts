@@ -19,7 +19,4 @@ export class SectionTypeDocument {
     { eager: true },
   )
   typeDocument: TypeDocument;
-
-  @OneToMany(() => Document, (document) => document.sectionTypeDocument)
-  documents: Document[];
 }

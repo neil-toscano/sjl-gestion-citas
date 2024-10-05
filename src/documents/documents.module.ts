@@ -11,6 +11,8 @@ import { UserModule } from 'src/user/user.module';
 import { AssignmentsModule } from 'src/assignments/assignments.module';
 import { AppointmentModule } from 'src/appointment/appointment.module';
 import { EmailModule } from 'src/email/email.module';
+import { ProcessStatusModule } from 'src/process-status/process-status.module';
+import { TypeDocumentModule } from 'src/type-document/type-document.module';
 
 @Module({
   controllers: [DocumentsController],
@@ -25,7 +27,9 @@ import { EmailModule } from 'src/email/email.module';
     UserModule,
     AssignmentsModule,
     AppointmentModule,
-    EmailModule
+    EmailModule,
+    ProcessStatusModule,
+    TypeDocumentModule
   ],
 })
 export class DocumentsModule {}

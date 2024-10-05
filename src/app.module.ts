@@ -23,16 +23,17 @@ import { AssignmentsModule } from './assignments/assignments.module';
 import { AdminModule } from './admin/admin.module';
 import { EmailModule } from './email/email.module';
 import { CronModule } from './cron/cron.module';
+import { ProcessStatusModule } from './process-status/process-status.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot(),
 
     TypeOrmModule.forRoot({
-      ssl: true,
-      extra: {
-        ssl: true ? { rejectUnauthorized: false } : null,
-      },
+      // ssl: true,
+      // extra: {
+      //   ssl: true ? { rejectUnauthorized: false } : null,
+      // },
       type: 'postgres',
       host: process.env.DB_HOST,
       port: +process.env.DB_PORT,
@@ -78,6 +79,8 @@ import { CronModule } from './cron/cron.module';
     EmailModule,
 
     CronModule,
+
+    ProcessStatusModule,
   ],
 })
 export class AppModule {}

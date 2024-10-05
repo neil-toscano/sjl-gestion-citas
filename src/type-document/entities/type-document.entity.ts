@@ -1,6 +1,6 @@
 import { Document } from 'src/documents/entities/document.entity';
 import { SectionTypeDocument } from 'src/section-type-document/entities/section-type-document.entity';
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity({ name: 'type_document' })
 export class TypeDocument {
@@ -17,4 +17,7 @@ export class TypeDocument {
     (sectionTypeDocument) => sectionTypeDocument.typeDocument,
   )
   sectionTypeDocument: SectionTypeDocument[];
+
+  @OneToMany(() => Document, (document) => document.typeDocument)
+  documents: Document[];
 }

@@ -28,7 +28,7 @@ export class TypeDocumentController {
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.typeDocumentService.findOne(+id);
+    return this.typeDocumentService.findOne(id);
   }
 
   @Patch(':id')

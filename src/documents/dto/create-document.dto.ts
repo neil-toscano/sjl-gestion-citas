@@ -7,7 +7,10 @@ import {
 } from 'class-validator';
 export class CreateDocumentDto {
   @IsUUID()
-  sectionTypeId: string;
+  sectionId: string;
+
+  @IsUUID()
+  typeDocumentId: string; 
 
   @IsString()
   @IsNotEmpty()
@@ -17,7 +20,7 @@ export class CreateDocumentDto {
   @IsNotEmpty()
   @IsIn(['EN PROCESO', 'VERIFICADO', 'OBSERVADO'], {
     message:
-      'Status must be one of the following values: EN PROCESO, VERIFICADO, OBSERVADO',
+      'El estado debe ser uno de los siguientes: EN PROCESO, VERIFICADO, OBSERVADO',
   })
   status: string;
 
