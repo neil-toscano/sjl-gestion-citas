@@ -31,17 +31,29 @@ export class ProcessStatusController {
   findAll() {
     return this.processStatusService.findAll();
   }
-  
+
   @Get('next-review/:sectionId')
   @Auth()
-  async getNextUserForReview(@Param('sectionId') sectionId: string, @GetUser() admin: User) {
-    return await this.processStatusService.findNextUserForReview(sectionId, admin.id);
+  async getNextUserForReview(
+    @Param('sectionId') sectionId: string,
+    @GetUser() admin: User,
+  ) {
+    return await this.processStatusService.findNextUserForReview(
+      sectionId,
+      admin.id,
+    );
   }
-  
+
   @Get('completed-users/:sectionId')
   @Auth()
-  findCompletedUsers(@Param('sectionId') sectionId: string, @GetUser() admin: User) {
-    return this.processStatusService.findUsersWithCompletedDocuments(sectionId, admin);
+  findCompletedUsers(
+    @Param('sectionId') sectionId: string,
+    @GetUser() admin: User,
+  ) {
+    return this.processStatusService.findUsersWithCompletedDocuments(
+      sectionId,
+      admin,
+    );
   }
 
   @Get('corrected/:sectionId')
@@ -55,17 +67,14 @@ export class ProcessStatusController {
       admin,
     );
   }
-  
+
   @Get('next-corrected/:sectionId')
   @Auth()
   async NextUserCorrected(
     @Param('sectionId', new ParseUUIDPipe()) sectionId: string,
     @GetUser() admin: User,
   ) {
-    return this.processStatusService.NextUserCorrected(
-      sectionId,
-      admin.id,
-    );
+    return this.processStatusService.NextUserCorrected(sectionId, admin.id);
   }
 
   @Get('unresolved-documents/:sectionId')
@@ -85,7 +94,6 @@ export class ProcessStatusController {
   findOneByUserSection(@Param('id') sectionId: string, @GetUser() user: User) {
     return this.processStatusService.findOneByUserSection(sectionId, user);
   }
-
 
   @Patch(':id')
   update(

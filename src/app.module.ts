@@ -42,6 +42,7 @@ import { ProcessStatusModule } from './process-status/process-status.module';
       password: process.env.DB_PASSWORD,
       autoLoadEntities: true,
       synchronize: true,
+      useUTC: false,
     }),
 
     ServeStaticModule.forRoot({

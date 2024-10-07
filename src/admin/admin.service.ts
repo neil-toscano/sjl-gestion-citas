@@ -26,33 +26,16 @@ export class AdminService {
     return 'This action adds a new admin';
   }
 
-  async findAllCompleted(id: string, admin: User) {
-    await this.assignmentService.remove(admin.id);
-    return await this.documentService.readyForReviewBySection(id);
-  }
-
-  async findBySection(idSection: string, admin: User) {
-    await this.assignmentService.remove(admin.id);
-    const user =
-      await this.documentService.findFirstUserReadyForReviewBySection(
-        idSection,
-        admin.id,
-      );
-    return user;
-  }
-
   async findDocumentBySection(
-    idSection: string,
-    idUser: string,
+    sectionId: string,
+    userId: string,
     adminUser: User,
   ) {
-    await this.sectionService.findOne(idSection);
-    const user = await this.userService.findOne(idUser);
+    await this.sectionService.findOne(sectionId);
+    const user = await this.userService.findOne(userId);
 
-    const documents = await this.documentService.findSectionDocumentsByUser(
-      idSection,
-      idUser,
-    );
+    const documents = await this.documentService.findBySection(sectionId, user);
+
     const documentsWithUser = documents.map((doc) => ({
       ...doc,
       user: user,
@@ -74,16 +57,11 @@ export class AdminService {
   }
 
   async finalizeAndRemoveAll(userId: string, sectionId: string) {
+    const user = await this.userService.findOne(userId);
+
     await this.appointmentService.removeByUser(userId, sectionId);
-    const documents = await this.documentService.findSectionDocumentsByUser(
-      sectionId,
-      userId,
-    );
-    if (documents.length === 0) {
-      throw new NotFoundException(
-        'No se encontraron documentos PDF para esta sección y usuario.',
-      );
-    }
+
+    const documents = await this.documentService.findBySection(sectionId, user);
 
     await this.documentService.removeDocuments(documents);
     return {

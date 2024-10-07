@@ -27,17 +27,17 @@ export class AssignmentsService {
   }
 
   findAll() {
-    return "hello"
+    return 'hello';
   }
   findAllBySection(sectionId: string) {
     return this.assignmentRepository.find({
       where: {
         sectionDocument: {
-          id: sectionId
-        }
+          id: sectionId,
+        },
       },
       relations: ['user'],
-    })
+    });
   }
 
   async findOneByUserAndSection(userId: string, idSection: string) {

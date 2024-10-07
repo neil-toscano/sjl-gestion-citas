@@ -60,8 +60,10 @@ export class DocumentsService {
       },
     });
 
-    if(document) {
-      throw new ConflictException('El tipo de documento para la sección ya existe.');
+    if (document) {
+      throw new ConflictException(
+        'El tipo de documento para la sección ya existe.',
+      );
     }
 
     const newDocument = this.documentRepository.create({
@@ -86,25 +88,29 @@ export class DocumentsService {
       },
     });
 
-    let processStatus = await this.processStatusService.findOneByUserSection(sectionId, user, false);
+    let processStatus = await this.processStatusService.findOneByUserSection(
+      sectionId,
+      user,
+      false,
+    );
     const newStatus =
-    section.requiredDocumentsCount === documents.length
-      ? ProcessStatusEnum.COMPLETE
-      : ProcessStatusEnum.INCOMPLETE;
+      section.requiredDocumentsCount === documents.length
+        ? ProcessStatusEnum.COMPLETE
+        : ProcessStatusEnum.INCOMPLETE;
 
-      if (processStatus) {
-        await this.processStatusService.update(processStatus.id, {
+    if (processStatus) {
+      await this.processStatusService.update(processStatus.id, {
+        status: newStatus,
+      });
+    } else {
+      await this.processStatusService.create(
+        {
+          sectionDocumentId: sectionId,
           status: newStatus,
-        });
-      } else {
-        await this.processStatusService.create(
-          {
-            sectionDocumentId: sectionId,
-            status: newStatus,
-          },
-          user,
-        );
-      }
+        },
+        user,
+      );
+    }
 
     return documentResult;
   }
@@ -116,22 +122,6 @@ export class DocumentsService {
     if (!document)
       throw new NotFoundException(`Document with id ${id} not found`);
     return document;
-  }
-
-  async findSectionDocumentsByUser(idSection: string, idUser: string) {
-    await this.sectionService.findOne(idSection);
-    await this.userService.findOne(idUser);
-    const documents = await this.documentRepository
-      .createQueryBuilder('document')
-      .leftJoinAndSelect('document.sectionTypeDocument', 'sectionTypeDocument')
-      .leftJoinAndSelect('sectionTypeDocument.section', 'sectionDocument')
-      .leftJoinAndSelect('sectionTypeDocument.typeDocument', 'typeDocument')
-      .where('document.user.id = :userId', { userId: idUser })
-      .andWhere('sectionDocument.id = :sectionId', { sectionId: idSection }) // Filtrar por sección
-      .distinct(true)
-      .getMany();
-
-    return documents;
   }
 
   async update(id: string, updateDocumentDto: UpdateDocumentDto, user: User) {
@@ -173,36 +163,37 @@ export class DocumentsService {
     if (updateDocumentDto.status) {
       switch (updateDocumentDto.status) {
         case 'EN PROCESO':
-          if(section.requiredDocumentsCount === documents.length) {
+          if (section.requiredDocumentsCount === documents.length) {
             const hasVerifiedDocument = documents.some(
               (document) => document.status === 'VERIFICADO',
             );
-      
+
             const hasInProcessDocument = documents.some(
               (document) => document.status === 'EN PROCESO',
             );
-      
+
             const noObservedDocuments = documents.every(
               (document) => document.status !== 'OBSERVADO',
             );
-      
-            if (hasVerifiedDocument && hasInProcessDocument && noObservedDocuments) {
+
+            if (
+              hasVerifiedDocument &&
+              hasInProcessDocument &&
+              noObservedDocuments
+            ) {
               await this.processStatusService.update(processStatus.id, {
                 status: ProcessStatusEnum.CORRECTED,
               });
-            }
-            else if(!noObservedDocuments) {
+            } else if (!noObservedDocuments) {
               await this.processStatusService.update(processStatus.id, {
                 status: ProcessStatusEnum.UNDER_OBSERVATION,
               });
-            }
-            else if(!hasVerifiedDocument && noObservedDocuments) {
+            } else if (!hasVerifiedDocument && noObservedDocuments) {
               await this.processStatusService.update(processStatus.id, {
                 status: ProcessStatusEnum.COMPLETE,
               });
             }
-          }
-          else {
+          } else {
             await this.processStatusService.update(processStatus.id, {
               status: ProcessStatusEnum.INCOMPLETE,
             });
@@ -212,7 +203,7 @@ export class DocumentsService {
           const allVerified = documents.every(
             (document) => document.status === 'VERIFICADO',
           );
-          if(allVerified) {
+          if (allVerified) {
             await this.processStatusService.update(processStatus.id, {
               status: ProcessStatusEnum.VERIFIED,
             });
@@ -231,34 +222,6 @@ export class DocumentsService {
     }
   }
 
-  async verifySectionDocumentsUploaded(user: User, sectionId: string) {
-    const sectionDocuments = await this.documentRepository
-      .createQueryBuilder('document')
-      .leftJoinAndSelect('document.sectionTypeDocument', 'sectionTypeDocument')
-      .leftJoinAndSelect('sectionTypeDocument.typeDocument', 'typeDocument') // Realiza el JOIN con typeDocument
-      .leftJoin('document.user', 'user') // Realiza el JOIN con la entidad User
-      .where('user.id = :userId', { userId: user.id }) // Filtra por el ID del usuario
-      .andWhere('sectionTypeDocument.section.id = :sectionId', {
-        sectionId: sectionId,
-      }) // Filtra por el ID de la sección
-      .orderBy('typeDocument.name', 'ASC')
-      .getMany(); // O getOne() si esperas un solo resultado
-
-    return sectionDocuments;
-  }
-
-  async findDocumentBySection(id: string, user: User) {
-    // const section = await this.sectionService.findOne(id);
-
-    const documents = await this.verifySectionDocumentsUploaded(user, id);
-    // if(section.requiredDocumentsCount === documents.length) {
-
-    //   throw new UnprocessableEntityException('No tiene subido todos los documentos en la sección');
-
-    // }
-    return documents;
-  }
-
   async findBySection(sectionId: string, user: User) {
     const section = await this.sectionService.findOne(sectionId);
     const documents = await this.documentRepository.find({
@@ -270,100 +233,10 @@ export class DocumentsService {
           id: user.id,
         },
       },
-      relations: ['typeDocument']
+      relations: ['typeDocument'],
     });
     return documents;
   }
-
-
-  async readyForReviewBySection(idSection: string) {
-    await this.sectionService.findOne(idSection);
-
-    const users = await this.userService.findAll();
-
-    const section = await this.sectionService.findOne(idSection);
-    const validUsers = [];
-    for (const user of users) {
-      const assignmentExists =
-        await this.assignmentService.findOneByUserAndSection(
-          user.id,
-          idSection,
-        );
-
-      if (assignmentExists) {
-        continue;
-      }
-
-      const sectionDocuments = await this.findDocumentBySection(
-        idSection,
-        user,
-      );
-
-      if (sectionDocuments.length !== section.requiredDocumentsCount) {
-        continue;
-      }
-
-      const allVerified = sectionDocuments.every(
-        (document) => document.status === 'EN PROCESO',
-      );
-
-      if (allVerified) {
-        validUsers.push(user);
-      }
-    }
-
-    return validUsers;
-  }
-
-  async findFirstUserReadyForReviewBySection(
-    idSection: string,
-    adminId: string,
-  ) {
-    await this.sectionService.findOne(idSection);
-
-    const users = await this.userService.findAll();
-    const section = await this.sectionService.findOne(idSection);
-
-    for (const user of users) {
-      const assignmentExists =
-        await this.assignmentService.findOneByUserAndSection(
-          user.id,
-          idSection,
-        );
-
-      if (assignmentExists) {
-        continue;
-      }
-
-      const sectionDocuments = await this.findDocumentBySection(
-        idSection,
-        user,
-      );
-
-      if (sectionDocuments.length !== section.requiredDocumentsCount) {
-        continue;
-      }
-
-      const allVerified = sectionDocuments.every(
-        (document) => document.status === 'EN PROCESO',
-      );
-
-      if (allVerified) {
-        await this.assignmentService.create(
-          {
-            sectionDocumentId: idSection,
-            userId: user.id,
-          },
-          adminId,
-        );
-
-        return [user]; // Devuelve el primer usuario que cumpla los requisitos
-      }
-    }
-
-    return [];
-  }
-
 
   async removeDocuments(documents: Document[]) {
     return await this.documentRepository.remove(documents);

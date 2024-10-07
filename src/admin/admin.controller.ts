@@ -23,30 +23,15 @@ export class AdminController {
     return this.adminService.create(createAdminDto);
   }
 
-  @Get(':id')
-  @Auth()
-  findAll(@Param('id') id: string, @GetUser() admin: User) {
-    return this.adminService.findAllCompleted(id, admin);
-  }
-
-  @Get('section/:id')
-  @Auth()
-  findUserBySection(
-    @Param('id', new ParseUUIDPipe()) idSection: string,
-    @GetUser() admin: User,
-  ) {
-    return this.adminService.findBySection(idSection, admin);
-  }
-
-  @Get('section/documents/:idSection/:idUser')
+  @Get('section/documents/:sectionId/:userId')
   @Auth()
   findDocumentBySection(
-    @Param('idSection', new ParseUUIDPipe()) idSection: string,
-    @Param('idUser', new ParseUUIDPipe()) idUser: string,
-    @GetUser() user: User,
+    @Param('sectionId', new ParseUUIDPipe()) sectionId: string,
+    @Param('userId', new ParseUUIDPipe()) userId: string,
+    @GetUser() admin: User,
   ) {
-    return this.adminService.findDocumentBySection(idSection, idUser, user);
-  } //todo: 
+    return this.adminService.findDocumentBySection(sectionId, userId, admin);
+  }
 
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateAdminDto: UpdateAdminDto) {
