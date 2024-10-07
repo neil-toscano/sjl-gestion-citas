@@ -196,7 +196,7 @@ export class DocumentsService {
                 status: ProcessStatusEnum.UNDER_OBSERVATION,
               });
             }
-            else if(!hasVerifiedDocument && !noObservedDocuments) {
+            else if(!hasVerifiedDocument && noObservedDocuments) {
               await this.processStatusService.update(processStatus.id, {
                 status: ProcessStatusEnum.COMPLETE,
               });

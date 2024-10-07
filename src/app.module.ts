@@ -30,10 +30,10 @@ import { ProcessStatusModule } from './process-status/process-status.module';
     ConfigModule.forRoot(),
 
     TypeOrmModule.forRoot({
-      ssl: true,
-      extra: {
-        ssl: true ? { rejectUnauthorized: false } : null,
-      },
+      // ssl: true,
+      // extra: {
+      //   ssl: true ? { rejectUnauthorized: false } : null,
+      // },
       type: 'postgres',
       host: process.env.DB_HOST,
       port: +process.env.DB_PORT,

@@ -47,7 +47,7 @@ export class ProcessStatusController {
   @Get('corrected/:sectionId')
   @Auth()
   async findAllUsersWithCorrectedDocuments(
-    @Param('id', new ParseUUIDPipe()) sectionId: string,
+    @Param('sectionId', new ParseUUIDPipe()) sectionId: string,
     @GetUser() admin: User,
   ) {
     return this.processStatusService.getAllUsersWithCorrectedDocuments(
@@ -59,7 +59,7 @@ export class ProcessStatusController {
   @Get('next-corrected/:sectionId')
   @Auth()
   async NextUserCorrected(
-    @Param('id', new ParseUUIDPipe()) sectionId: string,
+    @Param('sectionId', new ParseUUIDPipe()) sectionId: string,
     @GetUser() admin: User,
   ) {
     return this.processStatusService.NextUserCorrected(
