@@ -38,7 +38,7 @@ export class TypeDocumentService {
   }
 
   findOne(id: string) {
-    return this.typeDocumentRepository.findOneBy({id});
+    return this.typeDocumentRepository.findOneBy({ id });
   }
 
   update(id: number, updateTypeDocumentDto: UpdateTypeDocumentDto) {

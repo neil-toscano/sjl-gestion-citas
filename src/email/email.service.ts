@@ -31,26 +31,30 @@ export class EmailService {
 
   async notifyObservedUsers() {
     const temporaryEmails = await this.temporaryEmailRepository.find();
-    
-    const uniqueEmails = [...new Set(temporaryEmails.map(email => email.email))];
+
+    const uniqueEmails = [
+      ...new Set(temporaryEmails.map((email) => email.email)),
+    ];
 
     for (const email of uniqueEmails) {
-        await this.temporaryEmailRepository.delete({ email });
+      await this.temporaryEmailRepository.delete({ email });
     }
 
-    const emailPromises = uniqueEmails.map(email => this.sendStateChangeNotification(email));
+    const emailPromises = uniqueEmails.map((email) =>
+      this.sendStateChangeNotification(email),
+    );
     await Promise.all(emailPromises);
 
     return uniqueEmails; // Retornar los correos únicos si es necesario
-}
+  }
 
-async sendStateChangeNotification(email: string) {
-  const notification = {
-    from: '"Municipalidad de San Juan de Lurigancho" <luriganchomunicipalidad@gmail.com>',
-    to: email,
-    subject: "Revisar Estado de Su Trámite",
-    text: `Estimado(a) administrado(a),\n\nHemos observado que su trámite requiere atención. Por favor, visite nuestra página web para revisar el estado de su trámite y realizar las correcciones necesarias.\n\n¡Gracias por su colaboración!\n\nSaludos,\nEl equipo de San Juan de Lurigancho`,
-    html: `
+  async sendStateChangeNotification(email: string) {
+    const notification = {
+      from: '"Municipalidad de San Juan de Lurigancho" <luriganchomunicipalidad@gmail.com>',
+      to: email,
+      subject: 'Revisar Estado de Su Trámite',
+      text: `Estimado(a) administrado(a),\n\nHemos observado que su trámite requiere atención. Por favor, visite nuestra página web para revisar el estado de su trámite y realizar las correcciones necesarias.\n\n¡Gracias por su colaboración!\n\nSaludos,\nEl equipo de San Juan de Lurigancho`,
+      html: `
       <div style="font-family: Arial, sans-serif; color: #333; line-height: 1.6;">
         <div style="max-width: 600px; margin: 0 auto; border: 1px solid #e0e0e0; border-radius: 8px; overflow: hidden; background-color: #f4f4f4;">
           
@@ -86,22 +90,26 @@ async sendStateChangeNotification(email: string) {
         </div>
       </div>
     `,
-  };
+    };
 
-  return await this.sendEmail(notification);
-}
-
-
-
+    return await this.sendEmail(notification);
+  }
 
   async sendAppointmentConfirmation(appointment: AppointmentDetails) {
-    const {isFirstTime, email, appointmentDate, appointmentTime, person, service, recipientName } = appointment;
-    
+    const {
+      isFirstTime,
+      email,
+      appointmentDate,
+      appointmentTime,
+      person,
+      service,
+      recipientName,
+    } = appointment;
+
     let subject = '';
-    if(isFirstTime) {
+    if (isFirstTime) {
       subject = 'Confirmación de Cita Reservada';
-    }
-    else {
+    } else {
       subject = 'Reprogramación de cita';
     }
 
@@ -109,7 +117,7 @@ async sendStateChangeNotification(email: string) {
       from: '"Municipalidad de San Juan de Lurigancho" <luriganchomunicipalidad@gmail.com>',
       to: email,
       subject: subject,
-      text: `Estimado(a) administrado(a) ${recipientName},\n\nSu cita ha sido ${ isFirstTime? 'programada con éxito': 'reprogramado'}. A continuación, encontrará los detalles de su cita:\n\n- Fecha: ${appointmentDate}\n- Hora: ${appointmentTime}\n- Persona de contacto: ${person}\n- Servicio: ${service}\n\nPor favor, asegúrese de llegar 10 minutos antes de la hora programada.\n\nGracias por confiar en nosotros.\n\nSaludos cordiales,\nEl equipo de la Municipalidad de San Juan de Lurigancho`,
+      text: `Estimado(a) administrado(a) ${recipientName},\n\nSu cita ha sido ${isFirstTime ? 'programada con éxito' : 'reprogramado'}. A continuación, encontrará los detalles de su cita:\n\n- Fecha: ${appointmentDate}\n- Hora: ${appointmentTime}\n- Persona de contacto: ${person}\n- Servicio: ${service}\n\nPor favor, asegúrese de llegar 10 minutos antes de la hora programada.\n\nGracias por confiar en nosotros.\n\nSaludos cordiales,\nEl equipo de la Municipalidad de San Juan de Lurigancho`,
       html: `
         <div style="font-family: Arial, sans-serif; color: #333; line-height: 1.6;">
           <div style="max-width: 600px; margin: 0 auto; border: 1px solid #e0e0e0; border-radius: 8px; overflow: hidden; background-color: #ffffff;">
@@ -124,7 +132,7 @@ async sendStateChangeNotification(email: string) {
             <div style="padding: 20px;">
               <h3 style="color: #00aaff; font-size: 20px; margin-top: 0;">Detalles de su Cita</h3>
               <p>Estimado(a) <strong>${recipientName}</strong>,</p>
-              <p>Nos complace informarle que su cita ha sido ${isFirstTime? 'reservada exitosamente.': '<strong>reprogramada</strong>.'}  Aquí están los detalles importantes de su cita:</p>
+              <p>Nos complace informarle que su cita ha sido ${isFirstTime ? 'reservada exitosamente.' : '<strong>reprogramada</strong>.'}  Aquí están los detalles importantes de su cita:</p>
               <ul style="list-style-type: none; padding: 0; font-size: 16px; color: #000;">
                 <li><strong>📅 Fecha:</strong> ${appointmentDate}</li>
                 <li><strong>⏰ Hora:</strong> ${appointmentTime}</li>
@@ -149,20 +157,17 @@ async sendStateChangeNotification(email: string) {
         </div>
       `,
     };
-  
+
     return await this.sendEmail(appointmentConfirmation);
-}
+  }
 
-
-  
-  
-async sendSurvey(email: string) {
-  const survey = {
-    from: '"Municipalidad de San Juan de Lurigancho" <luriganchomunicipalidad@gmail.com>',
-    to: email,
-    subject: "Encuesta de Satisfacción",
-    text: `Estimado(a) administrado(a),\n\n¡Gracias por utilizar nuestros servicios! Tu opinión es muy importante para nosotros, ya que nos ayuda a mejorar continuamente. Te invitamos a completar nuestra breve encuesta de satisfacción ¡Agradecemos de antemano tu colaboración!\n\nAquí tienes el enlace: ${process.env.FORM_LINK}\n\n¡Gracias por tu tiempo!\n\nSaludos,\nEl equipo de San Juan de Lurigancho`,
-    html: `
+  async sendSurvey(email: string) {
+    const survey = {
+      from: '"Municipalidad de San Juan de Lurigancho" <luriganchomunicipalidad@gmail.com>',
+      to: email,
+      subject: 'Encuesta de Satisfacción',
+      text: `Estimado(a) administrado(a),\n\n¡Gracias por utilizar nuestros servicios! Tu opinión es muy importante para nosotros, ya que nos ayuda a mejorar continuamente. Te invitamos a completar nuestra breve encuesta de satisfacción ¡Agradecemos de antemano tu colaboración!\n\nAquí tienes el enlace: ${process.env.FORM_LINK}\n\n¡Gracias por tu tiempo!\n\nSaludos,\nEl equipo de San Juan de Lurigancho`,
+      html: `
       <div style="font-family: Arial, sans-serif; color: #333; line-height: 1.6;">
         <div style="max-width: 600px; margin: 0 auto; border: 1px solid #e0e0e0; border-radius: 8px; overflow: hidden; background-color: #f4f4f4;">
           
@@ -199,18 +204,17 @@ async sendSurvey(email: string) {
         </div>
       </div>
     `,
-  };
+    };
 
-  return await this.sendEmail(survey);
-}
+    return await this.sendEmail(survey);
+  }
 
-
-async sendVerificationEmail(email: string, url: string) {
-  const mailOptions = {
-    from: '"Municipalidad de San Juan de Lurigancho" <luriganchomunicipalidad@gmail.com>',
-    to: email,
-    subject: 'Verifica tu correo electrónico',
-    html: `
+  async sendVerificationEmail(email: string, url: string) {
+    const mailOptions = {
+      from: '"Municipalidad de San Juan de Lurigancho" <luriganchomunicipalidad@gmail.com>',
+      to: email,
+      subject: 'Verifica tu correo electrónico',
+      html: `
       <div style="font-family: Arial, sans-serif; color: #333; line-height: 1.6;">
         <div style="max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #ddd; border-radius: 10px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);">
           
@@ -243,16 +247,16 @@ async sendVerificationEmail(email: string, url: string) {
         </div>
       </div>
     `,
-  };
+    };
 
-  return await this.sendEmail(mailOptions);
-}
-async resetPassword(email: string, url: string) {
-  const mailOptions = {
-    from: '"Municipalidad de San Juan de Lurigancho" <luriganchomunicipalidad@gmail.com>',
-    to: email,
-    subject: 'Restablecer contraseña',
-    html: `
+    return await this.sendEmail(mailOptions);
+  }
+  async resetPassword(email: string, url: string) {
+    const mailOptions = {
+      from: '"Municipalidad de San Juan de Lurigancho" <luriganchomunicipalidad@gmail.com>',
+      to: email,
+      subject: 'Restablecer contraseña',
+      html: `
       <div style="font-family: Arial, sans-serif; color: #333; line-height: 1.6;">
         <div style="max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #ddd; border-radius: 10px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);">
           
@@ -286,13 +290,12 @@ async resetPassword(email: string, url: string) {
         </div>
       </div>
     `,
-  };
+    };
 
-  return await this.sendEmail(mailOptions);
-}
+    return await this.sendEmail(mailOptions);
+  }
 
   async sendEmail(mailOptions: any) {
-
     try {
       await this.transporter.sendMail(mailOptions);
     } catch (error) {
@@ -306,7 +309,6 @@ async resetPassword(email: string, url: string) {
       },
     };
   }
-
 
   findAll() {
     return `This action returns all email`;

@@ -15,7 +15,10 @@ export class Document {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @ManyToOne(() => SectionDocument, (sectionDocument) => sectionDocument.documents)
+  @ManyToOne(
+    () => SectionDocument,
+    (sectionDocument) => sectionDocument.documents,
+  )
   @JoinColumn({ name: 'section_id' })
   section: SectionDocument;
 

@@ -31,26 +31,11 @@ export class AdminController {
 
   @Get('section/:id')
   @Auth()
-  findUserBySection(@Param('id', new ParseUUIDPipe()) idSection: string, @GetUser() admin: User,) {
+  findUserBySection(
+    @Param('id', new ParseUUIDPipe()) idSection: string,
+    @GetUser() admin: User,
+  ) {
     return this.adminService.findBySection(idSection, admin);
-  }
-
-  @Get('section/pending-users/:id')
-  @Auth()
-  async findUsersWithCorrectedDocuments(@Param('id', new ParseUUIDPipe()) idSection: string, @GetUser() admin: User) {
-    return this.adminService.getUsersWithCorrectedDocuments(idSection, admin);
-  }
-  
-  @Get('section/all-pending/:id')
-  @Auth()
-  async findAllUsersWithCorrectedDocuments(@Param('id', new ParseUUIDPipe()) idSection: string, @GetUser() admin: User) {
-    return this.adminService.getAllUsersWithCorrectedDocuments(idSection, admin);
-  }
-  
-  @Get('section/unresolved-documents/:id')
-  @Auth()
-  async findAllUsersWithUnresolvedDocuments(@Param('id', new ParseUUIDPipe()) idSection: string, @GetUser() admin: User) {
-    return this.adminService.getAllUsersWithUnresolvedDocuments(idSection, admin);
   }
 
   @Get('section/documents/:idSection/:idUser')
@@ -61,8 +46,7 @@ export class AdminController {
     @GetUser() user: User,
   ) {
     return this.adminService.findDocumentBySection(idSection, idUser, user);
-  }
-
+  } //todo: 
 
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateAdminDto: UpdateAdminDto) {
@@ -73,10 +57,14 @@ export class AdminController {
   remove(@Param('id') id: string) {
     return this.adminService.remove(+id);
   }
-  
+
   @Delete('finalize/:userId/:sectionId')
   @Auth()
-  finalizeAndRemoveAll(@Param('userId') userId: string, @Param('sectionId') sectionId: string, @GetUser() user: User,) {
+  finalizeAndRemoveAll(
+    @Param('userId') userId: string,
+    @Param('sectionId') sectionId: string,
+    @GetUser() user: User,
+  ) {
     return this.adminService.finalizeAndRemoveAll(userId, sectionId);
   }
 }

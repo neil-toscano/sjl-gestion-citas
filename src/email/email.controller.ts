@@ -1,4 +1,13 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  Query,
+} from '@nestjs/common';
 import { EmailService } from './email.service';
 import { CreateEmailDto } from './dto/create-email.dto';
 import { UpdateEmailDto } from './dto/update-email.dto';
@@ -11,12 +20,12 @@ export class EmailController {
   create(@Body() createEmailDto: CreateEmailDto) {
     return this.emailService.create(createEmailDto);
   }
-  
+
   @Post('send')
   sendSurvey(@Query('email') email: string) {
     return this.emailService.sendSurvey(email);
   }
-  
+
   @Post('verify')
   verifyEmail(@Query('email') email: string) {
     const url = 'http';

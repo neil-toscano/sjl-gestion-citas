@@ -48,14 +48,20 @@ export class SeedService {
     }
     return 'success';
   }
-  
+
   async runSeedSections() {
     const sections = [
       { sectionName: 'SUCESIÓN INTESTADA', sectionSlug: 'sucesion-intestada' },
-      { sectionName: 'INSCRIPCIÓN DE SUBDIVISIÓN DE LOTES', sectionSlug: 'inscripcion-de-subdivision-de-lotes' },
-      { sectionName: 'INSCRIPCIÓN DE INDEPENDIZACIÓN', sectionSlug: 'inscripcion-de-independizacion' },
+      {
+        sectionName: 'INSCRIPCIÓN DE SUBDIVISIÓN DE LOTES',
+        sectionSlug: 'inscripcion-de-subdivision-de-lotes',
+      },
+      {
+        sectionName: 'INSCRIPCIÓN DE INDEPENDIZACIÓN',
+        sectionSlug: 'inscripcion-de-independizacion',
+      },
     ];
-  
+
     const createdSections = [];
     for (const section of sections) {
       const createdSection = await this.sectionService.create(section);
@@ -63,51 +69,73 @@ export class SeedService {
     }
     return createdSections;
   }
-  
+
   async runSeedTypeDocument() {
     const typeDocuments = [
-      { name: 'Copia de DNI'},
-      { name: 'Copia literal de las unidades a independizar'},
-      { name: 'Copia literal insertada en la sucesión intestada'},
-      { name: 'Copia literal o partida electrónica todos los asientos'},
-      { name: 'Copia literal de las unidades subdivididas o membretadas'},
-      { name: 'Suceción intentastada inscrita en sunarp'},
-      { name: 'Documento que acredite la titularidad del fallecido'},
-      { name: 'Copia de DNI de los herederos'},
+      { name: 'Copia de DNI' },
+      { name: 'Copia literal de las unidades a independizar' },
+      { name: 'Copia literal insertada en la sucesión intestada' },
+      { name: 'Copia literal o partida electrónica todos los asientos' },
+      { name: 'Copia literal de las unidades subdivididas o membretadas' },
+      { name: 'Suceción intentastada inscrita en sunarp' },
+      { name: 'Documento que acredite la titularidad del fallecido' },
+      { name: 'Copia de DNI de los herederos' },
     ];
-  
+
     const createdTypeDocuments = [];
     for (const typeDocument of typeDocuments) {
-      const createdTypeDocument = await this.typeDocumentService.create(typeDocument);
+      const createdTypeDocument =
+        await this.typeDocumentService.create(typeDocument);
       createdTypeDocuments.push(createdTypeDocument);
     }
     return createdTypeDocuments;
   }
 
   async runSeedSectionTypeDocuments() {
-    const sections = await this.runSeedSections(); 
-    const typeDocuments = await this.runSeedTypeDocument();  
-  
+    const sections = await this.runSeedSections();
+    const typeDocuments = await this.runSeedTypeDocument();
+
     // Asocia secciones con documentos
     const associations = [
-      { section: sections[0].sectionDocument, typeDocuments: [typeDocuments[5].sectionDocument, typeDocuments[6].sectionDocument, typeDocuments[7].sectionDocument] }, // Acceder a sectionDocument de ambos
-      { section: sections[1].sectionDocument, typeDocuments: [typeDocuments[3].sectionDocument, typeDocuments[4].sectionDocument, typeDocuments[7].sectionDocument] },
-      { section: sections[2].sectionDocument, typeDocuments: [typeDocuments[3].sectionDocument, typeDocuments[1].sectionDocument, typeDocuments[0].sectionDocument] },
+      {
+        section: sections[0].sectionDocument,
+        typeDocuments: [
+          typeDocuments[5].sectionDocument,
+          typeDocuments[6].sectionDocument,
+          typeDocuments[7].sectionDocument,
+        ],
+      }, // Acceder a sectionDocument de ambos
+      {
+        section: sections[1].sectionDocument,
+        typeDocuments: [
+          typeDocuments[3].sectionDocument,
+          typeDocuments[4].sectionDocument,
+          typeDocuments[7].sectionDocument,
+        ],
+      },
+      {
+        section: sections[2].sectionDocument,
+        typeDocuments: [
+          typeDocuments[3].sectionDocument,
+          typeDocuments[1].sectionDocument,
+          typeDocuments[0].sectionDocument,
+        ],
+      },
     ];
-  
+
     for (const association of associations) {
       for (const typeDocument of association.typeDocuments) {
         const sectionType: CreateSectionTypeDocumentDto = {
-          sectionId: association.section.id,     // Acceder a sectionDocument.id
-          typeDocumentId: typeDocument.id,       // Acceder a sectionDocument.id en typeDocuments
+          sectionId: association.section.id, // Acceder a sectionDocument.id
+          typeDocumentId: typeDocument.id, // Acceder a sectionDocument.id en typeDocuments
         };
-  
+
         await this.sectionTypeDocumentService.create(sectionType);
       }
     }
-    return "ejecutado correctamente";
+    return 'ejecutado correctamente';
   }
-  
+
   private async deleteTables() {
     await this.productsService.deleteAllProducts();
 

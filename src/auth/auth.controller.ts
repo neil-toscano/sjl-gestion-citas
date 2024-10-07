@@ -19,7 +19,7 @@ import { CreateUserDto, LoginUserDto } from './dto';
 import { UserRoleGuard } from './guards/user-role.guard';
 import { ValidRoles } from './interfaces';
 import { User } from 'src/user/entities/user.entity';
-import {  UpdatePassword } from 'src/common/dtos/password';
+import { UpdatePassword } from 'src/common/dtos/password';
 
 @Controller('auth')
 export class AuthController {
@@ -34,7 +34,7 @@ export class AuthController {
   loginUser(@Body() loginUserDto: LoginUserDto) {
     return this.authService.login(loginUserDto);
   }
-  
+
   @Post('verify-email')
   verifyEmail(@Query('token') token: string) {
     return this.authService.verifyToken(token);
@@ -44,9 +44,12 @@ export class AuthController {
   resetPassword(@Query('email') email: string) {
     return this.authService.resetPassword(email);
   }
-  
+
   @Post('set-password')
-  setPassword(@Query('token') token: string, @Body() updatePassword: UpdatePassword) {
+  setPassword(
+    @Query('token') token: string,
+    @Body() updatePassword: UpdatePassword,
+  ) {
     return this.authService.setPassword(token, updatePassword.password);
   }
 

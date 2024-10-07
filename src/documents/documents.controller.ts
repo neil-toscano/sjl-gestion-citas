@@ -22,13 +22,13 @@ export class DocumentsController {
     return this.documentsService.create(user, createDocumentDto);
   }
 
-  @Get(':id')
+  @Get('section/:sectionId')
   @Auth()
   findBySection(
-    @Param('id', new ParseUUIDPipe()) id: string,
+    @Param('sectionId', new ParseUUIDPipe()) sectionId: string,
     @GetUser() user: User,
   ) {
-    return this.documentsService.findCompleteDocumentBySection(id, user);
+    return this.documentsService.findBySection(sectionId, user);
   }
 
   @Patch(':id')
@@ -39,35 +39,5 @@ export class DocumentsController {
     @GetUser() user: User,
   ) {
     return this.documentsService.update(id, updateDocumentDto, user);
-  }
-
-  @Get('valid/:sectionId')
-  @Auth()
-  validDocuments(
-    @Param('sectionId', new ParseUUIDPipe()) sectionId: string,
-    @GetUser() user: User,
-  ) {
-    return this.documentsService.hasValidDocuments(sectionId, user);
-  }
-  
-  @Get('all-valid/without-appointment')
-  @Auth()
-  validDocumentsWithoutAppointmen(
-    @GetUser() user: User,
-  ) {
-    return this.documentsService.getUsersWithoutAppointmentsButVerified();
-  }
-  
-  @Get('all-section/count-documents')
-  // @Auth()
-  findCountsDocumentsBySection(
-    // @GetUser() user: User,
-  ) {
-    return this.documentsService.findCountsBySection();
-  }
-
-  @Get('super-user/sections/:id')
-  findAllDocumentsByUser(@Param('id', new ParseUUIDPipe()) id: string) {
-    return this.documentsService.findAllSectionsByUser(id);
   }
 }

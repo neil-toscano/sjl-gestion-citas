@@ -26,34 +26,26 @@ export class AdminService {
     return 'This action adds a new admin';
   }
 
-  async findAllCompleted(id:string, admin: User) {
+  async findAllCompleted(id: string, admin: User) {
     await this.assignmentService.remove(admin.id);
     return await this.documentService.readyForReviewBySection(id);
   }
 
   async findBySection(idSection: string, admin: User) {
     await this.assignmentService.remove(admin.id);
-    const user = await this.documentService.findFirstUserReadyForReviewBySection(idSection, admin.id);
+    const user =
+      await this.documentService.findFirstUserReadyForReviewBySection(
+        idSection,
+        admin.id,
+      );
     return user;
   }
 
-  async getUsersWithCorrectedDocuments(idSection: string, admin: User) {
-    await this.assignmentService.remove(admin.id);
-    const validUser =  await this.documentService.findFirstUserWithCorrectedDocuments(idSection, admin.id);
-    return validUser
-  }
-
-  async getAllUsersWithCorrectedDocuments(idSection: string, admin: User) {
-    await this.assignmentService.remove(admin.id);
-    return await this.documentService.getUsersWithCorrectedDocuments(idSection);
-  }
-
-  async getAllUsersWithUnresolvedDocuments(idSection: string, admin: User) {
-    await this.assignmentService.remove(admin.id);
-    return await this.documentService.getUsersWithObservedDocuments(idSection);
-  }
-  
-  async findDocumentBySection(idSection: string, idUser: string, adminUser: User) {
+  async findDocumentBySection(
+    idSection: string,
+    idUser: string,
+    adminUser: User,
+  ) {
     await this.sectionService.findOne(idSection);
     const user = await this.userService.findOne(idUser);
 
@@ -61,14 +53,14 @@ export class AdminService {
       idSection,
       idUser,
     );
-    const documentsWithUser = documents.map(doc => ({
+    const documentsWithUser = documents.map((doc) => ({
       ...doc,
       user: user,
     }));
-    
+
     return documentsWithUser;
   }
-  
+
   findOne(id: number) {
     return `This action returns a #${id} admin`;
   }
@@ -80,19 +72,23 @@ export class AdminService {
   remove(id: number) {
     return `This action removes a #${id} admin`;
   }
-  
-  async finalizeAndRemoveAll(userId: string, sectionId: string ) {
-    
+
+  async finalizeAndRemoveAll(userId: string, sectionId: string) {
     await this.appointmentService.removeByUser(userId, sectionId);
-    const documents = await this.documentService.findSectionDocumentsByUser(sectionId, userId);
+    const documents = await this.documentService.findSectionDocumentsByUser(
+      sectionId,
+      userId,
+    );
     if (documents.length === 0) {
-      throw new NotFoundException('No se encontraron documentos PDF para esta sección y usuario.');
+      throw new NotFoundException(
+        'No se encontraron documentos PDF para esta sección y usuario.',
+      );
     }
 
     await this.documentService.removeDocuments(documents);
     return {
       ok: true,
-      msg: 'Se inicializó todo el proceso'
-    }
+      msg: 'Se inicializó todo el proceso',
+    };
   }
 }

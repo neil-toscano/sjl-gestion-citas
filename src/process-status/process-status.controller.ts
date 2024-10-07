@@ -1,4 +1,13 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  ParseUUIDPipe,
+} from '@nestjs/common';
 import { ProcessStatusService } from './process-status.service';
 import { CreateProcessStatusDto } from './dto/create-process-status.dto';
 import { UpdateProcessStatusDto } from './dto/update-process-status.dto';
@@ -11,7 +20,10 @@ export class ProcessStatusController {
 
   @Post()
   @Auth()
-  create(@GetUser() user: User, @Body() createProcessStatusDto: CreateProcessStatusDto) {
+  create(
+    @GetUser() user: User,
+    @Body() createProcessStatusDto: CreateProcessStatusDto,
+  ) {
     return this.processStatusService.create(createProcessStatusDto, user);
   }
 
@@ -19,15 +31,67 @@ export class ProcessStatusController {
   findAll() {
     return this.processStatusService.findAll();
   }
+  
+  @Get('next-review/:sectionId')
+  @Auth()
+  async getNextUserForReview(@Param('sectionId') sectionId: string, @GetUser() admin: User) {
+    return await this.processStatusService.findNextUserForReview(sectionId, admin.id);
+  }
+  
+  @Get('completed-users/:sectionId')
+  @Auth()
+  findCompletedUsers(@Param('sectionId') sectionId: string, @GetUser() admin: User) {
+    return this.processStatusService.findUsersWithCompletedDocuments(sectionId, admin);
+  }
+
+  @Get('corrected/:sectionId')
+  @Auth()
+  async findAllUsersWithCorrectedDocuments(
+    @Param('id', new ParseUUIDPipe()) sectionId: string,
+    @GetUser() admin: User,
+  ) {
+    return this.processStatusService.getAllUsersWithCorrectedDocuments(
+      sectionId,
+      admin,
+    );
+  }
+  
+  @Get('next-corrected/:sectionId')
+  @Auth()
+  async NextUserCorrected(
+    @Param('id', new ParseUUIDPipe()) sectionId: string,
+    @GetUser() admin: User,
+  ) {
+    return this.processStatusService.NextUserCorrected(
+      sectionId,
+      admin.id,
+    );
+  }
+
+  @Get('unresolved-documents/:sectionId')
+  @Auth()
+  async findAllUsersWithUnresolvedDocuments(
+    @Param('sectionId', new ParseUUIDPipe()) sectionId: string,
+    @GetUser() admin: User,
+  ) {
+    return this.processStatusService.getAllUsersWithUnresolvedDocuments(
+      sectionId,
+      admin,
+    );
+  }
 
   @Get(':id')
   @Auth()
-  findOneByUserSection(@Param('id') sectionId: string, @GetUser() user: User,) {
-    return this.processStatusService.findOneByUserSection(sectionId,user);
+  findOneByUserSection(@Param('id') sectionId: string, @GetUser() user: User) {
+    return this.processStatusService.findOneByUserSection(sectionId, user);
   }
 
+
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateProcessStatusDto: UpdateProcessStatusDto) {
+  update(
+    @Param('id') id: string,
+    @Body() updateProcessStatusDto: UpdateProcessStatusDto,
+  ) {
     return this.processStatusService.update(id, updateProcessStatusDto);
   }
 

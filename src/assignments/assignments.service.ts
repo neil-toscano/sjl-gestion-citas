@@ -20,14 +20,24 @@ export class AssignmentsService {
         id: createAssignmentDto.userId,
       },
       admin: {
-        id: adminId
-      }
+        id: adminId,
+      },
     });
     return await this.assignmentRepository.save(newAssignment);
   }
 
   findAll() {
-    return `This action returns all assignments`;
+    return "hello"
+  }
+  findAllBySection(sectionId: string) {
+    return this.assignmentRepository.find({
+      where: {
+        sectionDocument: {
+          id: sectionId
+        }
+      },
+      relations: ['user'],
+    })
   }
 
   async findOneByUserAndSection(userId: string, idSection: string) {
@@ -52,14 +62,13 @@ export class AssignmentsService {
     return `This action updates a #${id} assignment`;
   }
 
-  
   async remove(id: string) {
     await this.assignmentRepository
-    .createQueryBuilder()
-    .delete()
-    .from(Assignment)
-    .where("admin = :adminId", { adminId: id }) // elimina filas donde el campo admin coincide con el adminId
-    .execute();
+      .createQueryBuilder()
+      .delete()
+      .from(Assignment)
+      .where('admin = :adminId', { adminId: id }) // elimina filas donde el campo admin coincide con el adminId
+      .execute();
     return `This action removes a #${id} assignment`;
   }
 }

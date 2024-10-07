@@ -29,7 +29,7 @@ import { TypeDocumentModule } from 'src/type-document/type-document.module';
     AppointmentModule,
     EmailModule,
     ProcessStatusModule,
-    TypeDocumentModule
+    TypeDocumentModule,
   ],
 })
 export class DocumentsModule {}

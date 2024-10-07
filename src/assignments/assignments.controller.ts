@@ -18,7 +18,10 @@ export class AssignmentsController {
   constructor(private readonly assignmentsService: AssignmentsService) {}
 
   @Post()
-  create(@Body() createAssignmentDto: CreateAssignmentDto, @GetUser() admin: User,) {
+  create(
+    @Body() createAssignmentDto: CreateAssignmentDto,
+    @GetUser() admin: User,
+  ) {
     return this.assignmentsService.create(createAssignmentDto, admin.id);
   }
 

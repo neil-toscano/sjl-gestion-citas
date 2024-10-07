@@ -51,11 +51,15 @@ export class AuthService {
     if (!user.isVerified) {
       const token = this.getJwtToken({ id: user.id });
       const verificationLink = `${process.env.APP_URL}/auth/verify-email?token=${token}`;
-  
-      await this.emailService.sendVerificationEmail(user.email, verificationLink);
-      
+
+      await this.emailService.sendVerificationEmail(
+        user.email,
+        verificationLink,
+      );
+
       return {
-        message: 'Por favor, verifica tu correo electrónico antes de iniciar sesión.',
+        message:
+          'Por favor, verifica tu correo electrónico antes de iniciar sesión.',
         emailVerified: false,
       };
     }
@@ -71,7 +75,7 @@ export class AuthService {
   async verifyToken(token: string) {
     try {
       const decoded = this.jwtService.verify(token);
-      const user = await this.userService.findOne(decoded.id); 
+      const user = await this.userService.findOne(decoded.id);
       if (user) {
         user.isVerified = true;
         return await this.userService.updateVerify(user);
@@ -80,22 +84,22 @@ export class AuthService {
       throw new UnauthorizedException('El token ha expirado, genere nuevo Url');
     }
   }
-  
+
   async resetPassword(email: string) {
     const user = await this.userService.findByTerm({
       field: 'email',
       value: email,
-    })
+    });
 
     const token = this.getJwtToken({ id: user.id });
     const verificationLink = `${process.env.APP_URL}/auth/reset-password?token=${token}`;
-  
+
     return await this.emailService.resetPassword(user.email, verificationLink);
   }
-  
+
   async setPassword(token: string, password: string) {
     const decoded = this.jwtService.verify(token);
-    const user = await this.userService.findOne(decoded.id); 
+    const user = await this.userService.findOne(decoded.id);
     return await this.userService.updatePassword(user, password);
   }
 

@@ -1,4 +1,8 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateAppointmentDto } from './dto/create-appointment.dto';
 import { UpdateAppointmentDto } from './dto/update-appointment.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -24,17 +28,17 @@ export class AppointmentService {
   async create(
     sectionId: string,
     scheduleId: string,
-    userId: string,
+    adminId: string,
     createAppointmentDto: CreateAppointmentDto,
-    admin: User,
+    user: User,
   ) {
     const section = await this.sectionService.findOne(sectionId);
     const schedule = await this.scheduleService.findOne(scheduleId);
-    await this.userService.findOneAdmin(admin.id);
+    await this.userService.findOneAdmin(adminId);
 
     const { ok, msg } = await this.hasOpenAppointmentBySection(
       sectionId,
-      userId,
+      user.id,
     );
     if (ok) {
       return {
@@ -46,10 +50,10 @@ export class AppointmentService {
     await this.isScheduleAvailable(
       scheduleId,
       createAppointmentDto.appointmentDate,
-      admin.id,
+      adminId,
     );
 
-    const user= await this.userService.findOne(userId);
+    const admin = await this.userService.findOne(adminId);
 
     const appointment = this.appointmentRepository.create({
       ...createAppointmentDto,
@@ -61,7 +65,7 @@ export class AppointmentService {
         id: scheduleId,
       },
       assignedAdmin: {
-        id: admin.id,
+        id: adminId,
       },
     });
     await this.emailService.sendAppointmentConfirmation({
@@ -81,8 +85,8 @@ export class AppointmentService {
     return this.appointmentRepository.find({
       where: {
         assignedAdmin: {
-          id: user.id
-        }
+          id: user.id,
+        },
       },
       relations: ['section', 'reservedBy', 'schedule'],
       order: {
@@ -136,8 +140,8 @@ export class AppointmentService {
     return appointment;
   }
 
-  remove(id:number) {
-    return "remove";
+  remove(id: number) {
+    return 'remove';
   }
   async removeByUser(userId: string, sectionId: string) {
     const appointment = await this.appointmentRepository.findOne({
@@ -145,7 +149,7 @@ export class AppointmentService {
         reservedBy: { id: userId },
         section: { id: sectionId },
       },
-      relations:['schedule'],
+      relations: ['schedule'],
     });
 
     if (!appointment) {
@@ -161,28 +165,32 @@ export class AppointmentService {
         reservedBy: { id: userId },
         section: { id: sectionId },
       },
-      relations:['schedule'],
+      relations: ['schedule'],
     });
 
     if (!appointment) {
       throw new NotFoundException('Ya borró la cita, Intenta actualizar');
     }
     const appointmentDateTime = new Date(appointment.appointmentDate);
-    const [startHour, startMinute, startSecond] = appointment.schedule.startTime.split(':').map(Number);
+    const [startHour, startMinute, startSecond] = appointment.schedule.startTime
+      .split(':')
+      .map(Number);
 
     appointmentDateTime.setHours(startHour, startMinute, startSecond);
     const now = new Date();
     const hoursDiff = (appointmentDateTime.getTime() - now.getTime()) / 3600000;
 
     if (hoursDiff <= 24) {
-      throw new BadRequestException('Ya no puede modificar la fecha de la cita ya que quedan menos de 24 horas');
+      throw new BadRequestException(
+        'Ya no puede modificar la fecha de la cita ya que quedan menos de 24 horas',
+      );
     }
 
     await this.appointmentRepository.remove(appointment);
 
     return {
       ok: true,
-      msg: 'La cita ha sido eliminado correctamente'
+      msg: 'La cita ha sido eliminado correctamente',
     };
   }
 
@@ -213,18 +221,20 @@ export class AppointmentService {
   }
   async expiredAppointments() {
     const date = new Date();
-  const limaOffset = -5; // Lima es UTC-5
-  const currentLimaTime = new Date(date.getTime() + limaOffset * 60 * 60 * 1000);
+    const limaOffset = -5; // Lima es UTC-5
+    const currentLimaTime = new Date(
+      date.getTime() + limaOffset * 60 * 60 * 1000,
+    );
 
+    const appointments = await this.appointmentRepository
+      .createQueryBuilder('appointment')
+      .where('appointment.appointmentDate < :currentTime', {
+        currentTime: currentLimaTime,
+      })
+      .leftJoinAndSelect('appointment.reservedBy', 'user')
+      .leftJoinAndSelect('appointment.section', 'section')
+      .getMany();
 
-  const appointments = await this.appointmentRepository
-  .createQueryBuilder('appointment')
-  .where('appointment.appointmentDate < :currentTime', { currentTime: currentLimaTime })
-  .leftJoinAndSelect('appointment.reservedBy', 'user')
-  .leftJoinAndSelect('appointment.section', 'section')
-  .getMany();
-
-  return appointments;
+    return appointments;
   }
-  
 }

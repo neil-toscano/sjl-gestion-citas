@@ -93,6 +93,6 @@ export class User {
   @OneToMany(() => Assignment, (assignment) => assignment.admin)
   adminAssignments: Assignment[];
 
-  @OneToMany(() => ProcessStatus, processStatus => processStatus.user)
+  @OneToMany(() => ProcessStatus, (processStatus) => processStatus.user)
   processStatus: ProcessStatus[];
 }

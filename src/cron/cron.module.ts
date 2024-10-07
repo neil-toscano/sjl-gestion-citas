@@ -8,8 +8,6 @@ import { EmailModule } from 'src/email/email.module';
 @Module({
   controllers: [CronController],
   providers: [CronService],
-  imports: [AppointmentModule, AdminModule,
-    EmailModule
-  ]
+  imports: [AppointmentModule, AdminModule, EmailModule],
 })
 export class CronModule {}

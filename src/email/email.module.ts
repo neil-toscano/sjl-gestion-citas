@@ -9,8 +9,6 @@ import { TemporaryEmail } from './entities/temporary-email.entity';
   controllers: [EmailController],
   providers: [EmailService],
   exports: [EmailService],
-  imports: [
-    TypeOrmModule.forFeature([TemporaryEmail]),
-  ]
+  imports: [TypeOrmModule.forFeature([TemporaryEmail])],
 })
 export class EmailModule {}

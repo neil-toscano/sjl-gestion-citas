@@ -88,7 +88,7 @@ export class ProductsService {
     return product;
   }
 
-  async  findOnePlain(term: string) {
+  async findOnePlain(term: string) {
     const { images = [], ...rest } = await this.findOne(term);
     return {
       ...rest,

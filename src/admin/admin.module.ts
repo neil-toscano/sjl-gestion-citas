@@ -18,7 +18,7 @@ import { AppointmentModule } from 'src/appointment/appointment.module';
     SectionDocumentModule,
     UserModule,
     AuthModule,
-    AppointmentModule
+    AppointmentModule,
   ],
   controllers: [AdminController],
   providers: [AdminService],

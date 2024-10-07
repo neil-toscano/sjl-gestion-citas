@@ -10,7 +10,7 @@ export class CreateDocumentDto {
   sectionId: string;
 
   @IsUUID()
-  typeDocumentId: string; 
+  typeDocumentId: string;
 
   @IsString()
   @IsNotEmpty()

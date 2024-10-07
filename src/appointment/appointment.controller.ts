@@ -21,36 +21,37 @@ import { FindByWeekDto } from 'src/common/dtos/date.dto';
 export class AppointmentController {
   constructor(private readonly appointmentService: AppointmentService) {}
 
-  @Post(':sectionId/:scheduleId/:userId')
+  @Post(':sectionId/:scheduleId/:adminId')
   @Auth()
   create(
     @Body() createAppointmentDto: CreateAppointmentDto,
-    @GetUser() admin: User,
+    @GetUser() user: User,
     @Param('sectionId') sectionId: string,
     @Param('scheduleId') scheduleId: string,
-    @Param('userId') userId: string,
+    @Param('adminId') adminId: string,
   ) {
     const inputDate = new Date(createAppointmentDto.appointmentDate);
     if (isNaN(inputDate.getTime()) || inputDate.getUTCDay() !== 6) {
       throw new BadRequestException('La fecha debe ser un sábado válido');
     }
 
-    const currentDate = new Date(); 
+    const currentDate = new Date();
 
     currentDate.setHours(0, 0, 0, 0);
     inputDate.setHours(0, 0, 0, 0);
 
     if (inputDate < currentDate) {
-      throw new BadRequestException('La fecha de la cita debe ser mayor o igual a la fecha actual.');
+      throw new BadRequestException(
+        'La fecha de la cita debe ser mayor o igual a la fecha actual.',
+      );
     }
-
 
     return this.appointmentService.create(
       sectionId,
       scheduleId,
-      userId,
+      adminId,
       createAppointmentDto,
-      admin,
+      user,
     );
   }
 
@@ -86,8 +87,12 @@ export class AppointmentController {
 
   @Delete('section/:sectionId/:userId')
   @Auth()
-  removeBySection(@Param('sectionId') sectionId: string, @Param('userId') userId: string, @GetUser() user: User,) {
-    return this.appointmentService.removeBySection(userId,  sectionId);
+  removeBySection(
+    @Param('sectionId') sectionId: string,
+    @Param('userId') userId: string,
+    @GetUser() user: User,
+  ) {
+    return this.appointmentService.removeBySection(userId, sectionId);
   }
 
   @Get('verify/:id')

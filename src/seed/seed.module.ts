@@ -14,6 +14,14 @@ import { SectionTypeDocumentModule } from 'src/section-type-document/section-typ
 @Module({
   controllers: [SeedController],
   providers: [SeedService],
-  imports: [ProductsModule, AuthModule, UserModule, ScheduleModule, SectionDocumentModule, TypeDocumentModule, SectionTypeDocumentModule],
+  imports: [
+    ProductsModule,
+    AuthModule,
+    UserModule,
+    ScheduleModule,
+    SectionDocumentModule,
+    TypeDocumentModule,
+    SectionTypeDocumentModule,
+  ],
 })
 export class SeedModule {}

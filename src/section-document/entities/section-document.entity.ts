@@ -40,7 +40,7 @@ export class SectionDocument {
   @OneToMany(() => Assignment, (assignment) => assignment.sectionDocument)
   assignments: Assignment[];
 
-  @OneToMany(() => ProcessStatus, processStatus => processStatus.section)
+  @OneToMany(() => ProcessStatus, (processStatus) => processStatus.section)
   processStatus: ProcessStatus[];
 
   @OneToMany(() => Document, (document) => document.section)

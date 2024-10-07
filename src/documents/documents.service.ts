@@ -1,4 +1,5 @@
 import {
+  ConflictException,
   Injectable,
   NotFoundException,
   UnprocessableEntityException,
@@ -35,7 +36,7 @@ export class DocumentsService {
     private readonly assignmentService: AssignmentsService,
     private readonly AppointmentService: AppointmentService,
     private readonly emailService: EmailService,
-    private readonly processStatusService:ProcessStatusService,
+    private readonly processStatusService: ProcessStatusService,
   ) {}
 
   async create(user: User, createDocumentDto: CreateDocumentDto) {
@@ -45,28 +46,22 @@ export class DocumentsService {
     await this.sectionService.findOne(sectionId);
     await this.typeDocumentService.findOne(typeDocumentId);
 
-    const document = await this.documentRepository.findOne(
-      {
-        where: {
-          section: {
-            id: sectionId
-          },
-          typeDocument: {
-            id: typeDocumentId
-          },
-          user: {
-            id: user.id
-          }
-        }
-      }
-    );
+    const document = await this.documentRepository.findOne({
+      where: {
+        section: {
+          id: sectionId,
+        },
+        typeDocument: {
+          id: typeDocumentId,
+        },
+        user: {
+          id: id,
+        },
+      },
+    });
 
-    if (document) {
-      await this.documentRepository.delete({
-        section: { id: sectionId },
-        typeDocument: { id: typeDocumentId },
-        user: { id: id },
-      });
+    if(document) {
+      throw new ConflictException('El tipo de documento para la sección ya existe.');
     }
 
     const newDocument = this.documentRepository.create({
@@ -83,31 +78,33 @@ export class DocumentsService {
     const documents = await this.documentRepository.find({
       where: {
         section: {
-          id: sectionId
+          id: sectionId,
         },
         user: {
-          id: user.id
-        }
+          id: user.id,
+        },
+      },
+    });
+
+    let processStatus = await this.processStatusService.findOneByUserSection(sectionId, user, false);
+    const newStatus =
+    section.requiredDocumentsCount === documents.length
+      ? ProcessStatusEnum.COMPLETE
+      : ProcessStatusEnum.INCOMPLETE;
+
+      if (processStatus) {
+        await this.processStatusService.update(processStatus.id, {
+          status: newStatus,
+        });
+      } else {
+        await this.processStatusService.create(
+          {
+            sectionDocumentId: sectionId,
+            status: newStatus,
+          },
+          user,
+        );
       }
-      });
-  const processStatus = await this.processStatusService.findOneByUserSection(sectionId, user);
-  if(processStatus) {
-    await this.processStatusService.remove(processStatus.id);
-  }
-  if(section.requiredDocumentsCount === documents.length) {
-    await this.processStatusService.create({
-      sectionDocumentId: sectionId,
-      status: ProcessStatusEnum.COMPLETE,
-    }, user);
-    
-  }
-  else {
-      console.log(documents);
-      await this.processStatusService.create({
-      sectionDocumentId: sectionId,
-      status: ProcessStatusEnum.INCOMPLETE,
-      }, user);
-    }
 
     return documentResult;
   }
@@ -119,41 +116,6 @@ export class DocumentsService {
     if (!document)
       throw new NotFoundException(`Document with id ${id} not found`);
     return document;
-  }
-
-  async findCountsBySection() {
-    const sectionTypeDocuments = await this.sectionTypeService.findAll();
-
-    const result = await Promise.all(
-        sectionTypeDocuments.map(async (section: any) => {
-            const users = await this.readyForReviewBySection(section.sectionId);
-
-            return {
-                section,
-                count: {
-                    newDocuments: users.length,
-                },
-            };
-        })
-    );
-
-    return result;
-}
-
-
-  async findAllSectionsByUser(id: string) {
-    const documents = await this.documentRepository
-      .createQueryBuilder('document')
-      .leftJoinAndSelect('document.sectionTypeDocument', 'sectionTypeDocument')
-      .leftJoinAndSelect('sectionTypeDocument.section', 'sectionDocument') // JOIN a la tabla section
-      .leftJoinAndSelect('sectionTypeDocument.typeDocument', 'typeDocument') // JOIN a la tabla typeDocument
-      .where('document.user.id = :userId')
-      .setParameters({ userId: id })
-      .distinct(true)
-      .getMany();
-
-    const result = groupDocumentsBySection(documents);
-    return result;
   }
 
   async findSectionDocumentsByUser(idSection: string, idUser: string) {
@@ -172,17 +134,6 @@ export class DocumentsService {
     return documents;
   }
 
-  // async findOneBySectionTypeId(id: string, userId: string) {
-  //   const result = await this.documentRepository.findOne({
-  //     where: { sectionTypeDocument: { id: id }, user: { id: userId } },
-  //   });
-
-  //   if (!result) {
-  //     return { isDocumentExists: false };
-  //   }
-  //   return { isDocumentExists: true };
-  // }
-
   async update(id: string, updateDocumentDto: UpdateDocumentDto, user: User) {
     const document = await this.findOne(id);
 
@@ -191,125 +142,138 @@ export class DocumentsService {
     }
     const promises = [];
 
-  if (updateDocumentDto.fileUrl) {
-    promises.push(this.fileService.deleteFile(document.fileUrl));
-  }
-
-  await Promise.all(promises);
-
-  await this.documentRepository.update(id, updateDocumentDto);
-
-  const documents = await this.documentRepository.find({
-  where: {
-    section: {
-      id: updateDocumentDto.sectionId
-    },
-    user: {
-      id: user.id
-    }
-  }
-  });
-
- const section = await this.sectionService.findOne(updateDocumentDto.sectionId);
-
-const processStatus = await this.processStatusService.findOneByUserSection(updateDocumentDto.sectionId, user);
-
-  if (updateDocumentDto.status) {
-    switch (updateDocumentDto.status) {
-      case 'EN PROCESO':
-        await this.processStatusService.update(processStatus.id, {
-          status: ProcessStatusEnum.COMPLETE
-        })
-        break;
-      case 'VERIFICADO':
-        const allVerified = documents.every(
-          (document) => document.status === 'VERIFICADO',
-        );
-        await this.processStatusService.update(processStatus.id, {
-          status: ProcessStatusEnum.VERIFIED
-        });
-        break;
-      case 'OBSERVADO':
-        await this.processStatusService.update(processStatus.id, {
-          status: ProcessStatusEnum.UNDER_OBSERVATION
-        })
-        break;
-      default:
-        throw new Error('Invalid status');
-    }
-    
-    return this.documentRepository.findOneBy({ id });
-  }
-  }
-
-  async hasValidDocuments(sectionId: string, user: User) {
-    const sectionDocuments = await this.verifySectionDocumentsUploaded(user, sectionId);
-
-    const section = await this.sectionService.findOne(sectionId);
-    if (sectionDocuments.length !== section.requiredDocumentsCount) {
-      throw new UnprocessableEntityException('No tiene subido todos los documentos en la sección');
+    if (updateDocumentDto.fileUrl) {
+      promises.push(this.fileService.deleteFile(document.fileUrl));
     }
 
-    const allVerified = sectionDocuments.every(
-      (document) => document.status === 'VERIFICADO',
+    await Promise.all(promises);
+
+    await this.documentRepository.update(id, updateDocumentDto);
+
+    const documents = await this.documentRepository.find({
+      where: {
+        section: {
+          id: updateDocumentDto.sectionId,
+        },
+        user: {
+          id: user.id,
+        },
+      },
+    });
+
+    const section = await this.sectionService.findOne(
+      updateDocumentDto.sectionId,
     );
-    if (!allVerified) {
-      return {
-        ok: false,
-        msg: 'Sus documentos aún no se encuentrarn verificados',
-      };
-    }
 
-    return {
-      ok: true,
-      msg: 'Se encuentra apto para hacer reserva de cita',
-    };
+    const processStatus = await this.processStatusService.findOneByUserSection(
+      updateDocumentDto.sectionId,
+      user,
+    );
+
+    if (updateDocumentDto.status) {
+      switch (updateDocumentDto.status) {
+        case 'EN PROCESO':
+          if(section.requiredDocumentsCount === documents.length) {
+            const hasVerifiedDocument = documents.some(
+              (document) => document.status === 'VERIFICADO',
+            );
+      
+            const hasInProcessDocument = documents.some(
+              (document) => document.status === 'EN PROCESO',
+            );
+      
+            const noObservedDocuments = documents.every(
+              (document) => document.status !== 'OBSERVADO',
+            );
+      
+            if (hasVerifiedDocument && hasInProcessDocument && noObservedDocuments) {
+              await this.processStatusService.update(processStatus.id, {
+                status: ProcessStatusEnum.CORRECTED,
+              });
+            }
+            else if(!noObservedDocuments) {
+              await this.processStatusService.update(processStatus.id, {
+                status: ProcessStatusEnum.UNDER_OBSERVATION,
+              });
+            }
+            else if(!hasVerifiedDocument && !noObservedDocuments) {
+              await this.processStatusService.update(processStatus.id, {
+                status: ProcessStatusEnum.COMPLETE,
+              });
+            }
+          }
+          else {
+            await this.processStatusService.update(processStatus.id, {
+              status: ProcessStatusEnum.INCOMPLETE,
+            });
+          }
+          break;
+        case 'VERIFICADO':
+          const allVerified = documents.every(
+            (document) => document.status === 'VERIFICADO',
+          );
+          if(allVerified) {
+            await this.processStatusService.update(processStatus.id, {
+              status: ProcessStatusEnum.VERIFIED,
+            });
+          }
+          break;
+        case 'OBSERVADO':
+          await this.processStatusService.update(processStatus.id, {
+            status: ProcessStatusEnum.UNDER_OBSERVATION,
+          });
+          break;
+        default:
+          throw new Error('Invalid status');
+      }
+
+      return this.documentRepository.findOneBy({ id });
+    }
   }
 
   async verifySectionDocumentsUploaded(user: User, sectionId: string) {
-
     const sectionDocuments = await this.documentRepository
-    .createQueryBuilder('document')
-    .leftJoinAndSelect('document.sectionTypeDocument', 'sectionTypeDocument')
-    .leftJoinAndSelect('sectionTypeDocument.typeDocument', 'typeDocument') // Realiza el JOIN con typeDocument
-    .leftJoin('document.user', 'user') // Realiza el JOIN con la entidad User
-    .where('user.id = :userId', { userId: user.id }) // Filtra por el ID del usuario
-    .andWhere('sectionTypeDocument.section.id = :sectionId', {
-      sectionId: sectionId,
-    }) // Filtra por el ID de la sección
-    .orderBy('typeDocument.name', 'ASC')
-    .getMany(); // O getOne() si esperas un solo resultado
+      .createQueryBuilder('document')
+      .leftJoinAndSelect('document.sectionTypeDocument', 'sectionTypeDocument')
+      .leftJoinAndSelect('sectionTypeDocument.typeDocument', 'typeDocument') // Realiza el JOIN con typeDocument
+      .leftJoin('document.user', 'user') // Realiza el JOIN con la entidad User
+      .where('user.id = :userId', { userId: user.id }) // Filtra por el ID del usuario
+      .andWhere('sectionTypeDocument.section.id = :sectionId', {
+        sectionId: sectionId,
+      }) // Filtra por el ID de la sección
+      .orderBy('typeDocument.name', 'ASC')
+      .getMany(); // O getOne() si esperas un solo resultado
 
-    
     return sectionDocuments;
   }
- 
+
   async findDocumentBySection(id: string, user: User) {
     // const section = await this.sectionService.findOne(id);
-    
+
     const documents = await this.verifySectionDocumentsUploaded(user, id);
     // if(section.requiredDocumentsCount === documents.length) {
-      
+
     //   throw new UnprocessableEntityException('No tiene subido todos los documentos en la sección');
-      
+
     // }
     return documents;
   }
 
-  async findCompleteDocumentBySection(sectionId: string, user: User) {
+  async findBySection(sectionId: string, user: User) {
     const section = await this.sectionService.findOne(sectionId);
     const documents = await this.documentRepository.find({
       where: {
         section: {
-          id: sectionId
+          id: sectionId,
         },
         user: {
-          id: user.id
-        }
-      }
-    })
+          id: user.id,
+        },
+      },
+    });
     return documents;
   }
+
 
   async readyForReviewBySection(idSection: string) {
     await this.sectionService.findOne(idSection);
@@ -350,53 +314,15 @@ const processStatus = await this.processStatusService.findOneByUserSection(updat
     return validUsers;
   }
 
-  async findFirstUserReadyForReviewBySection(idSection: string, adminId: string) {
-    await this.sectionService.findOne(idSection);
-  
-    const users = await this.userService.findAll();
-    const section = await this.sectionService.findOne(idSection);
-  
-    for (const user of users) {
-      const assignmentExists = await this.assignmentService.findOneByUserAndSection(
-        user.id,
-        idSection,
-      );
-  
-      if (assignmentExists) {
-        continue;
-      }
-  
-      const sectionDocuments = await this.findDocumentBySection(idSection, user);
-  
-      if (sectionDocuments.length !== section.requiredDocumentsCount) {
-        continue;
-      }
-  
-      const allVerified = sectionDocuments.every(
-        (document) => document.status === 'EN PROCESO',
-      );
-  
-      if (allVerified) {
-        await this.assignmentService.create({
-          sectionDocumentId: idSection,
-          userId: user.id,
-        }, adminId);
-
-        return [user]; // Devuelve el primer usuario que cumpla los requisitos
-      }
-    }
-  
-    return [];
-  }
-  
-  async getUsersWithCorrectedDocuments(idSection: string) {
+  async findFirstUserReadyForReviewBySection(
+    idSection: string,
+    adminId: string,
+  ) {
     await this.sectionService.findOne(idSection);
 
     const users = await this.userService.findAll();
-
     const section = await this.sectionService.findOne(idSection);
 
-    const validUsers = [];
     for (const user of users) {
       const assignmentExists =
         await this.assignmentService.findOneByUserAndSection(
@@ -407,6 +333,7 @@ const processStatus = await this.processStatusService.findOneByUserSection(updat
       if (assignmentExists) {
         continue;
       }
+
       const sectionDocuments = await this.findDocumentBySection(
         idSection,
         user,
@@ -416,155 +343,27 @@ const processStatus = await this.processStatusService.findOneByUserSection(updat
         continue;
       }
 
-      const hasVerifiedDocument = sectionDocuments.some(
-        (document) => document.status === 'VERIFICADO'
-      );
-      
-      const hasInProcessDocument = sectionDocuments.some(
-        (document) => document.status === 'EN PROCESO'
-      );
-      
-      const noObservedDocuments = sectionDocuments.every(
-        (document) => document.status !== 'OBSERVADO'
-      );
-      
-      if (hasVerifiedDocument && hasInProcessDocument && noObservedDocuments) {
-        validUsers.push(user);
-      }
-    }
-
-    return validUsers;
-  }
-  async findFirstUserWithCorrectedDocuments(idSection: string, adminId: string) {
-    await this.sectionService.findOne(idSection);
-  
-    const users = await this.userService.findAll();
-    const section = await this.sectionService.findOne(idSection);
-  
-    for (const user of users) {
-      const assignmentExists = await this.assignmentService.findOneByUserAndSection(
-        user.id,
-        idSection,
-      );
-  
-      if (assignmentExists) {
-        continue;
-      }
-  
-      const sectionDocuments = await this.findDocumentBySection(idSection, user);
-  
-      if (sectionDocuments.length !== section.requiredDocumentsCount) {
-        continue;
-      }
-  
-      const hasVerifiedDocument = sectionDocuments.some(
-        (document) => document.status === 'VERIFICADO',
-      );
-  
-      const hasInProcessDocument = sectionDocuments.some(
+      const allVerified = sectionDocuments.every(
         (document) => document.status === 'EN PROCESO',
       );
-  
-      const noObservedDocuments = sectionDocuments.every(
-        (document) => document.status !== 'OBSERVADO',
-      );
-  
-      if (hasVerifiedDocument && hasInProcessDocument && noObservedDocuments) {
-        await this.assignmentService.create({
-          sectionDocumentId: idSection,
-          userId: user.id,
-        }, adminId);
-        return [user]; 
-      }
-    }
-  
-    return []; // Si ningún usuario es válido, devolver null o un valor vacío
-  }
-  
 
-  async getUsersWithObservedDocuments(idSection: string) {
-    await this.sectionService.findOne(idSection);
-  
-    const users = await this.userService.findAll();
-  
-    const section = await this.sectionService.findOne(idSection);
-  
-    const validUsers = [];
-  
-    for (const user of users) {
-      const assignmentExists = await this.assignmentService.findOneByUserAndSection(
-        user.id,
-        idSection,
-      );
-  
-      if (assignmentExists) {
-        continue;
-      }
-  
-      const sectionDocuments = await this.findDocumentBySection(
-        idSection,
-        user,
-      );
-  
-      if (sectionDocuments.length !== section.requiredDocumentsCount) {
-        continue;
-      }
-  
-      const hasObservedDocument = sectionDocuments.some(
-        (document) => document.status === 'OBSERVADO'
-      );
-  
-      if (hasObservedDocument) {
-        validUsers.push(user);
-      }
-    }
-  
-    return validUsers;
-  }
-
-  async getUsersWithoutAppointmentsButVerified() {
-    // Obtener todas las secciones y usuarios en paralelo
-    const [sections, users] = await Promise.all([
-      this.sectionService.findAll(),
-      this.userService.findAll(),
-    ]);
-  
-    const validUsers = [];
-  
-    // Procesar usuarios en paralelo usando Promise.all
-    await Promise.all(users.map(async (user) => {
-      // Para cada usuario, procesar cada sección
-      await Promise.all(sections.map(async (section) => {
-        // Verificar si el usuario ya tiene una asignación de cita para la sección
-        const { ok } = await this.AppointmentService.hasOpenAppointmentBySection(section.id, user.id);
-  
-        if (ok) return; // Si tiene cita, continuar con la siguiente sección
-  
-        // Obtener los documentos del usuario para la sección actual
-        const sectionDocuments = await this.findDocumentBySection(section.id, user);
-  
-        // Verificar si el usuario tiene el número correcto de documentos requeridos
-        if (sectionDocuments.length !== section.requiredDocumentsCount) return;
-  
-        // Verificar si todos los documentos están en estado 'VERIFICADO'
-        const allDocumentsVerified = sectionDocuments.every(
-          (document) => document.status === 'VERIFICADO'
+      if (allVerified) {
+        await this.assignmentService.create(
+          {
+            sectionDocumentId: idSection,
+            userId: user.id,
+          },
+          adminId,
         );
-  
-        if (allDocumentsVerified) {
-          validUsers.push({ user, section });
-        }
-      }));
-    }));
-  
-    // Devolver los usuarios que cumplen con los requisitos en diferentes secciones
-    return validUsers;
+
+        return [user]; // Devuelve el primer usuario que cumpla los requisitos
+      }
+    }
+
+    return [];
   }
-  
-  
-  
-  
-  
+
+
   async removeDocuments(documents: Document[]) {
     return await this.documentRepository.remove(documents);
   }

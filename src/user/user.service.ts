@@ -15,7 +15,6 @@ import * as bcrypt from 'bcrypt';
 import { TermDto } from 'src/common/dtos/term.dto';
 @Injectable()
 export class UserService {
-
   constructor(
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
@@ -26,18 +25,18 @@ export class UserService {
 
     const existUserByDni = await this.userRepository.findOne({
       where: {
-        dni
-      }
+        dni,
+      },
     });
-    
+
     if (existUserByDni) {
       throw new ConflictException('El DNI ya está registrado.');
     }
-    
-    const existUserByEmail= await this.userRepository.findOne({
+
+    const existUserByEmail = await this.userRepository.findOne({
       where: {
-        email
-      }
+        email,
+      },
     });
 
     if (existUserByEmail) {
@@ -67,15 +66,18 @@ export class UserService {
       .getMany();
   }
 
-
   async findByTerm(termDto: TermDto): Promise<User | undefined> {
     const { field, value } = termDto;
 
-    const user = await this.userRepository.findOne({ where: { [field]: value } });
+    const user = await this.userRepository.findOne({
+      where: { [field]: value },
+    });
     if (!user) {
-        throw new NotFoundException(`Usuario con ${field} ${value} no encontrado`);
+      throw new NotFoundException(
+        `Usuario con ${field} ${value} no encontrado`,
+      );
     }
-    
+
     return user;
   }
 
@@ -116,22 +118,20 @@ export class UserService {
   }
 
   async updateVerify(user: User) {
-  await this.userRepository.save(user);
-  return {
-    statusCode: 201,
-    message: 'Email verificado correctamente',
-  };
+    await this.userRepository.save(user);
+    return {
+      statusCode: 201,
+      message: 'Email verificado correctamente',
+    };
   }
-  
+
   async updatePassword(user: User, password: string) {
-
-  user.password = bcrypt.hashSync(password, 10);
-  await this.userRepository.save(user);
-  return {
-    statusCode: 201,
-    message: 'Contraseña modificado correctamente',
-  };
-
+    user.password = bcrypt.hashSync(password, 10);
+    await this.userRepository.save(user);
+    return {
+      statusCode: 201,
+      message: 'Contraseña modificado correctamente',
+    };
   }
 
   async update(id: string, updateUserDto: UpdateUserDto) {

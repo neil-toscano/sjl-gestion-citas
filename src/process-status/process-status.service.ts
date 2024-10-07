@@ -3,15 +3,17 @@ import { CreateProcessStatusDto } from './dto/create-process-status.dto';
 import { UpdateProcessStatusDto } from './dto/update-process-status.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ProcessStatus } from './entities/process-status.entity';
-import { Repository } from 'typeorm';
+import { In, Not, Repository } from 'typeorm';
 import { User } from 'src/user/entities/user.entity';
 import { ProcessStatusEnum } from './interfaces/status.enum';
+import { AssignmentsService } from 'src/assignments/assignments.service';
 
 @Injectable()
 export class ProcessStatusService {
   constructor(
     @InjectRepository(ProcessStatus)
     private readonly processStatusRepository: Repository<ProcessStatus>,
+    private readonly assignmentService: AssignmentsService
   ) {
 
   }
@@ -32,23 +34,132 @@ export class ProcessStatusService {
     return `This action returns all processStatus`;
   }
 
-  async findOneByUserSection(sectionId: string, user: User) {
-    const processStatus = await this.processStatusRepository.findOne({
+  async findUsersWithCompletedDocuments(sectionId: string, admin: User) {
+    await this.assignmentService.remove(admin.id);
+    const assignedUsers = await this.assignmentService.findAllBySection(sectionId);
+
+    const assignedUserIds = assignedUsers.map(a => a.user.id);
+  
+    return await this.processStatusRepository.find({
       where: {
-        user: {
-          id: user.id
-        },
-        section: {
-          id: sectionId
-        }
-      }
+        status: ProcessStatusEnum.COMPLETE,
+        section: { id: sectionId },
+        user: { id: Not(In(assignedUserIds)) },
+      },
+      relations: ['user'],
+    });
+  }
+  
+
+  async findNextUserForReview(
+    sectionId: string,
+    adminId: string,
+  ) {
+    await this.assignmentService.remove(adminId);
+    const assignedUsers = await this.assignmentService.findAllBySection(sectionId);
+
+    const assignedUserIds = assignedUsers.map(a => a.user.id);
+
+    const userForReview = await this.processStatusRepository.findOne({
+      where: {
+        status: ProcessStatusEnum.COMPLETE,
+        section: { id: sectionId },
+        user: { id: Not(In(assignedUserIds)) },
+      },
+      relations: ['user'],
     });
 
-    if(!processStatus) {
-      if (!processStatus) {
-        throw new NotFoundException(`Aún no tiene proceso iniciado`);
-      }
+    if (!userForReview) {
+      return [];
     }
+
+    await this.assignmentService.create(
+      {
+        sectionDocumentId: sectionId,
+        userId: userForReview.user.id,
+      },
+      adminId,
+    );
+    return [userForReview];
+  }
+  
+  async getAllUsersWithCorrectedDocuments(sectionId: string, admin: User) {
+    await this.assignmentService.remove(admin.id);
+    const assignedUsers = await this.assignmentService.findAllBySection(sectionId);
+
+    const assignedUserIds = assignedUsers.map(a => a.user.id);
+  
+    return await this.processStatusRepository.find({
+      where: {
+        status: ProcessStatusEnum.CORRECTED,
+        section: { id: sectionId },
+        user: { id: Not(In(assignedUserIds)) },
+      },
+      relations: ['user'],
+    });
+  }
+  
+
+  async NextUserCorrected(
+    sectionId: string,
+    adminId: string,
+  ) {
+    await this.assignmentService.remove(adminId);
+    const assignedUsers = await this.assignmentService.findAllBySection(sectionId);
+
+    const assignedUserIds = assignedUsers.map(a => a.user.id);
+
+    const userForReview = await this.processStatusRepository.findOne({
+      where: {
+        status: ProcessStatusEnum.CORRECTED,
+        section: { id: sectionId },
+        user: { id: Not(In(assignedUserIds)) },
+      },
+      relations: ['user'],
+    });
+
+    if (!userForReview) {
+      return [];
+    }
+
+    await this.assignmentService.create(
+      {
+        sectionDocumentId: sectionId,
+        userId: userForReview.user.id,
+      },
+      adminId,
+    );
+    return [userForReview];
+  }
+
+  async getAllUsersWithUnresolvedDocuments(sectionId: string, admin: User) {
+    await this.assignmentService.remove(admin.id);
+    const assignedUsers = await this.assignmentService.findAllBySection(sectionId);
+
+    const assignedUserIds = assignedUsers.map(a => a.user.id);
+  
+    return await this.processStatusRepository.find({
+      where: {
+        status: ProcessStatusEnum.UNDER_OBSERVATION,
+        section: { id: sectionId },
+        user: { id: Not(In(assignedUserIds)) },
+      },
+      relations: ['user'],
+    });
+  }
+  
+  async findOneByUserSection(sectionId: string, user: User, throwErrorIfNotFound = true) {
+    const processStatus = await this.processStatusRepository.findOne({
+      where: {
+        user: { id: user.id },
+        section: { id: sectionId },
+      },
+    });
+  
+    if (!processStatus && throwErrorIfNotFound) {
+      throw new NotFoundException(`El usuario no ha iniciado ningún proceso`);
+    }
+  
     return processStatus;
   }
 

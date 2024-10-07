@@ -37,8 +37,12 @@ export class CreateUserDto {
   @IsString({ message: 'El distrito debe ser una cadena de texto' })
   district: string;
 
-  @IsPhoneNumber('PE', { message: 'El número de celular debe ser un número válido de Perú' }) // Para Perú
-  @Length(9, 9, { message: 'El número de celular debe tener exactamente 9 dígitos' })
+  @IsPhoneNumber('PE', {
+    message: 'El número de celular debe ser un número válido de Perú',
+  }) // Para Perú
+  @Length(9, 9, {
+    message: 'El número de celular debe tener exactamente 9 dígitos',
+  })
   mobileNumber: string;
 
   @IsString({ message: 'El correo debe ser una cadena de texto' })
@@ -47,6 +51,8 @@ export class CreateUserDto {
 
   @IsString({ message: 'La contraseña debe ser una cadena de texto' })
   @MinLength(6, { message: 'La contraseña debe tener al menos 6 caracteres' })
-  @MaxLength(50, { message: 'La contraseña no puede exceder los 50 caracteres' })
+  @MaxLength(50, {
+    message: 'La contraseña no puede exceder los 50 caracteres',
+  })
   password: string;
 }
