@@ -270,6 +270,7 @@ export class DocumentsService {
           id: user.id,
         },
       },
+      relations: ['typeDocument']
     });
     return documents;
   }
