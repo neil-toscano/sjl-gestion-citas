@@ -18,8 +18,8 @@ export class UserPermissionsController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.userPermissionsService.findOne(+id);
+  findByUser(@Param('id') id: string) {
+    return this.userPermissionsService.findByUser(id);
   }
 
   @Patch(':id')
@@ -29,6 +29,6 @@ export class UserPermissionsController {
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.userPermissionsService.remove(+id);
+    return this.userPermissionsService.remove(id);
   }
 }

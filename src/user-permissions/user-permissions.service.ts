@@ -4,6 +4,7 @@ import { UpdateUserPermissionDto } from './dto/update-user-permission.dto';
 import { UserPermission } from './entities/user-permission.entity';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
+import { User } from 'src/user/entities/user.entity';
 
 @Injectable()
 export class UserPermissionsService {
@@ -25,6 +26,15 @@ export class UserPermissionsService {
       }
     });
 
+    await this.userPermissionRepository
+    .delete({
+      user: {
+        id: userId
+      },
+      section: {
+        id: sectionId
+      }
+    });
 
     return await this.userPermissionRepository.save(userPermission);
   }
@@ -37,11 +47,29 @@ export class UserPermissionsService {
     return `This action returns a #${id} userPermission`;
   }
 
+  async findByUser(id: string) {
+    return await this.userPermissionRepository.find({
+      where: {
+        user: {
+          id: id
+        }
+      },
+      relations: ['section']
+    })
+  }
+
   update(id: number, updateUserPermissionDto: UpdateUserPermissionDto) {
     return `This action updates a #${id} userPermission`;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} userPermission`;
+  async remove(id: string) {
+    await this.userPermissionRepository.delete({
+      id: id,
+    });
+
+    return {
+      ok: true,
+      message: 'se eliminó correctamente el permiso',
+    };
   }
 }
