@@ -11,7 +11,8 @@ import {
 import { SectionTypeDocumentService } from './section-type-document.service';
 import { CreateSectionTypeDocumentDto } from './dto/create-section-type-document.dto';
 import { UpdateSectionTypeDocumentDto } from './dto/update-section-type-document.dto';
-import { Auth } from 'src/auth/decorators';
+import { Auth, GetUser } from 'src/auth/decorators';
+import { User } from 'src/user/entities/user.entity';
 
 @Controller('section-type-document')
 export class SectionTypeDocumentController {
@@ -25,8 +26,11 @@ export class SectionTypeDocumentController {
   }
 
   @Get()
-  findAll() {
-    return this.sectionTypeDocumentService.findAll();
+  @Auth()
+  findAll(
+    @GetUser() user: User,
+  ) {
+    return this.sectionTypeDocumentService.findAll(user);
   }
 
   @Get(':id')

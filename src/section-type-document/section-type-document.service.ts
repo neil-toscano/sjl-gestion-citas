@@ -5,12 +5,15 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { SectionTypeDocument } from './entities/section-type-document.entity';
 import { Repository } from 'typeorm';
 import { SectionType } from './interfaces/document';
+import { User } from 'src/user/entities/user.entity';
+import { UserPermissionsService } from 'src/user-permissions/user-permissions.service';
 
 @Injectable()
 export class SectionTypeDocumentService {
   constructor(
     @InjectRepository(SectionTypeDocument)
     private readonly sectionTypeDocumentRepository: Repository<SectionTypeDocument>,
+    private readonly userPermissionService: UserPermissionsService
   ) {}
   create(createSectionTypeDocumentDto: CreateSectionTypeDocumentDto) {
     const { sectionId, typeDocumentId } = createSectionTypeDocumentDto;
@@ -23,23 +26,56 @@ export class SectionTypeDocumentService {
     return this.sectionTypeDocumentRepository.save(newSectionTypeDocument);
   }
 
-  async findAll(): Promise<SectionType[]> {
-    //TODO: Verificar detalladamente
-    const result = await this.sectionTypeDocumentRepository
-      .createQueryBuilder('sectionTypeDocument')
-      .leftJoinAndSelect('sectionTypeDocument.section', 'section')
-      .leftJoinAndSelect('sectionTypeDocument.typeDocument', 'typeDocument')
-      .select([
-        'sectionTypeDocument.id AS sectionTypeDocumentId',
-        'section.id AS sectionId',
-        'section.sectionName AS sectionName',
-        'section.sectionSlug AS sectionSlug',
-        'typeDocument.id AS typeDocumentId',
-        'typeDocument.name AS typeDocumentName',
-      ])
-      .orderBy('section.sectionName', 'ASC')
-      .getRawMany();
-    return Object.values(this.organizeData(result));
+  async findAll(user: User): Promise<SectionType[]> {
+    // console.log(user)
+    if(user.roles.includes('user')) {
+      //TODO: Verificar detalladamente
+      const result = await this.sectionTypeDocumentRepository
+        .createQueryBuilder('sectionTypeDocument')
+        .leftJoinAndSelect('sectionTypeDocument.section', 'section')
+        .leftJoinAndSelect('sectionTypeDocument.typeDocument', 'typeDocument')
+        .select([
+          'sectionTypeDocument.id AS sectionTypeDocumentId',
+          'section.id AS sectionId',
+          'section.sectionName AS sectionName',
+          'section.sectionSlug AS sectionSlug',
+          'typeDocument.id AS typeDocumentId',
+          'typeDocument.name AS typeDocumentName',
+        ])
+        .orderBy('section.sectionName', 'ASC')
+        .getRawMany();
+      return Object.values(this.organizeData(result));
+    }
+    else if (user.roles.includes('platform-operator')) {
+      const permissions = await this.userPermissionService.findByUser(user.id);
+    
+      const accessibleSectionIds = permissions
+        .filter(permission => permission.hasAccess)
+        .map(permission => permission.section.id);
+    
+      if (accessibleSectionIds.length === 0) {
+        return [];
+      }
+    
+      // Query to get only sections the user has access to
+      const result = await this.sectionTypeDocumentRepository
+        .createQueryBuilder('sectionTypeDocument')
+        .leftJoinAndSelect('sectionTypeDocument.section', 'section')
+        .leftJoinAndSelect('sectionTypeDocument.typeDocument', 'typeDocument')
+        .select([
+          'sectionTypeDocument.id AS sectionTypeDocumentId',
+          'section.id AS sectionId',
+          'section.sectionName AS sectionName',
+          'section.sectionSlug AS sectionSlug',
+          'typeDocument.id AS typeDocumentId',
+          'typeDocument.name AS typeDocumentName',
+        ])
+        .where('section.id IN (:...accessibleSectionIds)', { accessibleSectionIds })  // Filter sections by accessible IDs
+        .orderBy('section.sectionName', 'ASC')
+        .getRawMany();
+    
+      return Object.values(this.organizeData(result));
+    }    
   }
   
   async findOne(id: string) {
