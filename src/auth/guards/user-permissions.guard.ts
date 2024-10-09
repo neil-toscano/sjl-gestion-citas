@@ -1,4 +1,9 @@
-import { Injectable, CanActivate, ExecutionContext, ForbiddenException } from '@nestjs/common';
+import {
+  Injectable,
+  CanActivate,
+  ExecutionContext,
+  ForbiddenException,
+} from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { User } from 'src/user/entities/user.entity';
 import { Permissions } from '../decorators/permissions-protected.decorator';
@@ -16,13 +21,12 @@ export class PermissionGuard implements CanActivate {
     const user = request.user as User;
 
     for (const permission of user.permissions) {
-        if (permisions.includes(permission)) {
-          return true;
-        }
+      if (permisions.includes(permission)) {
+        return true;
       }
-      throw new ForbiddenException(
-        `User ${user.firstName} need a valid permission: [${permisions}]`,
-      );
-    
+    }
+    throw new ForbiddenException(
+      `User ${user.firstName} need a valid permission: [${permisions}]`,
+    );
   }
 }

@@ -1,4 +1,4 @@
-import { TimeRemaining } from "../interfaces/time-remaining";
+import { TimeRemaining } from '../interfaces/time-remaining';
 
 export function getTimeRemaining(updatedAt: Date): TimeRemaining {
   const updatedDate = new Date(updatedAt);

@@ -127,11 +127,11 @@ export class DocumentsService {
   async update(id: string, updateDocumentDto: UpdateDocumentDto) {
     const document = await this.documentRepository.findOne({
       where: {
-        id: id
+        id: id,
       },
-      relations: ['user']
+      relations: ['user'],
     });
-    
+
     const user = document.user;
 
     if (Object.keys(updateDocumentDto).length === 0) {
@@ -220,6 +220,7 @@ export class DocumentsService {
           await this.processStatusService.update(processStatus.id, {
             status: ProcessStatusEnum.UNDER_OBSERVATION,
           });
+          await this.emailService.createTemporaryEmail(user.email);
           break;
         default:
           throw new Error('Invalid status');

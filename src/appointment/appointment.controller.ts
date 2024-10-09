@@ -61,10 +61,10 @@ export class AppointmentController {
     return this.appointmentService.findAll(user);
   }
 
-  @Get('week/:adminId')
+  @Get('week/:operatorId')
   @Auth()
   findByWeek(
-    @Param('adminId', new ParseUUIDPipe()) adminId: string,
+    @Param('operatorId', new ParseUUIDPipe()) operatorId: string,
     @Query() query: FindByWeekDto,
   ) {
     const inputDate = new Date(query.date);
@@ -72,7 +72,7 @@ export class AppointmentController {
       throw new BadRequestException('La fecha debe ser un sábado válido.');
     }
 
-    return this.appointmentService.findByWeek(inputDate, adminId);
+    return this.appointmentService.findByWeek(inputDate, operatorId);
   }
 
   @Get(':id')

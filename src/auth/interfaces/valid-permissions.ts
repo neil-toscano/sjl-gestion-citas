@@ -1,5 +1,4 @@
 export enum ValidPermissions {
-    intestada = 'intestada',
-    lotes = 'lotes',
-  }
-  
+  intestada = 'intestada',
+  lotes = 'lotes',
+}

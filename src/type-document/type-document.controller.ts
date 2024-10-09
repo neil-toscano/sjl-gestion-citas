@@ -10,7 +10,6 @@ import {
 import { TypeDocumentService } from './type-document.service';
 import { CreateTypeDocumentDto } from './dto/create-type-document.dto';
 import { UpdateTypeDocumentDto } from './dto/update-type-document.dto';
-import { Auth } from 'src/auth/decorators';
 
 @Controller('type-document')
 export class TypeDocumentController {

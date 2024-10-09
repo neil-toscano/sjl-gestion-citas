@@ -90,18 +90,18 @@ export class UserService {
     return user;
   }
 
-  async findOneAdmin(id: string) {
-    const admin = await this.userRepository
+  async findOnePlatformOperator(id: string) {
+    const platformOperator = await this.userRepository
       .createQueryBuilder('user')
       .where('user.id = :id', { id })
-      .andWhere(':role = ANY(user.roles)', { role: 'super-user' }) // Verifica si el rol está en el array
+      .andWhere(':role = ANY(user.roles)', { role: 'platform-operator' }) // Verifica si el rol está en el array
       .getOne();
 
-    if (!admin) {
-      throw new NotFoundException(`Admin with id ${id} not found`);
+    if (!platformOperator) {
+      throw new NotFoundException(`Platform-operator with id ${id} not found`);
     }
 
-    return admin;
+    return platformOperator;
   }
 
   async findPlatformOperators(): Promise<User[]> {
@@ -116,7 +116,6 @@ export class UserService {
 
     return platformOperator;
   }
-  
 
   async updateVerify(user: User) {
     await this.userRepository.save(user);

@@ -35,18 +35,22 @@ export class AppointmentService {
     createAppointmentDto: CreateAppointmentDto,
     user: User,
   ) {
-    const checkEligibility = await this.processStatusService.checkEligibilityForAppointment(sectionId, user);
-    if(!checkEligibility.hasProcess) {
+    const checkEligibility =
+      await this.processStatusService.checkEligibilityForAppointment(
+        sectionId,
+        user,
+      );
+    if (!checkEligibility.hasProcess) {
       throw new NotFoundException('No tiene ningún proceso');
     }
 
-    if(!checkEligibility.timeRemaining.expired) {
+    if (!checkEligibility.timeRemaining.expired) {
       throw new BadRequestException('Aún no cumple la fecha para sacar cita.');
     }
 
     const section = await this.sectionService.findOne(sectionId);
     const schedule = await this.scheduleService.findOne(scheduleId);
-    await this.userService.findOneAdmin(adminId);
+    await this.userService.findOnePlatformOperator(adminId);
 
     const { ok, msg } = await this.hasOpenAppointmentBySection(
       sectionId,
@@ -140,13 +144,13 @@ export class AppointmentService {
     return true; // Si no hay cita existente, el horario está disponible
   }
 
-  async findByWeek(date: Date, adminId: string): Promise<Appointment[]> {
-    await this.userService.findOneAdmin(adminId);
+  async findByWeek(date: Date, platformOperatorId: string): Promise<Appointment[]> {
+    await this.userService.findOnePlatformOperator(platformOperatorId);
     return this.appointmentRepository.find({
       where: {
         appointmentDate: date,
         assignedAdmin: {
-          id: adminId,
+          id: platformOperatorId,
         },
       },
       relations: ['section', 'reservedBy', 'schedule'],

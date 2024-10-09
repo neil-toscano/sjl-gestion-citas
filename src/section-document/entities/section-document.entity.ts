@@ -47,6 +47,6 @@ export class SectionDocument {
   @OneToMany(() => Document, (document) => document.section)
   documents: Document[];
 
-  @OneToMany(() => UserPermission, permission => permission.section)
+  @OneToMany(() => UserPermission, (permission) => permission.section)
   permissions: UserPermission[];
 }

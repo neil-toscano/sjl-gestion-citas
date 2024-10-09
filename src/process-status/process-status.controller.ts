@@ -100,13 +100,11 @@ export class ProcessStatusController {
       user,
     );
   }
-  
+
   @Get('status/count')
-  async countByStatus(
-  ) {
+  async countByStatus() {
     return this.processStatusService.countByStatus();
   }
-
 
   @Get(':id')
   @Auth()

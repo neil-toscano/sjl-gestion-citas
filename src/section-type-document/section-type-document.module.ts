@@ -11,6 +11,11 @@ import { ProcessStatusModule } from 'src/process-status/process-status.module';
   controllers: [SectionTypeDocumentController],
   providers: [SectionTypeDocumentService],
   exports: [TypeOrmModule, SectionTypeDocumentService],
-  imports: [TypeOrmModule.forFeature([SectionTypeDocument]), AuthModule, UserPermissionsModule, ProcessStatusModule],
+  imports: [
+    TypeOrmModule.forFeature([SectionTypeDocument]),
+    AuthModule,
+    UserPermissionsModule,
+    ProcessStatusModule,
+  ],
 })
 export class SectionTypeDocumentModule {}

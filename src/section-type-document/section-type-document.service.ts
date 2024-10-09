@@ -11,12 +11,14 @@ import { ProcessStatusService } from 'src/process-status/process-status.service'
 
 @Injectable()
 export class SectionTypeDocumentService {
+  
   constructor(
     @InjectRepository(SectionTypeDocument)
     private readonly sectionTypeDocumentRepository: Repository<SectionTypeDocument>,
     private readonly userPermissionService: UserPermissionsService,
     private readonly processStatusService: ProcessStatusService,
   ) {}
+
   create(createSectionTypeDocumentDto: CreateSectionTypeDocumentDto) {
     const { sectionId, typeDocumentId } = createSectionTypeDocumentDto;
 
@@ -30,7 +32,7 @@ export class SectionTypeDocumentService {
 
   async findAll(user: User): Promise<SectionType[]> {
     // console.log(user)
-    if(user.roles.includes('user') || user.roles.includes('administrator')) {
+    if (user.roles.includes('user') || user.roles.includes('administrator')) {
       //TODO: Verificar detalladamente
 
       const statusCounts = await this.processStatusService.countByStatus();
@@ -50,33 +52,32 @@ export class SectionTypeDocumentService {
         .orderBy('section.sectionName', 'ASC')
         .getRawMany();
       const statusCountMap = statusCounts.reduce((acc, current) => {
-          const { sectionId, status, count } = current;
-          if (!acc[sectionId]) {
-            acc[sectionId] = [];
-          }
-          acc[sectionId].push({ status, count });
-          return acc;
-        }, {});
+        const { sectionId, status, count } = current;
+        if (!acc[sectionId]) {
+          acc[sectionId] = [];
+        }
+        acc[sectionId].push({ status, count });
+        return acc;
+      }, {});
 
-        const organizedData: any[] = Object.values(this.organizeData(result));
-        const finalResult = organizedData.map(section => ({
-          ...section,
-          statusCounts: statusCountMap[section.sectionId] || []
-        }));
+      const organizedData: any[] = Object.values(this.organizeData(result));
+      const finalResult = organizedData.map((section) => ({
+        ...section,
+        statusCounts: statusCountMap[section.sectionId] || [],
+      }));
 
-        return finalResult;
-    }
-    else if (user.roles.includes('platform-operator')) {
+      return finalResult;
+    } else if (user.roles.includes('platform-operator')) {
       const permissions = await this.userPermissionService.findByUser(user.id);
-    
+
       const accessibleSectionIds = permissions
-        .filter(permission => permission.hasAccess)
-        .map(permission => permission.section.id);
-    
+        .filter((permission) => permission.hasAccess)
+        .map((permission) => permission.section.id);
+
       if (accessibleSectionIds.length === 0) {
         return [];
       }
-      
+
       const statusCounts = await this.processStatusService.countByStatus();
 
       const result = await this.sectionTypeDocumentRepository
@@ -91,29 +92,31 @@ export class SectionTypeDocumentService {
           'typeDocument.id AS typeDocumentId',
           'typeDocument.name AS typeDocumentName',
         ])
-        .where('section.id IN (:...accessibleSectionIds)', { accessibleSectionIds })  // Filter sections by accessible IDs
+        .where('section.id IN (:...accessibleSectionIds)', {
+          accessibleSectionIds,
+        }) // Filter sections by accessible IDs
         .orderBy('section.sectionName', 'ASC')
         .getRawMany();
 
-        const statusCountMap = statusCounts.reduce((acc, current) => {
-          const { sectionId, status, count } = current;
-          if (!acc[sectionId]) {
-            acc[sectionId] = [];
-          }
-          acc[sectionId].push({ status, count });
-          return acc;
-        }, {});
+      const statusCountMap = statusCounts.reduce((acc, current) => {
+        const { sectionId, status, count } = current;
+        if (!acc[sectionId]) {
+          acc[sectionId] = [];
+        }
+        acc[sectionId].push({ status, count });
+        return acc;
+      }, {});
 
-        const organizedData: any[] = Object.values(this.organizeData(result));
-        const finalResult = organizedData.map(section => ({
-          ...section,
-          statusCounts: statusCountMap[section.sectionId] || []
-        }));
+      const organizedData: any[] = Object.values(this.organizeData(result));
+      const finalResult = organizedData.map((section) => ({
+        ...section,
+        statusCounts: statusCountMap[section.sectionId] || [],
+      }));
 
-        return finalResult;
-    }    
+      return finalResult;
+    }
   }
-  
+
   async findOne(id: string) {
     const result = await this.sectionTypeDocumentRepository.findOne({
       where: { id: id },

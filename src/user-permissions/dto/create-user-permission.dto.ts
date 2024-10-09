@@ -1,6 +1,5 @@
-import {  IsNotEmpty, IsUUID } from 'class-validator';
+import { IsNotEmpty, IsUUID } from 'class-validator';
 export class CreateUserPermissionDto {
-
   @IsUUID()
   @IsNotEmpty()
   userId: string;
@@ -8,5 +7,4 @@ export class CreateUserPermissionDto {
   @IsUUID()
   @IsNotEmpty()
   sectionId: string;
-
 }

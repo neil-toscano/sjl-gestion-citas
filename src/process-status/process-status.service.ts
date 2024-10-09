@@ -154,25 +154,23 @@ export class ProcessStatusService {
       relations: ['user'],
     });
 
-
     let timeRemaining: TimeRemaining;
 
-    if(processStatus) {
+    if (processStatus) {
       timeRemaining = getTimeRemaining(processStatus.updatedAt);
-    }
-    
-    else {
+    } else {
       timeRemaining = { expired: false, days: 0, hours: 0, minutes: 0 };
     }
 
     return {
-      hasProcess: processStatus? true: false, 
+      hasProcess: processStatus ? true : false,
       processStatus: processStatus,
       timeRemaining: timeRemaining,
     };
   }
 
-  async countByStatus() { //TODO: CAMBIOS
+  async countByStatus() {
+    //TODO: CAMBIOS
     const result = await this.processStatusRepository
       .createQueryBuilder('processStatus')
       .select('processStatus.sectionId', 'sectionId') // Agrupamos por sectionId
@@ -181,7 +179,7 @@ export class ProcessStatusService {
       .groupBy('processStatus.sectionId') // Agrupamos por sectionId
       .addGroupBy('processStatus.status') // Agrupamos por status también
       .getRawMany();
-  
+
     return result;
   }
 

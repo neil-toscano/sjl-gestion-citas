@@ -97,6 +97,6 @@ export class User {
   @OneToMany(() => ProcessStatus, (processStatus) => processStatus.user)
   processStatus: ProcessStatus[];
 
-  @OneToMany(() => UserPermission, permission => permission.user)
+  @OneToMany(() => UserPermission, (permission) => permission.user)
   permissions: UserPermission[];
 }

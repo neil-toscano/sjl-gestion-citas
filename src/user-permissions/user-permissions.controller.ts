@@ -1,4 +1,12 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+} from '@nestjs/common';
 import { UserPermissionsService } from './user-permissions.service';
 import { CreateUserPermissionDto } from './dto/create-user-permission.dto';
 import { UpdateUserPermissionDto } from './dto/update-user-permission.dto';
@@ -6,9 +14,12 @@ import { Auth } from 'src/auth/decorators';
 
 @Controller('user-permissions')
 export class UserPermissionsController {
-  constructor(private readonly userPermissionsService: UserPermissionsService) {}
+  constructor(
+    private readonly userPermissionsService: UserPermissionsService,
+  ) {}
 
   @Post()
+  @Auth()
   create(@Body() createUserPermissionDto: CreateUserPermissionDto) {
     return this.userPermissionsService.create(createUserPermissionDto);
   }
@@ -19,6 +30,7 @@ export class UserPermissionsController {
   }
 
   @Get(':id')
+  @Auth()
   findByUser(@Param('id') id: string) {
     return this.userPermissionsService.findByUser(id);
   }
@@ -30,11 +42,15 @@ export class UserPermissionsController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateUserPermissionDto: UpdateUserPermissionDto) {
+  update(
+    @Param('id') id: string,
+    @Body() updateUserPermissionDto: UpdateUserPermissionDto,
+  ) {
     return this.userPermissionsService.update(+id, updateUserPermissionDto);
   }
 
   @Delete(':id')
+  @Auth()
   remove(@Param('id') id: string) {
     return this.userPermissionsService.remove(id);
   }

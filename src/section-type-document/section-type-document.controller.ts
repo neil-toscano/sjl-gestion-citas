@@ -27,9 +27,7 @@ export class SectionTypeDocumentController {
 
   @Get()
   @Auth()
-  findAll(
-    @GetUser() user: User,
-  ) {
+  findAll(@GetUser() user: User) {
     return this.sectionTypeDocumentService.findAll(user);
   }
 
