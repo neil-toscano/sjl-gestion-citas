@@ -124,8 +124,15 @@ export class DocumentsService {
     return document;
   }
 
-  async update(id: string, updateDocumentDto: UpdateDocumentDto, user: User) {
-    const document = await this.findOne(id);
+  async update(id: string, updateDocumentDto: UpdateDocumentDto) {
+    const document = await this.documentRepository.findOne({
+      where: {
+        id: id
+      },
+      relations: ['user']
+    });
+    
+    const user = document.user;
 
     if (Object.keys(updateDocumentDto).length === 0) {
       return { message: 'No data provided for update' };

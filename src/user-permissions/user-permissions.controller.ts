@@ -2,6 +2,7 @@ import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/commo
 import { UserPermissionsService } from './user-permissions.service';
 import { CreateUserPermissionDto } from './dto/create-user-permission.dto';
 import { UpdateUserPermissionDto } from './dto/update-user-permission.dto';
+import { Auth } from 'src/auth/decorators';
 
 @Controller('user-permissions')
 export class UserPermissionsController {
@@ -20,6 +21,12 @@ export class UserPermissionsController {
   @Get(':id')
   findByUser(@Param('id') id: string) {
     return this.userPermissionsService.findByUser(id);
+  }
+
+  @Get('platform-operators/:sectionId')
+  @Auth()
+  findPlatformOperators(@Param('sectionId') sectionId: string) {
+    return this.userPermissionsService.findPlatformOperators(sectionId);
   }
 
   @Patch(':id')

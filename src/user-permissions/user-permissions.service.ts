@@ -47,6 +47,17 @@ export class UserPermissionsService {
     return `This action returns a #${id} userPermission`;
   }
 
+  async findPlatformOperators(sectionId: string) {
+    return await this.userPermissionRepository.find({
+      where: {
+        section: {
+          id: sectionId
+        }
+      },
+      relations: ['user']
+    })
+  }
+
   async findByUser(id: string) {
     return await this.userPermissionRepository.find({
       where: {

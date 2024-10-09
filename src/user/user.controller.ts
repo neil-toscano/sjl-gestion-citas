@@ -38,7 +38,7 @@ export class UserController {
 
   @Get('roles/platform-operators')
   @Auth()
-  findAdmins() {
+  findPlatformOperators() {
     return this.userService.findPlatformOperators();
   }
 

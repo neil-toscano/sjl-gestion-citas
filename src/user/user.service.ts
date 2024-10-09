@@ -116,6 +116,7 @@ export class UserService {
 
     return platformOperator;
   }
+  
 
   async updateVerify(user: User) {
     await this.userRepository.save(user);
