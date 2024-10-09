@@ -28,7 +28,7 @@ export class SectionTypeDocumentService {
 
   async findAll(user: User): Promise<SectionType[]> {
     // console.log(user)
-    if(user.roles.includes('user')) {
+    if(user.roles.includes('user') || user.roles.includes('administrator')) {
       //TODO: Verificar detalladamente
       const result = await this.sectionTypeDocumentRepository
         .createQueryBuilder('sectionTypeDocument')
