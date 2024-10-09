@@ -36,10 +36,10 @@ export class UserController {
     return this.userService.findByTerm(termDto);
   }
 
-  @Get('roles/admins')
+  @Get('roles/platform-operators')
   @Auth()
   findAdmins() {
-    return this.userService.findAdmins();
+    return this.userService.findPlatformOperators();
   }
 
   @Patch(':id')

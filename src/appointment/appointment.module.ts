@@ -8,6 +8,7 @@ import { SectionDocumentModule } from 'src/section-document/section-document.mod
 import { UserModule } from 'src/user/user.module';
 import { ScheduleModule } from 'src/schedule/schedule.module';
 import { EmailModule } from 'src/email/email.module';
+import { ProcessStatusModule } from 'src/process-status/process-status.module';
 
 @Module({
   controllers: [AppointmentController],
@@ -19,6 +20,7 @@ import { EmailModule } from 'src/email/email.module';
     UserModule,
     ScheduleModule,
     EmailModule,
+    ProcessStatusModule,
   ],
   exports: [AppointmentService, TypeOrmModule],
 })

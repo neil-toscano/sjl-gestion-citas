@@ -7,6 +7,8 @@ import { In, Not, Repository } from 'typeorm';
 import { User } from 'src/user/entities/user.entity';
 import { ProcessStatusEnum } from './interfaces/status.enum';
 import { AssignmentsService } from 'src/assignments/assignments.service';
+import { getTimeRemaining } from './utils/time.util';
+import { TimeRemaining } from './interfaces/time-remaining';
 
 @Injectable()
 export class ProcessStatusService {
@@ -141,6 +143,46 @@ export class ProcessStatusService {
       },
       relations: ['user'],
     });
+  }
+
+  async checkEligibilityForAppointment(sectionId: string, user: User) {
+    const processStatus = await this.processStatusRepository.findOne({
+      where: {
+        section: { id: sectionId },
+        user: { id: user.id },
+      },
+      relations: ['user'],
+    });
+
+
+    let timeRemaining: TimeRemaining;
+
+    if(processStatus) {
+      timeRemaining = getTimeRemaining(processStatus.updatedAt);
+    }
+    
+    else {
+      timeRemaining = { expired: false, days: 0, hours: 0, minutes: 0 };
+    }
+
+    return {
+      hasProcess: processStatus? true: false, 
+      processStatus: processStatus,
+      timeRemaining: timeRemaining,
+    };
+  }
+
+  async countByStatus() { //TODO: CAMBIOS
+    const result = await this.processStatusRepository
+      .createQueryBuilder('processStatus')
+      .select('processStatus.sectionId', 'sectionId') // Agrupamos por sectionId
+      .addSelect('processStatus.status', 'status')
+      .addSelect('COUNT(processStatus.id)', 'count')
+      .groupBy('processStatus.sectionId') // Agrupamos por sectionId
+      .addGroupBy('processStatus.status') // Agrupamos por status también
+      .getRawMany();
+  
+    return result;
   }
 
   async findOneByUserSection(

@@ -104,17 +104,17 @@ export class UserService {
     return admin;
   }
 
-  async findAdmins(): Promise<User[]> {
-    const admins = await this.userRepository
+  async findPlatformOperators(): Promise<User[]> {
+    const platformOperator = await this.userRepository
       .createQueryBuilder('user')
-      .where(':role = ANY(user.roles)', { role: 'super-user' }) // Verifica si el rol está en el array
+      .where(':role = ANY(user.roles)', { role: 'platform-operator' }) // Verifica si el rol está en el array
       .getMany(); // Obtiene todos los usuarios que coincidan
 
-    if (admins.length === 0) {
-      throw new NotFoundException(`No admins with the 'super-user' role found`);
+    if (platformOperator.length === 0) {
+      return [];
     }
 
-    return admins;
+    return platformOperator;
   }
 
   async updateVerify(user: User) {

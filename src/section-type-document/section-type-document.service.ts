@@ -41,7 +41,7 @@ export class SectionTypeDocumentService {
       .getRawMany();
     return Object.values(this.organizeData(result));
   }
-
+  
   async findOne(id: string) {
     const result = await this.sectionTypeDocumentRepository.findOne({
       where: { id: id },

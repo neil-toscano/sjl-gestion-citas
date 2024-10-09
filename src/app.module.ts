@@ -24,6 +24,7 @@ import { AdminModule } from './admin/admin.module';
 import { EmailModule } from './email/email.module';
 import { CronModule } from './cron/cron.module';
 import { ProcessStatusModule } from './process-status/process-status.module';
+import { UserPermissionsModule } from './user-permissions/user-permissions.module';
 
 @Module({
   imports: [
@@ -42,7 +43,7 @@ import { ProcessStatusModule } from './process-status/process-status.module';
       password: process.env.DB_PASSWORD,
       autoLoadEntities: true,
       synchronize: true,
-      useUTC: false,
+      useUTC: true,
     }),
 
     ServeStaticModule.forRoot({
@@ -82,6 +83,8 @@ import { ProcessStatusModule } from './process-status/process-status.module';
     CronModule,
 
     ProcessStatusModule,
+
+    UserPermissionsModule,
   ],
 })
 export class AppModule {}

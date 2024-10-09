@@ -13,6 +13,8 @@ import { User } from 'src/user/entities/user.entity';
 import { UserService } from 'src/user/user.service';
 import { ScheduleService } from 'src/schedule/schedule.service';
 import { EmailService } from 'src/email/email.service';
+import { ProcessStatusService } from 'src/process-status/process-status.service';
+import { ProcessStatusEnum } from 'src/process-status/interfaces/status.enum';
 
 @Injectable()
 export class AppointmentService {
@@ -23,6 +25,7 @@ export class AppointmentService {
     private readonly userService: UserService,
     private readonly scheduleService: ScheduleService,
     private readonly emailService: EmailService,
+    private readonly processStatusService: ProcessStatusService,
   ) {}
 
   async create(
@@ -32,6 +35,15 @@ export class AppointmentService {
     createAppointmentDto: CreateAppointmentDto,
     user: User,
   ) {
+    const checkEligibility = await this.processStatusService.checkEligibilityForAppointment(sectionId, user);
+    if(!checkEligibility.hasProcess) {
+      throw new NotFoundException('No tiene ningún proceso');
+    }
+
+    if(!checkEligibility.timeRemaining.expired) {
+      throw new BadRequestException('Aún no cumple la fecha para sacar cita.');
+    }
+
     const section = await this.sectionService.findOne(sectionId);
     const schedule = await this.scheduleService.findOne(scheduleId);
     await this.userService.findOneAdmin(adminId);
@@ -68,6 +80,17 @@ export class AppointmentService {
         id: adminId,
       },
     });
+
+    const processStatus = await this.processStatusService.findOneByUserSection(
+      sectionId,
+      user,
+      true,
+    );
+
+    await this.processStatusService.update(processStatus.id, {
+      status: ProcessStatusEnum.APPOINTMENT_SCHEDULED,
+    });
+
     await this.emailService.sendAppointmentConfirmation({
       isFirstTime: createAppointmentDto.isFirstTime,
       appointmentDate: createAppointmentDto.appointmentDate,

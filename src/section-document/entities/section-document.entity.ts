@@ -4,6 +4,7 @@ import { Document } from 'src/documents/entities/document.entity';
 import { ProcessStatus } from 'src/process-status/entities/process-status.entity';
 import { Schedule } from 'src/schedule/entities/schedule.entity';
 import { SectionTypeDocument } from 'src/section-type-document/entities/section-type-document.entity';
+import { UserPermission } from 'src/user-permissions/entities/user-permission.entity';
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity({ name: 'section_document' })
@@ -45,4 +46,7 @@ export class SectionDocument {
 
   @OneToMany(() => Document, (document) => document.section)
   documents: Document[];
+
+  @OneToMany(() => UserPermission, permission => permission.section)
+  permissions: UserPermission[];
 }

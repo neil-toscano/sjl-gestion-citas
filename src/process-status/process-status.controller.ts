@@ -89,6 +89,25 @@ export class ProcessStatusController {
     );
   }
 
+  @Get('is-eligible-for-appointment/:sectionId')
+  @Auth()
+  async isEligibleForAppointment(
+    @Param('sectionId', new ParseUUIDPipe()) sectionId: string,
+    @GetUser() user: User,
+  ) {
+    return this.processStatusService.checkEligibilityForAppointment(
+      sectionId,
+      user,
+    );
+  }
+  
+  @Get('status/count')
+  async countByStatus(
+  ) {
+    return this.processStatusService.countByStatus();
+  }
+
+
   @Get(':id')
   @Auth()
   findOneByUserSection(@Param('id') sectionId: string, @GetUser() user: User) {
