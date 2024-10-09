@@ -242,6 +242,11 @@ export class DocumentsService {
         },
       },
       relations: ['typeDocument'],
+      order: {
+        typeDocument: {
+          name: 'ASC',
+        },
+      },
     });
     return documents;
   }
