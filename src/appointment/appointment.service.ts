@@ -144,7 +144,10 @@ export class AppointmentService {
     return true; // Si no hay cita existente, el horario está disponible
   }
 
-  async findByWeek(date: Date, platformOperatorId: string): Promise<Appointment[]> {
+  async findByWeek(
+    date: Date,
+    platformOperatorId: string,
+  ): Promise<Appointment[]> {
     await this.userService.findOnePlatformOperator(platformOperatorId);
     return this.appointmentRepository.find({
       where: {

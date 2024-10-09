@@ -15,7 +15,7 @@ export class TypeDocumentService {
     @InjectRepository(TypeDocument)
     private readonly typeDocumentRepository: Repository<TypeDocument>,
   ) {}
-  
+
   async create(createTypeDocumentDto: CreateTypeDocumentDto) {
     try {
       const sectionDocument = this.typeDocumentRepository.create(

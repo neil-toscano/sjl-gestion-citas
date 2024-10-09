@@ -1,4 +1,8 @@
-import { Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateUserPermissionDto } from './dto/create-user-permission.dto';
 import { UpdateUserPermissionDto } from './dto/update-user-permission.dto';
 import { UserPermission } from './entities/user-permission.entity';
@@ -35,7 +39,6 @@ export class UserPermissionsService {
     return await this.userPermissionRepository.save(userPermission);
   }
 
-  
   async findByUser(id: string) {
     return await this.userPermissionRepository.find({
       where: {
@@ -46,7 +49,7 @@ export class UserPermissionsService {
       relations: ['section'],
     });
   }
-  
+
   async findPlatformOperators(sectionId: string) {
     return await this.userPermissionRepository.find({
       where: {
@@ -57,15 +60,15 @@ export class UserPermissionsService {
       relations: ['user'],
     });
   }
-  
+
   async remove(id: string) {
     try {
       const result = await this.userPermissionRepository.delete({ id });
-  
+
       if (result.affected === 0) {
         throw new NotFoundException('Permiso no encontrado');
       }
-  
+
       return {
         ok: true,
         message: 'Se eliminó correctamente el permiso',

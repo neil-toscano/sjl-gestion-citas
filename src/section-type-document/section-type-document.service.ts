@@ -11,7 +11,6 @@ import { ProcessStatusService } from 'src/process-status/process-status.service'
 
 @Injectable()
 export class SectionTypeDocumentService {
-  
   constructor(
     @InjectRepository(SectionTypeDocument)
     private readonly sectionTypeDocumentRepository: Repository<SectionTypeDocument>,
@@ -31,10 +30,7 @@ export class SectionTypeDocumentService {
   }
 
   async findAll(user: User): Promise<SectionType[]> {
-    // console.log(user)
     if (user.roles.includes('user') || user.roles.includes('administrator')) {
-      //TODO: Verificar detalladamente
-
       const statusCounts = await this.processStatusService.countByStatus();
 
       const result = await this.sectionTypeDocumentRepository
@@ -51,14 +47,8 @@ export class SectionTypeDocumentService {
         ])
         .orderBy('section.sectionName', 'ASC')
         .getRawMany();
-      const statusCountMap = statusCounts.reduce((acc, current) => {
-        const { sectionId, status, count } = current;
-        if (!acc[sectionId]) {
-          acc[sectionId] = [];
-        }
-        acc[sectionId].push({ status, count });
-        return acc;
-      }, {});
+
+      const statusCountMap = this.mapStatusCounts(statusCounts);
 
       const organizedData: any[] = Object.values(this.organizeData(result));
       const finalResult = organizedData.map((section) => ({
@@ -69,10 +59,7 @@ export class SectionTypeDocumentService {
       return finalResult;
     } else if (user.roles.includes('platform-operator')) {
       const permissions = await this.userPermissionService.findByUser(user.id);
-
-      const accessibleSectionIds = permissions
-        .filter((permission) => permission.hasAccess)
-        .map((permission) => permission.section.id);
+      const accessibleSectionIds = this.getAccessibleSections(permissions);
 
       if (accessibleSectionIds.length === 0) {
         return [];
@@ -94,18 +81,11 @@ export class SectionTypeDocumentService {
         ])
         .where('section.id IN (:...accessibleSectionIds)', {
           accessibleSectionIds,
-        }) // Filter sections by accessible IDs
+        })
         .orderBy('section.sectionName', 'ASC')
         .getRawMany();
 
-      const statusCountMap = statusCounts.reduce((acc, current) => {
-        const { sectionId, status, count } = current;
-        if (!acc[sectionId]) {
-          acc[sectionId] = [];
-        }
-        acc[sectionId].push({ status, count });
-        return acc;
-      }, {});
+      const statusCountMap = this.mapStatusCounts(statusCounts);
 
       const organizedData: any[] = Object.values(this.organizeData(result));
       const finalResult = organizedData.map((section) => ({
@@ -117,10 +97,27 @@ export class SectionTypeDocumentService {
     }
   }
 
+  private mapStatusCounts(statusCounts: any[]): Record<string, any[]> {
+    return statusCounts.reduce((acc, current) => {
+      const { sectionId, status, count } = current;
+      if (!acc[sectionId]) {
+        acc[sectionId] = [];
+      }
+      acc[sectionId].push({ status, count });
+      return acc;
+    }, {});
+  }
+
+  private getAccessibleSections(permissions: any[]): string[] {
+    return permissions
+      .filter((permission) => permission.hasAccess)
+      .map((permission) => permission.section.id);
+  }
+
   async findOne(id: string) {
     const result = await this.sectionTypeDocumentRepository.findOne({
       where: { id: id },
-      relations: ['section'], // Incluir la relación con la entidad Section
+      relations: ['section'],
     });
 
     if (!result) {
