@@ -35,7 +35,6 @@ export class AdminService {
     const user = await this.userService.findOne(userId);
 
     const documents = await this.documentService.findBySection(sectionId, user);
-
     const documentsWithUser = documents.map((doc) => ({
       ...doc,
       user: user,

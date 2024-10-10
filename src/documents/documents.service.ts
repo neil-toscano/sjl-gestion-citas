@@ -241,7 +241,7 @@ export class DocumentsService {
           id: user.id,
         },
       },
-      relations: ['typeDocument'],
+      relations: ['typeDocument', 'section'],
       order: {
         typeDocument: {
           name: 'ASC',
