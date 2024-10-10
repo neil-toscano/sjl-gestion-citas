@@ -45,9 +45,9 @@ export class AppointmentService {
       throw new NotFoundException('No tiene ningún proceso');
     }
 
-    if (!checkEligibility.timeRemaining.expired) {
-      throw new BadRequestException('Aún no cumple la fecha para sacar cita.');
-    }
+    // if (!checkEligibility.timeRemaining.expired) {
+    //   throw new BadRequestException('Aún no cumple la fecha para sacar cita.');
+    // }
 
     const section = await this.sectionService.findOne(sectionId);
     const schedule = await this.scheduleService.findOne(scheduleId);
