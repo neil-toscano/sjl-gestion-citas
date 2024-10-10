@@ -147,6 +147,7 @@ export class DocumentsService {
 
     await this.documentRepository.update(id, updateDocumentDto);
 
+
     const documents = await this.documentRepository.find({
       where: {
         section: {
@@ -217,10 +218,16 @@ export class DocumentsService {
           }
           break;
         case 'OBSERVADO':
-          await this.processStatusService.update(processStatus.id, {
-            status: ProcessStatusEnum.UNDER_OBSERVATION,
-          });
-          await this.emailService.createTemporaryEmail(user.email);
+            try {
+              
+              await this.processStatusService.update(processStatus.id, {
+                  status: ProcessStatusEnum.UNDER_OBSERVATION,
+                });
+                await this.emailService.createTemporaryEmail(user.email);
+            } catch (error) {
+              console.log(error, 'error');
+              
+            }  
           break;
         default:
           throw new Error('Invalid status');

@@ -10,6 +10,6 @@ export class TemporaryEmail {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column({ unique: true })
+  @Column({ unique: false })
   email: string;
 }
