@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  HttpException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
@@ -267,4 +268,23 @@ export class AppointmentService {
 
     return appointments;
   }
+
+  async update(id: string, updateAppointmentDto: UpdateAppointmentDto) {
+
+    delete updateAppointmentDto.isFirstTime;
+
+    if (Object.keys(updateAppointmentDto).length === 0) {
+      throw new BadRequestException('No update values provided');
+    }
+
+    await this.appointmentRepository
+    .createQueryBuilder()
+    .update(Appointment)
+    .set(updateAppointmentDto)  // Solo campos válidos de la entidad
+    .where("id = :id", { id })
+    .execute();
+
+    return await this.appointmentRepository.findOneBy({id});
+  }
+
 }

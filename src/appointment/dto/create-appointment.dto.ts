@@ -6,6 +6,8 @@ import {
   IsOptional,
   IsISO8601,
   Matches,
+  IsString,
+  MaxLength,
 } from 'class-validator';
 import { AppointmentStatus } from '../entities/appointment.entity';
 
@@ -22,5 +24,10 @@ export class CreateAppointmentDto {
 
   @IsBoolean()
   @IsOptional()
-  isFirstTime: boolean = false;
+  isFirstTime: boolean = true;
+
+  @IsString()
+  @IsOptional()
+  @MaxLength(500, { message: 'El mensaje solo puede tener un máximo de 500 caracteres' })
+  message?: string;
 }

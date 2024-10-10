@@ -36,4 +36,7 @@ export class Appointment {
 
   @ManyToOne(() => User, (user) => user.appointments)
   assignedAdmin: User;
+
+  @Column({ nullable: true })
+  message: string;
 }

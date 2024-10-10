@@ -85,6 +85,15 @@ export class AppointmentController {
     return this.appointmentService.remove(+id);
   }
 
+  @Patch(':id')
+  @Auth()
+  update(
+    @Param('id') id: string,
+    @Body() updateAppointmentDto: UpdateAppointmentDto,
+  ) {
+    return this.appointmentService.update(id, updateAppointmentDto);
+  }
+
   @Delete('section/:sectionId/:userId')
   @Auth()
   removeBySection(
