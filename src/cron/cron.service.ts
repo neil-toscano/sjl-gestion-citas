@@ -35,11 +35,11 @@ export class CronService {
 
     this.job.start();
 
-    // const jobEveryMinute = new CronJob('*/2 * * * *', async () => {
-    //   console.log('Se ejecuta cada minuto');
-    //   await this.notifyObservedUsers();
-    // }, null, true, 'America/Lima');
-    // jobEveryMinute.start();
+    const jobEveryMinute = new CronJob('*/2 * * * *', async () => {
+      console.log('Se ejecuta cada minuto');
+      await this.notifyObservedUsers();
+    }, null, true, 'America/Lima');
+    jobEveryMinute.start();
   }
 
   async expiredAppoinments() {
