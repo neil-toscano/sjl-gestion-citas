@@ -129,7 +129,7 @@ export class DocumentsService {
       where: {
         id: id,
       },
-      relations: ['user'],
+      relations: ['user', 'section'],
     });
 
     const user = document.user;
@@ -147,11 +147,10 @@ export class DocumentsService {
 
     await this.documentRepository.update(id, updateDocumentDto);
 
-
     const documents = await this.documentRepository.find({
       where: {
         section: {
-          id: updateDocumentDto.sectionId,
+          id: document.section.id,
         },
         user: {
           id: user.id,
@@ -160,11 +159,10 @@ export class DocumentsService {
     });
 
     const section = await this.sectionService.findOne(
-      updateDocumentDto.sectionId,
+      document.section.id,
     );
-
     const processStatus = await this.processStatusService.findOneByUserSection(
-      updateDocumentDto.sectionId,
+      document.section.id,
       user,
     );
 
