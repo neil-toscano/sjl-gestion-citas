@@ -231,8 +231,8 @@ export class DocumentsService {
           throw new Error('Invalid status');
       }
 
-      return this.documentRepository.findOneBy({ id });
     }
+    return this.documentRepository.findOneBy({ id });
   }
 
   async findBySection(sectionId: string, user: User) {
