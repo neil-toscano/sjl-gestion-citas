@@ -8,6 +8,7 @@ import {
   IsDate,
   IsPhoneNumber,
   IsOptional,
+  IsBoolean,
 } from 'class-validator';
 
 export class CreateUserDto {
@@ -58,7 +59,6 @@ export class CreateUserDto {
   @IsString({ message: 'El correo debe ser una cadena de texto' })
   @IsEmail({}, { message: 'El correo electrónico debe ser un email válido' })
   email: string;
-
   // @IsString({ message: 'La contraseña debe ser una cadena de texto' })
   // @MinLength(6, { message: 'La contraseña debe tener al menos 6 caracteres' })
   // @MaxLength(50, {

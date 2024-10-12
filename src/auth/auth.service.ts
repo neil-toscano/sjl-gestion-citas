@@ -47,10 +47,13 @@ export class AuthService {
 
     
     if (!user) {
-      const newUser = await this.userService.create(loginUserDto);
+      const newUser = await this.userService.create({
+        ...loginUserDto,
+        
+      });
       return {
         ...newUser,
-        token: this.getJwtToken({ id: user.id }),
+        token: this.getJwtToken({ id: newUser.id }),
       }
     }
 

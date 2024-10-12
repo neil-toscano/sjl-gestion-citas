@@ -30,4 +30,5 @@ export class CreateAppointmentDto {
   @IsOptional()
   @MaxLength(500, { message: 'El mensaje solo puede tener un máximo de 500 caracteres' })
   message?: string;
+  
 }

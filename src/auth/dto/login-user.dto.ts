@@ -1,5 +1,7 @@
 import {
+  IsBoolean,
   IsEmail,
+  IsOptional,
   IsString,
   Length,
   MaxLength,
@@ -30,4 +32,8 @@ export class LoginUserDto {
   @MinLength(0, { message: 'El apellido materno' })
   @MaxLength(50, { message: 'El apellido no puede exceder los 50 caracteres' })
   apellido_materno: string;
+
+  @IsBoolean()
+  @IsOptional()
+  isVerified: boolean = true;
 }
