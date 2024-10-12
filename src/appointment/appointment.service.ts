@@ -101,9 +101,9 @@ export class AppointmentService {
       appointmentDate: createAppointmentDto.appointmentDate,
       appointmentTime: `${schedule.startTime} - ${schedule.endTime}`,
       email: user.email,
-      person: `${admin.firstName} ${admin.lastName} `,
+      person: `${admin.firstName} ${admin.apellido_paterno} `,
       service: section.sectionName,
-      recipientName: `${user.firstName} ${user.lastName}`,
+      recipientName: `${user.firstName} ${user.apellido_paterno}`,
     });
 
     return this.appointmentRepository.save(appointment);

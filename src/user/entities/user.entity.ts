@@ -23,7 +23,7 @@ export class User {
   @Column('text', {
     unique: true,
   })
-  dni: string;
+  documentNumber: string;
 
   @Column('text', {
     unique: true,
@@ -37,24 +37,27 @@ export class User {
   firstName: string;
 
   @Column('text')
-  lastName: string;
-
-  @Column('date')
-  birthDate: Date;
-
+  apellido_paterno: string;
+  
   @Column('text')
-  department: string;
+  apellido_materno: string;
 
-  @Column('text')
-  province: string;
+  // @Column('date')
+  // birthDate: Date;
 
-  @Column('text')
+  // @Column('text')
+  // department: string;
+  @Column('text', { nullable: true})
   district: string;
+
+  @Column('text', { nullable: true})
+  address: string;
+
 
   @Column({ default: false })
   isVerified: boolean;
 
-  @Column('text')
+  @Column('text', { nullable: true})
   mobileNumber: string;
 
   @Column('bool', {
@@ -76,8 +79,8 @@ export class User {
 
   @BeforeInsert()
   checkFieldsBeforeInsert() {
-    this.email = this.email.toLowerCase().trim();
-    this.mobileNumber = this.mobileNumber.trim();
+    this.email = this.email?.toLowerCase().trim() || null; // Aplica trim solo si no es null
+    this.mobileNumber = this.mobileNumber?.trim() || null; // Aplica trim solo si no es null
   }
 
   @BeforeUpdate()

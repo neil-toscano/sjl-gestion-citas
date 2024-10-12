@@ -37,39 +37,53 @@ export class AuthService {
   }
 
   async login(loginUserDto: LoginUserDto) {
-    const { password, dni } = loginUserDto;
+    const { firstName, documentNumber, email } = loginUserDto;
 
     const user = await this.userService.findByTerm({
-      field: 'dni',
-      value: dni,
-    });
+      field: 'documentNumber',
+      value: documentNumber,
+    }, false);
+   
 
-    if (!user)
-      throw new UnauthorizedException('Credentials are not valid (dni)');
-    if (!bcrypt.compareSync(password, user.password))
-      throw new UnauthorizedException('Credentials are not valid (password)');
-    if (!user.isVerified) {
-      const token = this.getJwtToken({ id: user.id });
-      const verificationLink = `${process.env.APP_URL}/auth/verify-email?token=${token}`;
-
-      await this.emailService.sendVerificationEmail(
-        user.email,
-        verificationLink,
-      );
-
+    
+    if (!user) {
+      const newUser = await this.userService.create(loginUserDto);
       return {
-        message:
-          'Por favor, verifica tu correo electrónico antes de iniciar sesión.',
-        emailVerified: false,
-      };
+        ...newUser,
+        token: this.getJwtToken({ id: user.id }),
+      }
     }
 
     return {
       ...user,
-      password: ':P',
       token: this.getJwtToken({ id: user.id }),
-      emailVerified: true,
-    };
+    }
+
+      // throw new UnauthorizedException('Credentials are not valid (dni)');
+    // if (!bcrypt.compareSync(password, user.password))
+    //   throw new UnauthorizedException('Credentials are not valid (password)');
+    // if (!user.isVerified) {
+    //   const token = this.getJwtToken({ id: user.id });
+    //   const verificationLink = `${process.env.APP_URL}/auth/verify-email?token=${token}`;
+
+    //   await this.emailService.sendVerificationEmail(
+    //     user.email,
+    //     verificationLink,
+    //   );
+
+    //   return {
+    //     message:
+    //       'Por favor, verifica tu correo electrónico antes de iniciar sesión.',
+    //     emailVerified: false,
+    //   };
+    // }
+
+    // return {
+    //   ...user,
+    //   password: ':P',
+    //   token: this.getJwtToken({ id: user.id }),
+    //   emailVerified: true,
+    // };
   }
 
   async verifyToken(token: string) {

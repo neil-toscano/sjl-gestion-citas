@@ -21,16 +21,16 @@ export class UserService {
   ) {}
 
   async create(createUserDto: CreateUserDto) {
-    const { dni, email } = createUserDto;
+    const { documentNumber, email } = createUserDto;
 
     const existUserByDni = await this.userRepository.findOne({
       where: {
-        dni,
+        documentNumber,
       },
     });
 
     if (existUserByDni) {
-      throw new ConflictException('El DNI ya está registrado.');
+      throw new ConflictException('El Documento ya está registrado.');
     }
 
     const existUserByEmail = await this.userRepository.findOne({
@@ -44,11 +44,11 @@ export class UserService {
     }
 
     try {
-      const { password, ...userData } = createUserDto;
+      const { ...userData } = createUserDto;
 
       const user = this.userRepository.create({
         ...userData,
-        password: bcrypt.hashSync(password, 10),
+        password: bcrypt.hashSync("P", 10),
       });
 
       const newUser = await this.userRepository.save(user);
@@ -66,16 +66,14 @@ export class UserService {
       .getMany();
   }
 
-  async findByTerm(termDto: TermDto): Promise<User | undefined> {
+  async findByTerm(termDto: TermDto, throwError: boolean = true): Promise<User | undefined> {
     const { field, value } = termDto;
 
     const user = await this.userRepository.findOne({
       where: { [field]: value },
     });
-    if (!user) {
-      throw new NotFoundException(
-        `Usuario con ${field} ${value} no encontrado`,
-      );
+    if (!user && throwError) {
+      throw new NotFoundException(`Usuario con ${field} ${value} no encontrado`);
     }
 
     return user;
