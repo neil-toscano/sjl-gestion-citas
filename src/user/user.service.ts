@@ -133,7 +133,16 @@ export class UserService {
   }
 
   async update(id: string, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} user`;
+    await this.userRepository
+    .createQueryBuilder()
+    .update(User)
+    .set(updateUserDto)
+    .where("id = :id", { id: id })
+    .execute()
+    return {
+      ok: true,
+      message: `se actualizó el usuario con id ${id}`
+    }
   }
 
   remove(id: number) {
