@@ -31,6 +31,16 @@ export class EmailController {
     const url = 'http';
     return this.emailService.sendVerificationEmail(email, url);
   }
+  
+  @Post('state-change')
+  flaggedDocuments(@Query('email') email: string) {
+    return this.emailService.sendStateChangeNotification(email);
+  }
+  
+  @Post('verified-documents')
+  verifiedDocuments(@Query('email') email: string) {
+    return this.emailService.sendVerifiedNotification(email);
+  }
 
   @Get()
   findAll() {

@@ -72,7 +72,7 @@ export class EmailService {
               Hemos observado que su trámite requiere atención. Le invitamos a revisar el estado de su trámite y realizar las correcciones necesarias.
             </p>
             <div style="text-align: center; margin: 30px 0;">
-              <a href="https://su-web.com/revisar-tramite" target="_blank" style="background-color: #2b8cbe; color: white; text-decoration: none; padding: 15px 30px; border-radius: 5px; font-weight: bold; font-size: 16px;">
+              <a href="${process.env.APP_URL}" target="_blank" style="background-color: #ffcc00; color: white; text-decoration: none; padding: 15px 30px; border-radius: 5px; font-weight: bold; font-size: 16px;">
                 Revisar Estado de Trámite
               </a>
             </div>
@@ -89,11 +89,60 @@ export class EmailService {
           
         </div>
       </div>
-    `,
+      `,
     };
+    
 
     return await this.sendEmail(notification);
   }
+
+  async sendVerifiedNotification(email: string) {
+    const notification = {
+      from: '"Municipalidad de San Juan de Lurigancho" <luriganchomunicipalidad@gmail.com>',
+      to: email,
+      subject: 'Documentos Verificados',
+      text: `Estimado(a) administrado(a),\n\nNos complace informarle que sus documentos han sido revisado con éxito. ahora puede sacar una cita.\n\n¡Gracias por su colaboración!\n\nSaludos,\nEl equipo de San Juan de Lurigancho`,
+      html: `
+      <div style="font-family: Arial, sans-serif; color: #333; line-height: 1.6;">
+        <div style="max-width: 600px; margin: 0 auto; border: 1px solid #e0e0e0; border-radius: 8px; overflow: hidden; background-color: #f4f4f4;">
+          
+          <!-- Encabezado -->
+          <div style="background-color: #2b8cbe; padding: 20px; text-align: center; color: black;">
+            <img src="https://web.munisjl.gob.pe/web/images/mdsjl-cambia-contigo.png" alt="Logo" style="max-height: 60px;">  
+            <p style="font-size: 16px;">Documentos Verificados</p>
+          </div>
+          
+          <!-- Cuerpo del correo -->
+          <div style="padding: 20px; background-color: #ffffff;">
+            <h3 style="color: #333; font-size: 18px; margin-top: 0;">Verificación Completa</h3>
+            <p>Estimado(a) administrado(a),</p>
+            <p>
+              Nos complace informarle que sus documentos han sido verificados con éxito. Ahora puede sacar una cita.
+            </p>
+            <div style="text-align: center; margin: 30px 0;">
+              <a href="${process.env.APP_URL}" target="_blank" style="background-color: #28a745; color: white; text-decoration: none; padding: 15px 30px; border-radius: 5px; font-weight: bold; font-size: 16px;">
+                Ir a la página
+              </a>
+            </div>
+            <p>¡Gracias por su colaboración!</p>
+            <p>Saludos cordiales,</p>
+            <p><strong>El equipo de la Municipalidad de San Juan de Lurigancho</strong></p>
+          </div>
+          
+          <!-- Pie de página -->
+          <div style="background-color: #2b8cbe; padding: 10px; text-align: center; color: black;">
+            <p style="font-size: 12px; margin: 0;">Municipalidad de San Juan de Lurigancho © 2024</p>
+            <p style="font-size: 12px; margin: 0;">Todos los derechos reservados</p>
+          </div>
+          
+        </div>
+      </div>
+      `,
+    };
+  
+    return await this.sendEmail(notification);
+  }
+  
 
   async sendAppointmentConfirmation(appointment: AppointmentDetails) {
     const {

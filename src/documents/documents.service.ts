@@ -221,7 +221,7 @@ export class DocumentsService {
               await this.processStatusService.update(processStatus.id, {
                   status: ProcessStatusEnum.UNDER_OBSERVATION,
                 });
-                await this.emailService.createTemporaryEmail(user.email);
+                // await this.emailService.createTemporaryEmail(user.email);
             } catch (error) {
               console.log(error, 'error');
               
