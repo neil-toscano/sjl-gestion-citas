@@ -43,7 +43,7 @@ export class ProcessStatusService {
 
     return await this.processStatusRepository.find({
       where: {
-        status: ProcessStatusEnum.COMPLETE,
+        status: ProcessStatusEnum.EN_PROCESO, //todo: cambio completo => en proceso
         section: { id: sectionId },
         user: { id: Not(In(assignedUserIds)) },
       },
@@ -60,7 +60,7 @@ export class ProcessStatusService {
 
     const userForReview = await this.processStatusRepository.findOne({
       where: {
-        status: ProcessStatusEnum.COMPLETE,
+        status: ProcessStatusEnum.EN_PROCESO, //todo: cambio completo => en proceso
         section: { id: sectionId },
         user: { id: Not(In(assignedUserIds)) },
       },

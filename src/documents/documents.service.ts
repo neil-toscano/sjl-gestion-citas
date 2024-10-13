@@ -95,7 +95,7 @@ export class DocumentsService {
     );
     const newStatus =
       section.requiredDocumentsCount === documents.length
-        ? ProcessStatusEnum.COMPLETE
+        ? ProcessStatusEnum.COMPLETE // MOIFICATOD  COMPLETO => EN_PROCESO
         : ProcessStatusEnum.INCOMPLETE;
 
     if (processStatus) {
