@@ -10,6 +10,7 @@ import { SectionDocumentService } from 'src/section-document/section-document.se
 import { UserService } from 'src/user/user.service';
 import { User } from 'src/user/entities/user.entity';
 import { AppointmentService } from 'src/appointment/appointment.service';
+import { ProcessStatusService } from 'src/process-status/process-status.service';
 
 @Injectable()
 export class AdminService {
@@ -21,6 +22,7 @@ export class AdminService {
     private readonly sectionService: SectionDocumentService,
     private readonly userService: UserService,
     private readonly appointmentService: AppointmentService,
+    private readonly processStatusService: ProcessStatusService,
   ) {}
   create(createAdminDto: CreateAdminDto) {
     return 'This action adds a new admin';
@@ -59,6 +61,8 @@ export class AdminService {
     const user = await this.userService.findOne(userId);
 
     await this.appointmentService.removeByUser(userId, sectionId);
+    const processStatus = await this.processStatusService.findOneByUserSection(sectionId, user);
+    await this.processStatusService.remove(processStatus.id);
 
     const documents = await this.documentService.findBySection(sectionId, user);
 
