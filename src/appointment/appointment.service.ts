@@ -112,7 +112,7 @@ export class AppointmentService {
       return newAppointment;
       
     } catch (error) {
-      throw new ConflictException('Upss!! alguien ya acaba de usar esa hora, recargue la página.');
+      throw new ConflictException('Upss!! alguien ya acaba de usar esa hora, recargue la página');
     }
   }
 
