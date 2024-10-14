@@ -9,6 +9,7 @@ import { SectionDocumentModule } from 'src/section-document/section-document.mod
 import { UserModule } from 'src/user/user.module';
 import { AuthModule } from 'src/auth/auth.module';
 import { AppointmentModule } from 'src/appointment/appointment.module';
+import { ProcessStatusModule } from 'src/process-status/process-status.module';
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { AppointmentModule } from 'src/appointment/appointment.module';
     UserModule,
     AuthModule,
     AppointmentModule,
+    ProcessStatusModule,
   ],
   controllers: [AdminController],
   providers: [AdminService],
