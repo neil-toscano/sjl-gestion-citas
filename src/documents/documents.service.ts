@@ -234,6 +234,116 @@ export class DocumentsService {
     }
     return this.documentRepository.findOneBy({ id });
   }
+  async updateByAdmin(id: string, updateDocumentDto: UpdateDocumentDto) {
+    const document = await this.documentRepository.findOne({
+      where: {
+        id: id,
+      },
+      relations: ['user', 'section'],
+    });
+
+    const user = document.user;
+
+    if (Object.keys(updateDocumentDto).length === 0) {
+      return { message: 'No data provided for update' };
+    }
+    const promises = [];
+
+    if (updateDocumentDto.fileUrl) {
+      promises.push(this.fileService.deleteFile(document.fileUrl));
+    }
+
+    await Promise.all(promises);
+
+    await this.documentRepository.update(id, updateDocumentDto);
+
+    const documents = await this.documentRepository.find({
+      where: {
+        section: {
+          id: document.section.id,
+        },
+        user: {
+          id: user.id,
+        },
+      },
+    });
+
+    const section = await this.sectionService.findOne(
+      document.section.id,
+    );
+    const processStatus = await this.processStatusService.findOneByUserSection(
+      document.section.id,
+      user,
+    );
+
+    if (updateDocumentDto.status) {
+      switch (updateDocumentDto.status) {
+        case 'EN PROCESO':
+          if (section.requiredDocumentsCount === documents.length) {
+            const hasVerifiedDocument = documents.some(
+              (document) => document.status === 'VERIFICADO',
+            );
+
+            const hasInProcessDocument = documents.some(
+              (document) => document.status === 'EN PROCESO',
+            );
+
+            const noObservedDocuments = documents.every(
+              (document) => document.status !== 'OBSERVADO',
+            );
+
+            if (
+              hasVerifiedDocument &&
+              hasInProcessDocument &&
+              noObservedDocuments
+            ) {
+              await this.processStatusService.update(processStatus.id, {
+                status: ProcessStatusEnum.CORRECTED,
+              });
+            } else if (!noObservedDocuments) {
+              await this.processStatusService.update(processStatus.id, {
+                status: ProcessStatusEnum.UNDER_OBSERVATION,
+              });
+            } else if (!hasVerifiedDocument && noObservedDocuments) {
+              await this.processStatusService.update(processStatus.id, {
+                status: ProcessStatusEnum.EN_PROCESO, //TODO: cambio completo => en_proceso
+              });
+            }
+          } else {
+            await this.processStatusService.update(processStatus.id, {
+              status: ProcessStatusEnum.INCOMPLETE,
+            });
+          }
+          break;
+        case 'VERIFICADO':
+          const allVerified = documents.every(
+            (document) => document.status === 'VERIFICADO',
+          );
+          if (allVerified) {
+            await this.processStatusService.update(processStatus.id, {
+              status: ProcessStatusEnum.VERIFIED,
+            });
+          }
+          break;
+        case 'OBSERVADO':
+            try {
+              
+              await this.processStatusService.update(processStatus.id, {
+                  status: ProcessStatusEnum.UNDER_OBSERVATION,
+                });
+                // await this.emailService.createTemporaryEmail(user.email);
+            } catch (error) {
+              console.log(error, 'error');
+              
+            }  
+          break;
+        default:
+          throw new Error('Invalid status');
+      }
+
+    }
+    return this.documentRepository.findOneBy({ id });
+  }
 
   async findBySection(sectionId: string, user: User) {
     const section = await this.sectionService.findOne(sectionId);
