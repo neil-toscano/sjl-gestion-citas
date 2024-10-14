@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  ConflictException,
   HttpException,
   Injectable,
   NotFoundException,
@@ -106,7 +107,13 @@ export class AppointmentService {
       recipientName: `${user.firstName} ${user.apellido_paterno}`,
     });
 
-    return this.appointmentRepository.save(appointment);
+    try {
+      const newAppointment = await this.appointmentRepository.save(appointment);
+      return newAppointment;
+      
+    } catch (error) {
+      throw new ConflictException('Upss!! alguien ya acaba de usar esa hora, recargue la página.');
+    }
   }
 
   findAll(user: User) {
