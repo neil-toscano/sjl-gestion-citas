@@ -220,7 +220,9 @@ export class ProcessStatusService {
       .where('id = :id', { id: id })
       .execute();
 
-    return processStatus;
+    return await this.processStatusRepository.findOne({
+      where: {id}
+    })
   }
 
   async remove(id: string) {

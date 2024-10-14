@@ -113,6 +113,7 @@ export class ProcessStatusController {
   }
 
   @Patch(':id')
+  @Auth()
   update(
     @Param('id') id: string,
     @Body() updateProcessStatusDto: UpdateProcessStatusDto,
