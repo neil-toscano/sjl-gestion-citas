@@ -53,8 +53,13 @@ export class SectionDocumentService {
     return `This action updates a #${id} sectionDocument`;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} sectionDocument`;
+  async remove(id: string) {
+    return await this.sectionDocumentRepository
+    .createQueryBuilder()
+    .delete()
+    .from(SectionDocument)
+    .where("id = :id", { id: id })
+    .execute()
   }
 
   private handleDBErrors(error: any): never {

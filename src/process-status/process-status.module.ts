@@ -9,6 +9,6 @@ import { AssignmentsModule } from 'src/assignments/assignments.module';
   controllers: [ProcessStatusController],
   providers: [ProcessStatusService],
   exports: [ProcessStatusService],
-  imports: [TypeOrmModule.forFeature([ProcessStatus]), AssignmentsModule],
+  imports: [TypeOrmModule.forFeature([ProcessStatus]), AssignmentsModule, ProcessStatusModule],
 })
 export class ProcessStatusModule {}

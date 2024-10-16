@@ -3,7 +3,7 @@ import { CreateProcessStatusDto } from './dto/create-process-status.dto';
 import { UpdateProcessStatusDto } from './dto/update-process-status.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ProcessStatus } from './entities/process-status.entity';
-import { In, Not, Repository } from 'typeorm';
+import { In, LessThan, Not, Repository } from 'typeorm';
 import { User } from 'src/user/entities/user.entity';
 import { ProcessStatusEnum } from './interfaces/status.enum';
 import { AssignmentsService } from 'src/assignments/assignments.service';
@@ -142,6 +142,19 @@ export class ProcessStatusService {
         user: { id: Not(In(assignedUserIds)) },
       },
       relations: ['user'],
+    });
+  }
+  
+  async getAllUsersWithObservedDocuments() {
+    const dateLimit = new Date();
+    dateLimit.setHours(dateLimit.getHours() - 0);
+  
+    return await this.processStatusRepository.find({
+      where: {
+        status: ProcessStatusEnum.UNDER_OBSERVATION,
+        updatedAt: LessThan(dateLimit),
+      },
+      relations: ['user', 'section'],
     });
   }
 

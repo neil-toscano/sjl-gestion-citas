@@ -43,6 +43,6 @@ export class SectionDocumentController {
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.sectionDocumentService.remove(+id);
+    return this.sectionDocumentService.remove(id);
   }
 }

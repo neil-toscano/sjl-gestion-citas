@@ -95,7 +95,7 @@ export class DocumentsService {
     );
     const newStatus =
       section.requiredDocumentsCount === documents.length
-        ? ProcessStatusEnum.COMPLETE // MOIFICATOD  COMPLETO => EN_PROCESO
+        ? ProcessStatusEnum.COMPLETE
         : ProcessStatusEnum.INCOMPLETE;
 
     if (processStatus) {
@@ -368,5 +368,16 @@ export class DocumentsService {
 
   async removeDocuments(documents: Document[]) {
     return await this.documentRepository.remove(documents);
+  }
+
+  async getAllUrl() {
+    const filesUrl = await this.documentRepository.find({
+      select: ['fileUrl'],
+    });
+
+    console.log(filesUrl, 'docs-url');
+
+    const allFiles = await this.fileService.getAllPdfFiles();
+    console.log(allFiles, 'en static');
   }
 }

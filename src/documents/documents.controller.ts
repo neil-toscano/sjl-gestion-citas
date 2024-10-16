@@ -13,12 +13,8 @@ import { CreateDocumentDto } from './dto/create-document.dto';
 import { UpdateDocumentDto } from './dto/update-document.dto';
 import { Auth, GetUser } from 'src/auth/decorators';
 import { User } from 'src/user/entities/user.entity';
-import { PermissionGuard } from 'src/auth/guards/user-permissions.guard';
-import { Permissions } from 'src/auth/decorators/permissions-protected.decorator';
-import { ValidPermissions } from 'src/auth/interfaces/valid-permissions';
 
 @Controller('documents')
-// @UseGuards(PermissionGuard)
 export class DocumentsController {
   constructor(private readonly documentsService: DocumentsService) {}
   @Post()
@@ -29,7 +25,6 @@ export class DocumentsController {
 
   @Get('section/:sectionId')
   @Auth()
-  // @Permissions(ValidPermissions.lotes)
   findBySection(
     @Param('sectionId', new ParseUUIDPipe()) sectionId: string,
     @GetUser() user: User,
