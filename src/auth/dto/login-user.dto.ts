@@ -1,6 +1,9 @@
 import {
+  ArrayNotEmpty,
+  IsArray,
   IsBoolean,
   IsEmail,
+  IsIn,
   IsOptional,
   IsString,
   Length,
@@ -35,4 +38,14 @@ export class LoginUserDto {
   @IsBoolean()
   @IsOptional()
   isVerified: boolean = true;
+
+  @IsOptional()
+  @IsArray()
+  @ArrayNotEmpty()
+  @IsString({ each: true })
+  @IsIn(['user', 'platform-operator', 'administrator'], { 
+    each: true,
+    message: 'El rol debe ser uno de los siguientes: user, platform-operator, administrator' 
+  })
+  roles?: string[] = ['user'];
 }
