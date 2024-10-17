@@ -55,11 +55,11 @@ export class SectionDocumentService {
 
   async remove(id: string) {
     return await this.sectionDocumentRepository
-    .createQueryBuilder()
-    .delete()
-    .from(SectionDocument)
-    .where("id = :id", { id: id })
-    .execute()
+      .createQueryBuilder()
+      .delete()
+      .from(SectionDocument)
+      .where('id = :id', { id: id })
+      .execute();
   }
 
   private handleDBErrors(error: any): never {

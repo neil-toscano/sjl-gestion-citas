@@ -61,7 +61,10 @@ export class AdminService {
     const user = await this.userService.findOne(userId);
 
     await this.appointmentService.removeByUser(userId, sectionId);
-    const processStatus = await this.processStatusService.findOneByUserSection(sectionId, user);
+    const processStatus = await this.processStatusService.findOneByUserSection(
+      sectionId,
+      user,
+    );
     await this.processStatusService.remove(processStatus.id);
 
     const documents = await this.documentService.findBySection(sectionId, user);

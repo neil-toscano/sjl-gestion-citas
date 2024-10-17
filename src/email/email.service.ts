@@ -91,7 +91,6 @@ export class EmailService {
       </div>
       `,
     };
-    
 
     return await this.sendEmail(notification);
   }
@@ -139,10 +138,9 @@ export class EmailService {
       </div>
       `,
     };
-  
+
     return await this.sendEmail(notification);
   }
-  
 
   async sendAppointmentConfirmation(appointment: AppointmentDetails) {
     const {

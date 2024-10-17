@@ -40,7 +40,7 @@ export class DocumentsController {
   ) {
     return this.documentsService.update(id, updateDocumentDto);
   }
-  
+
   @Patch('admin/:id')
   @Auth()
   updateByAdmin(

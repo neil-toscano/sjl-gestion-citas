@@ -1,4 +1,10 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, Unique } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  ManyToOne,
+  Unique,
+} from 'typeorm';
 import { User } from 'src/user/entities/user.entity';
 import { SectionDocument } from 'src/section-document/entities/section-document.entity';
 import { Schedule } from 'src/schedule/entities/schedule.entity';
@@ -11,7 +17,7 @@ export enum AppointmentStatus {
 }
 
 @Entity()
-@Unique(['assignedAdmin', 'schedule', 'appointmentDate']) 
+@Unique(['assignedAdmin', 'schedule', 'appointmentDate'])
 export class Appointment {
   @PrimaryGeneratedColumn('uuid')
   id: string;

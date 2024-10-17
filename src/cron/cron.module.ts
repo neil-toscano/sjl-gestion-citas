@@ -10,6 +10,12 @@ import { DocumentsModule } from 'src/documents/documents.module';
 @Module({
   controllers: [CronController],
   providers: [CronService],
-  imports: [AppointmentModule, AdminModule, EmailModule, ProcessStatusModule, DocumentsModule],
+  imports: [
+    AppointmentModule,
+    AdminModule,
+    EmailModule,
+    ProcessStatusModule,
+    DocumentsModule,
+  ],
 })
 export class CronModule {}

@@ -25,7 +25,7 @@ export class CreateUserDto {
   @MinLength(2, { message: 'El apellido debe tener al menos 2 caracteres' })
   @MaxLength(50, { message: 'El apellido no puede exceder los 50 caracteres' })
   apellido_paterno: string;
-  
+
   @IsString({ message: 'El apellido debe ser una cadena de texto' })
   @MinLength(2, { message: 'El apellido debe tener al menos 2 caracteres' })
   @MaxLength(50, { message: 'El apellido no puede exceder los 50 caracteres' })
@@ -34,7 +34,6 @@ export class CreateUserDto {
   // @IsDate({ message: 'La fecha de nacimiento debe ser una fecha válida' })
   // @Type(() => Date)
   // birthDate: Date;
-
 
   // @IsString({ message: 'La provincia debe ser una cadena de texto' })
   // province: string;

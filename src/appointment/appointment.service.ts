@@ -110,9 +110,10 @@ export class AppointmentService {
     try {
       const newAppointment = await this.appointmentRepository.save(appointment);
       return newAppointment;
-      
     } catch (error) {
-      throw new ConflictException('Upss!! alguien ya acaba de usar esa hora, recargue la página');
+      throw new ConflictException(
+        'Upss!! alguien ya acaba de usar esa hora, recargue la página',
+      );
     }
   }
 
@@ -277,7 +278,6 @@ export class AppointmentService {
   }
 
   async update(id: string, updateAppointmentDto: UpdateAppointmentDto) {
-
     delete updateAppointmentDto.isFirstTime;
 
     if (Object.keys(updateAppointmentDto).length === 0) {
@@ -285,13 +285,12 @@ export class AppointmentService {
     }
 
     await this.appointmentRepository
-    .createQueryBuilder()
-    .update(Appointment)
-    .set(updateAppointmentDto)  // Solo campos válidos de la entidad
-    .where("id = :id", { id })
-    .execute();
+      .createQueryBuilder()
+      .update(Appointment)
+      .set(updateAppointmentDto) // Solo campos válidos de la entidad
+      .where('id = :id', { id })
+      .execute();
 
-    return await this.appointmentRepository.findOneBy({id});
+    return await this.appointmentRepository.findOneBy({ id });
   }
-
 }

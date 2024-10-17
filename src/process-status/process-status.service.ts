@@ -144,11 +144,11 @@ export class ProcessStatusService {
       relations: ['user'],
     });
   }
-  
+
   async getAllUsersWithObservedDocuments() {
     const dateLimit = new Date();
-    dateLimit.setHours(dateLimit.getHours() - 0);
-  
+    dateLimit.setHours(dateLimit.getHours() - 48);
+
     return await this.processStatusRepository.find({
       where: {
         status: ProcessStatusEnum.UNDER_OBSERVATION,
@@ -234,8 +234,8 @@ export class ProcessStatusService {
       .execute();
 
     return await this.processStatusRepository.findOne({
-      where: {id}
-    })
+      where: { id },
+    });
   }
 
   async remove(id: string) {

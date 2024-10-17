@@ -158,9 +158,7 @@ export class DocumentsService {
       },
     });
 
-    const section = await this.sectionService.findOne(
-      document.section.id,
-    );
+    const section = await this.sectionService.findOne(document.section.id);
     const processStatus = await this.processStatusService.findOneByUserSection(
       document.section.id,
       user,
@@ -216,21 +214,18 @@ export class DocumentsService {
           }
           break;
         case 'OBSERVADO':
-            try {
-              
-              await this.processStatusService.update(processStatus.id, {
-                  status: ProcessStatusEnum.UNDER_OBSERVATION,
-                });
-                // await this.emailService.createTemporaryEmail(user.email);
-            } catch (error) {
-              console.log(error, 'error');
-              
-            }  
+          try {
+            await this.processStatusService.update(processStatus.id, {
+              status: ProcessStatusEnum.UNDER_OBSERVATION,
+            });
+            // await this.emailService.createTemporaryEmail(user.email);
+          } catch (error) {
+            console.log(error, 'error');
+          }
           break;
         default:
           throw new Error('Invalid status');
       }
-
     }
     return this.documentRepository.findOneBy({ id });
   }
@@ -268,9 +263,7 @@ export class DocumentsService {
       },
     });
 
-    const section = await this.sectionService.findOne(
-      document.section.id,
-    );
+    const section = await this.sectionService.findOne(document.section.id);
     const processStatus = await this.processStatusService.findOneByUserSection(
       document.section.id,
       user,
@@ -326,21 +319,18 @@ export class DocumentsService {
           }
           break;
         case 'OBSERVADO':
-            try {
-              
-              await this.processStatusService.update(processStatus.id, {
-                  status: ProcessStatusEnum.UNDER_OBSERVATION,
-                });
-                // await this.emailService.createTemporaryEmail(user.email);
-            } catch (error) {
-              console.log(error, 'error');
-              
-            }  
+          try {
+            await this.processStatusService.update(processStatus.id, {
+              status: ProcessStatusEnum.UNDER_OBSERVATION,
+            });
+            // await this.emailService.createTemporaryEmail(user.email);
+          } catch (error) {
+            console.log(error, 'error');
+          }
           break;
         default:
           throw new Error('Invalid status');
       }
-
     }
     return this.documentRepository.findOneBy({ id });
   }
@@ -375,9 +365,19 @@ export class DocumentsService {
       select: ['fileUrl'],
     });
 
-    console.log(filesUrl, 'docs-url');
+    const filesInDb = filesUrl.map((doc) => doc.fileUrl);
 
     const allFiles = await this.fileService.getAllPdfFiles();
-    console.log(allFiles, 'en static');
+
+    const filesToDelete = allFiles.filter((file) => !filesInDb.includes(file));
+
+    for (const file of filesToDelete) {
+      try {
+        await this.fileService.deleteFile(file);
+        console.log(`Archivo ${file} eliminado exitosamente.`);
+      } catch (error) {
+        console.error(`Error eliminando el archivo ${file}: ${error.message}`);
+      }
+    }
   }
 }

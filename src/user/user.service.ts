@@ -48,7 +48,7 @@ export class UserService {
 
       const user = this.userRepository.create({
         ...userData,
-        password: bcrypt.hashSync("P", 10),
+        password: bcrypt.hashSync('P', 10),
       });
 
       const newUser = await this.userRepository.save(user);
@@ -66,14 +66,19 @@ export class UserService {
       .getMany();
   }
 
-  async findByTerm(termDto: TermDto, throwError: boolean = true): Promise<User | undefined> {
+  async findByTerm(
+    termDto: TermDto,
+    throwError: boolean = true,
+  ): Promise<User | undefined> {
     const { field, value } = termDto;
 
     const user = await this.userRepository.findOne({
       where: { [field]: value },
     });
     if (!user && throwError) {
-      throw new NotFoundException(`Usuario con ${field} ${value} no encontrado`);
+      throw new NotFoundException(
+        `Usuario con ${field} ${value} no encontrado`,
+      );
     }
 
     return user;
@@ -134,15 +139,15 @@ export class UserService {
 
   async update(id: string, updateUserDto: UpdateUserDto) {
     await this.userRepository
-    .createQueryBuilder()
-    .update(User)
-    .set(updateUserDto)
-    .where("id = :id", { id: id })
-    .execute()
+      .createQueryBuilder()
+      .update(User)
+      .set(updateUserDto)
+      .where('id = :id', { id: id })
+      .execute();
     return {
       ok: true,
-      message: `se actualizó el usuario con id ${id}`
-    }
+      message: `se actualizó el usuario con id ${id}`,
+    };
   }
 
   remove(id: number) {

@@ -32,15 +32,15 @@ export class FilesService {
 
   async getAllPdfFiles() {
     const pdfDirectory = join(__dirname, '../../static/pdf');
-  
+
     if (!existsSync(pdfDirectory)) {
       throw new BadRequestException(`Directory not found: ${pdfDirectory}`);
     }
-  
+
     const files = readdirSync(pdfDirectory);
-  
-    const pdfFiles = files.filter(file => file.endsWith('.pdf'));
-  
-    return pdfFiles; 
+
+    const pdfFiles = files.filter((file) => file.endsWith('.pdf'));
+
+    return pdfFiles;
   }
 }

@@ -5,7 +5,6 @@ import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ServeStaticModule } from '@nestjs/serve-static';
 
-import { ProductsModule } from './products/products.module';
 import { CommonModule } from './common/common.module';
 import { SeedModule } from './seed/seed.module';
 import { FilesModule } from './files/files.module';
@@ -31,10 +30,10 @@ import { UserPermissionsModule } from './user-permissions/user-permissions.modul
     ConfigModule.forRoot(),
 
     TypeOrmModule.forRoot({
-      // ssl: true,
-      // extra: {
-      //   ssl: true ? { rejectUnauthorized: false } : null,
-      // },
+      ssl: true,
+      extra: {
+        ssl: true ? { rejectUnauthorized: false } : null,
+      },
       type: 'postgres',
       host: process.env.DB_HOST,
       port: +process.env.DB_PORT,
@@ -49,8 +48,6 @@ import { UserPermissionsModule } from './user-permissions/user-permissions.modul
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, '..', 'public'),
     }),
-
-    ProductsModule,
 
     CommonModule,
 

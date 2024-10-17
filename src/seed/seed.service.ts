@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
-import { ProductsService } from './../products/products.service';
 import { initialData } from './data/seed-data';
 import { User } from 'src/user/entities/user.entity';
 import { Schedule } from 'src/schedule/entities/schedule.entity';
@@ -14,7 +13,6 @@ import { CreateSectionTypeDocumentDto } from 'src/section-type-document/dto/crea
 @Injectable()
 export class SeedService {
   constructor(
-    private readonly productsService: ProductsService,
     private readonly sectionService: SectionDocumentService,
     private readonly typeDocumentService: TypeDocumentService,
     private readonly sectionTypeDocumentService: SectionTypeDocumentService,
@@ -30,7 +28,7 @@ export class SeedService {
     await this.deleteTables();
     const adminUser = await this.insertUsers();
 
-    await this.insertNewProducts(adminUser);
+    // await this.insertNewProducts(adminUser);
 
     return 'SEED EXECUTED';
   }
@@ -51,14 +49,20 @@ export class SeedService {
 
   async runSeedSections() {
     const sections = [
-      { sectionName: 'SUCESIÓN INTESTADA', sectionSlug: 'sucesion-intestada' },
+      {
+        sectionName: 'SUCESIÓN INTESTADA',
+        sectionSlug: 'sucesion-intestada',
+        requiredDocumentsCount: 3,
+      },
       {
         sectionName: 'INSCRIPCIÓN DE SUBDIVISIÓN DE LOTES',
         sectionSlug: 'inscripcion-de-subdivision-de-lotes',
+        requiredDocumentsCount: 3,
       },
       {
         sectionName: 'INSCRIPCIÓN DE INDEPENDIZACIÓN',
         sectionSlug: 'inscripcion-de-independizacion',
+        requiredDocumentsCount: 3,
       },
     ];
 
@@ -137,8 +141,6 @@ export class SeedService {
   }
 
   private async deleteTables() {
-    await this.productsService.deleteAllProducts();
-
     const queryBuilder = this.userRepository.createQueryBuilder();
     await queryBuilder.delete().where({}).execute();
   }
@@ -157,19 +159,19 @@ export class SeedService {
     return dbUsers[0];
   }
 
-  private async insertNewProducts(user: User) {
-    await this.productsService.deleteAllProducts();
+  // private async insertNewProducts(user: User) {
+  //   await this.productsService.deleteAllProducts();
 
-    const products = initialData.products;
+  //   const products = initialData.products;
 
-    const insertPromises = [];
+  //   const insertPromises = [];
 
-    products.forEach((product) => {
-      insertPromises.push(this.productsService.create(product, user));
-    });
+  //   products.forEach((product) => {
+  //     insertPromises.push(this.productsService.create(product, user));
+  //   });
 
-    await Promise.all(insertPromises);
+  //   await Promise.all(insertPromises);
 
-    return true;
-  }
+  //   return true;
+  // }
 }

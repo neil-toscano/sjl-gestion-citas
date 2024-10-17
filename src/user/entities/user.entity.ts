@@ -6,7 +6,6 @@ import {
   OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import { Product } from '../../products/entities';
 import { Type } from 'class-transformer';
 import { Document } from 'src/documents/entities/document.entity';
 import { Schedule } from 'src/schedule/entities/schedule.entity';
@@ -38,7 +37,7 @@ export class User {
 
   @Column('text')
   apellido_paterno: string;
-  
+
   @Column('text')
   apellido_materno: string;
 
@@ -47,17 +46,16 @@ export class User {
 
   // @Column('text')
   // department: string;
-  @Column('text', { nullable: true})
+  @Column('text', { nullable: true })
   district: string;
 
-  @Column('text', { nullable: true})
+  @Column('text', { nullable: true })
   address: string;
-
 
   @Column({ default: false })
   isVerified: boolean;
 
-  @Column('text', { nullable: true})
+  @Column('text', { nullable: true })
   mobileNumber: string;
 
   @Column('bool', {
@@ -70,9 +68,6 @@ export class User {
     default: ['user'],
   })
   roles: string[];
-
-  @OneToMany(() => Product, (product) => product.user)
-  product: Product;
 
   @OneToMany(() => Document, (document) => document.user)
   document: Document;

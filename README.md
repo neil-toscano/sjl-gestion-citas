@@ -18,6 +18,11 @@ docker-compose up -d
 
 7. Ejecutar SEED
 
+7.1 Ejecutar los trámites con sus requisitos
 ```
-http://localhost:3000/api/seed
+http://localhost:3000/api/seed/section-types
+```
+7.2 Ejecutar el horario
+```
+http://localhost:3000/api/seed/schedule
 ```

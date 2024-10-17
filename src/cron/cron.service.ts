@@ -39,11 +39,16 @@ export class CronService {
 
     this.job.start();
 
-    const jobEveryMinute = new CronJob('*/2 * * * *', async () => {
-      console.log('Se ejecuta cada minuto');
-      await this.getAllUsersWithObservedDocuments();
-      await this.deleteUnusedFiles();
-    }, null, true, 'America/Lima');
+    const jobEveryMinute = new CronJob(
+      '0 0 * * *',
+      async () => {
+        await this.getAllUsersWithObservedDocuments();
+        await this.deleteUnusedFiles();
+      },
+      null,
+      true,
+      'America/Lima',
+    );
     jobEveryMinute.start();
   }
 
@@ -61,49 +66,54 @@ export class CronService {
       msg: 'Se removió todos los documentos y citas',
     };
   }
-  
+
   async removeObservedDocuments() {
-    const expiredAppointments = await this.appointmentService.expiredAppointments();
-    
+    const expiredAppointments =
+      await this.appointmentService.expiredAppointments();
+
     expiredAppointments.forEach(async (appointment) => {
       const sectionId = appointment.section.id;
       const userId = appointment.reservedBy.id;
-  
+
       await this.adminService.finalizeAndRemoveAll(userId, sectionId);
     });
-  
+
     return {
       ok: true,
       msg: 'Se removieron todas las citas de usuarios que nunca corrigieron sus documentos',
     };
   }
-  
 
   async notifyObservedUsers() {
     await this.emailService.notifyObservedUsers();
   }
 
-  async getAllUsersWithObservedDocuments() { //TODO:
-    const observedUsers = await this.processStatusService.getAllUsersWithObservedDocuments();
+  async getAllUsersWithObservedDocuments() {
+    //TODO:
+    const observedUsers =
+      await this.processStatusService.getAllUsersWithObservedDocuments();
     const deletePromises = observedUsers.map(async (processStatus) => {
       const userId = processStatus.user.id;
       const sectionId = processStatus.section.id;
       await this.processStatusService.remove(processStatus.id);
-      const documents = await this.documentService.findBySection(sectionId, processStatus.user);
+      const documents = await this.documentService.findBySection(
+        sectionId,
+        processStatus.user,
+      );
       await this.documentService.removeDocuments(documents);
     });
     await Promise.all(deletePromises);
 
     return {
       ok: true,
-      msg: 'Se eliminaron las secciones y usuarios observados correctamente',
+      msg: 'Se eliminaron las secciones y usuarios observados...',
     };
   }
 
- private async deleteUnusedFiles() {
+  private async deleteUnusedFiles() {
     const result = await this.documentService.getAllUrl();
     return {
-      message: "eliminando todo los pdf no usados...",
+      message: 'eliminando todo los pdf no usados...',
       ok: true,
     };
   }
