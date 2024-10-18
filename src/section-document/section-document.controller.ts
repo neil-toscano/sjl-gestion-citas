@@ -38,7 +38,7 @@ export class SectionDocumentController {
     @Param('id') id: string,
     @Body() updateSectionDocumentDto: UpdateSectionDocumentDto,
   ) {
-    return this.sectionDocumentService.update(+id, updateSectionDocumentDto);
+    return this.sectionDocumentService.update(id, updateSectionDocumentDto);
   }
 
   @Delete(':id')

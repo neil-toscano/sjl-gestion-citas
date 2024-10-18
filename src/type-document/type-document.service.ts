@@ -2,6 +2,7 @@ import {
   BadRequestException,
   Injectable,
   InternalServerErrorException,
+  NotFoundException,
 } from '@nestjs/common';
 import { CreateTypeDocumentDto } from './dto/create-type-document.dto';
 import { UpdateTypeDocumentDto } from './dto/update-type-document.dto';
@@ -42,8 +43,16 @@ export class TypeDocumentService {
     return this.typeDocumentRepository.findOneBy({ id });
   }
 
-  update(id: number, updateTypeDocumentDto: UpdateTypeDocumentDto) {
-    return `This action updates a #${id} typeDocument`;
+  async update(id: string, updateTypeDocumentDto: UpdateTypeDocumentDto) {
+    const document = await this.findOne(id);
+
+    if (!document) {
+      throw new NotFoundException(`Document with ID ${id} not found`);
+    }
+  
+    await this.typeDocumentRepository.update(id, updateTypeDocumentDto);
+  
+    return await this.findOne(id);
   }
 
   remove(id: number) {

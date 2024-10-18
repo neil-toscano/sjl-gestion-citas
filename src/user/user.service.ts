@@ -146,7 +146,7 @@ export class UserService {
       .execute();
     return {
       ok: true,
-      message: `se actualizó el usuario con id ${id}`,
+      message: `se actualizó los datos del usuario`,
     };
   }
 

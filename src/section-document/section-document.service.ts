@@ -49,8 +49,16 @@ export class SectionDocumentService {
     return schedule;
   }
 
-  update(id: number, updateSectionDocumentDto: UpdateSectionDocumentDto) {
-    return `This action updates a #${id} sectionDocument`;
+  async update(id: string, updateSectionDocumentDto: UpdateSectionDocumentDto) {
+    const sectionDocument = await this.findOne(id);
+
+    if (!sectionDocument) {
+      throw new NotFoundException(`Document with ID ${id} not found`);
+    }
+  
+    await this.sectionDocumentRepository.update(id, updateSectionDocumentDto);
+  
+    return await this.findOne(id);
   }
 
   async remove(id: string) {

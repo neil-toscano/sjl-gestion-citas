@@ -35,7 +35,7 @@ export class TypeDocumentController {
     @Param('id') id: string,
     @Body() updateTypeDocumentDto: UpdateTypeDocumentDto,
   ) {
-    return this.typeDocumentService.update(+id, updateTypeDocumentDto);
+    return this.typeDocumentService.update(id, updateTypeDocumentDto);
   }
 
   @Delete(':id')

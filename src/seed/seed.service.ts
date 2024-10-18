@@ -79,11 +79,11 @@ export class SeedService {
       { name: 'Copia de DNI' },
       { name: 'Copia literal de las unidades a independizar' },
       { name: 'Copia literal insertada en la sucesión intestada' },
-      { name: 'Copia literal o partida electrónica todos los asientos' },
+      { name: 'Copia literal o partida electrónica de todos los asientos' },
       { name: 'Copia literal de las unidades subdivididas o membretadas' },
-      { name: 'Suceción intentastada inscrita en sunarp' },
+      { name: 'Sucesión intestada inscrita en SUNARP' },
       { name: 'Documento que acredite la titularidad del fallecido' },
-      { name: 'Copia de DNI de los herederos' },
+      { name: 'Copia DNI de los herederos' },
     ];
 
     const createdTypeDocuments = [];
