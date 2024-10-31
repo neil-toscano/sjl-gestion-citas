@@ -52,4 +52,14 @@ export class AdminController {
   ) {
     return this.adminService.finalizeAndRemoveAll(userId, sectionId);
   }
+
+  @Delete('remove-documents/:userId/:sectionId')
+  @Auth()
+  removeDocuments(
+    @Param('userId') userId: string,
+    @Param('sectionId') sectionId: string,
+    @GetUser() user: User,
+  ) {
+    return this.adminService.removeDocuments(userId, sectionId);
+  }
 }

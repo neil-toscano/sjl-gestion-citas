@@ -30,7 +30,7 @@ import { UserPermissionsModule } from './user-permissions/user-permissions.modul
     ConfigModule.forRoot(),
 
     TypeOrmModule.forRoot({
-      ssl: true,
+      // ssl: true,
       // extra: {
       //   ssl: true ? { rejectUnauthorized: false } : null,
       // },

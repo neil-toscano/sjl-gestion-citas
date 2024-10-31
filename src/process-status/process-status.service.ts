@@ -217,7 +217,6 @@ export class ProcessStatusService {
 
   async update(id: string, updateProcessStatusDto: UpdateProcessStatusDto) {
     const { status } = updateProcessStatusDto;
-
     const processStatus = await this.processStatusRepository.findOne({
       where: { id },
     });

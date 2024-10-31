@@ -111,7 +111,8 @@ export class UserService {
     const platformOperator = await this.userRepository
       .createQueryBuilder('user')
       .where(':role = ANY(user.roles)', { role: 'platform-operator' }) // Verifica si el rol está en el array
-      .getMany(); // Obtiene todos los usuarios que coincidan
+      .andWhere('user.isActive = :isActive', { isActive: true })
+      .getMany();
 
     if (platformOperator.length === 0) {
       return [];

@@ -71,6 +71,11 @@ export class CreateUserDto {
     message: 'El rol debe ser uno de los siguientes: user, platform-operator, administrator' 
   })
   roles?: string[] = ['user']; 
+
+  @IsOptional()
+  @IsBoolean()
+  isActive: boolean = true;
+
   // @IsString({ message: 'La contraseña debe ser una cadena de texto' })
   // @MinLength(6, { message: 'La contraseña debe tener al menos 6 caracteres' })
   // @MaxLength(50, {

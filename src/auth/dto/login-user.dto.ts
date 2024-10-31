@@ -40,6 +40,10 @@ export class LoginUserDto {
   isVerified: boolean = true;
 
   @IsOptional()
+  @IsBoolean()
+  isActive: boolean = true;
+
+  @IsOptional()
   @IsArray()
   @ArrayNotEmpty()
   @IsString({ each: true })

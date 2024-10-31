@@ -47,6 +47,10 @@ export class AuthService {
       false,
     );
 
+    if (!user.isActive) {
+      throw new UnauthorizedException('Cuenta desactivada');
+    }
+    
     if (!user) {
       const newUser = await this.userService.create({
         ...loginUserDto,

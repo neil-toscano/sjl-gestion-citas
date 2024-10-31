@@ -75,4 +75,22 @@ export class AdminService {
       msg: 'Se inicializó todo el proceso',
     };
   }
+  async removeDocuments(userId: string, sectionId: string) {
+    const user = await this.userService.findOne(userId);
+
+    const processStatus = await this.processStatusService.findOneByUserSection(
+      sectionId,
+      user,
+    );
+    
+    await this.processStatusService.remove(processStatus.id);
+
+    const documents = await this.documentService.findBySection(sectionId, user);
+
+    await this.documentService.removeDocuments(documents);
+    return {
+      ok: true,
+      msg: 'Se inicializó todo el proceso',
+    };
+  }
 }
