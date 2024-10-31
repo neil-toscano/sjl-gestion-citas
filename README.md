@@ -4,7 +4,7 @@
 
 # GESTIÓN CITAS-TRÁMITES CECOM SAN JUAN DE LURIGANCHO
 
-1. Clonar proyecto e instalar
+1. Clonar proyecto e instalar las dependencias
 2. `yarn install`
 3. Clonar el archivo `.env.template` y renombrarlo a `.env`
 4. Cambiar las variables de entorno
