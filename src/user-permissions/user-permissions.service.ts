@@ -6,7 +6,7 @@ import {
 import { CreateUserPermissionDto } from './dto/create-user-permission.dto';
 import { UpdateUserPermissionDto } from './dto/update-user-permission.dto';
 import { UserPermission } from './entities/user-permission.entity';
-import { In, Repository } from 'typeorm';
+import { Any, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 
 @Injectable()
@@ -51,18 +51,13 @@ export class UserPermissionsService {
   }
 
   async findPlatformOperators(sectionId: string) {
-    return await this.userPermissionRepository.find({
-      where: {
-        section: {
-          id: sectionId,
-        },
-        user: {
-          isActive: true,
-          roles: In(['platform-operator']),
-        },
-      },
-      relations: ['user'],
-    });
+    return await this.userPermissionRepository
+      .createQueryBuilder('userPermission')
+      .leftJoinAndSelect('userPermission.user', 'user')
+      .where('userPermission.sectionId = :sectionId', { sectionId })
+      .andWhere('user.isActive = :isActive', { isActive: true })
+      .andWhere(':role = ANY(user.roles)', { role: 'platform-operator' })
+      .getMany();
   }
 
   async remove(id: string) {
