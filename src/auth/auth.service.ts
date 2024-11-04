@@ -46,10 +46,6 @@ export class AuthService {
       },
       false,
     );
-
-    if (!user.isActive) {
-      throw new UnauthorizedException('Cuenta desactivada');
-    }
     
     if (!user) {
       const newUser = await this.userService.create({
@@ -59,6 +55,10 @@ export class AuthService {
         ...newUser,
         token: this.getJwtToken({ id: newUser.id }),
       };
+    }
+
+    if (!user.isActive) {
+      throw new UnauthorizedException('Cuenta desactivada');
     }
 
     return {
