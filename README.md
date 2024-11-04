@@ -22,7 +22,7 @@ docker-compose up -d
 ```
 http://localhost:3000/api/seed/section-types
 ```
-7.2 Ejecutar el horario
+7.2 Ejecutar el horario de los plataformistas
 ```
 http://localhost:3000/api/seed/schedule
 ```
