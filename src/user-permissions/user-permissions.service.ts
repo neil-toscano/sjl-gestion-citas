@@ -6,7 +6,7 @@ import {
 import { CreateUserPermissionDto } from './dto/create-user-permission.dto';
 import { UpdateUserPermissionDto } from './dto/update-user-permission.dto';
 import { UserPermission } from './entities/user-permission.entity';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 
 @Injectable()
@@ -55,6 +55,10 @@ export class UserPermissionsService {
       where: {
         section: {
           id: sectionId,
+        },
+        user: {
+          isActive: true,
+          roles: In(['platform-operator']),
         },
       },
       relations: ['user'],
