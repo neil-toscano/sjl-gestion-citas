@@ -55,9 +55,9 @@ export class SectionDocumentService {
     if (!sectionDocument) {
       throw new NotFoundException(`Document with ID ${id} not found`);
     }
-  
+
     await this.sectionDocumentRepository.update(id, updateSectionDocumentDto);
-  
+
     return await this.findOne(id);
   }
 

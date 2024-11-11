@@ -13,6 +13,7 @@ import { CreateAdminDto } from './dto/create-admin.dto';
 import { UpdateAdminDto } from './dto/update-admin.dto';
 import { Auth, GetUser } from 'src/auth/decorators';
 import { User } from 'src/user/entities/user.entity';
+import { ValidRoles } from 'src/auth/interfaces';
 
 @Controller('admin')
 export class AdminController {
@@ -54,10 +55,10 @@ export class AdminController {
   }
 
   @Delete('remove-documents/:userId/:sectionId')
-  @Auth()
+  @Auth(ValidRoles.superUser)
   removeDocuments(
-    @Param('userId') userId: string,
-    @Param('sectionId') sectionId: string,
+    @Param('userId', new ParseUUIDPipe()) userId: string,
+    @Param('sectionId', new ParseUUIDPipe()) sectionId: string,
     @GetUser() user: User,
   ) {
     return this.adminService.removeDocuments(userId, sectionId);

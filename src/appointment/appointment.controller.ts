@@ -21,14 +21,13 @@ import { FindByWeekDto } from 'src/common/dtos/date.dto';
 export class AppointmentController {
   constructor(private readonly appointmentService: AppointmentService) {}
 
-  @Post(':sectionId/:scheduleId/:adminId')
+  @Post(':sectionId/:scheduleId')
   @Auth()
   create(
     @Body() createAppointmentDto: CreateAppointmentDto,
     @GetUser() user: User,
     @Param('sectionId') sectionId: string,
     @Param('scheduleId') scheduleId: string,
-    @Param('adminId') adminId: string,
   ) {
     const inputDate = new Date(createAppointmentDto.appointmentDate);
     if (isNaN(inputDate.getTime()) || inputDate.getUTCDay() !== 6) {
@@ -49,22 +48,21 @@ export class AppointmentController {
     return this.appointmentService.create(
       sectionId,
       scheduleId,
-      adminId,
       createAppointmentDto,
       user,
     );
   }
 
-  @Get()
+  @Get('section/:id')
   @Auth()
-  findAll(@GetUser() user: User) {
-    return this.appointmentService.findAll(user);
+  findAll(@GetUser() user: User, @Param('id') sectionId: string) {
+    return this.appointmentService.findAll(user, sectionId);
   }
 
-  @Get('week/:operatorId')
+  @Get('week/:sectionId')
   @Auth()
   findByWeek(
-    @Param('operatorId', new ParseUUIDPipe()) operatorId: string,
+    @Param('sectionId', new ParseUUIDPipe()) sectionId: string,
     @Query() query: FindByWeekDto,
   ) {
     const inputDate = new Date(query.date);
@@ -72,7 +70,7 @@ export class AppointmentController {
       throw new BadRequestException('La fecha debe ser un sábado válido.');
     }
 
-    return this.appointmentService.findByWeek(inputDate, operatorId);
+    return this.appointmentService.findByWeek(inputDate, sectionId);
   }
 
   @Get(':id')

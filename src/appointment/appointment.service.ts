@@ -33,7 +33,6 @@ export class AppointmentService {
   async create(
     sectionId: string,
     scheduleId: string,
-    adminId: string,
     createAppointmentDto: CreateAppointmentDto,
     user: User,
   ) {
@@ -52,7 +51,6 @@ export class AppointmentService {
 
     const section = await this.sectionService.findOne(sectionId);
     const schedule = await this.scheduleService.findOne(scheduleId);
-    await this.userService.findOnePlatformOperator(adminId);
 
     const { ok, msg } = await this.hasOpenAppointmentBySection(
       sectionId,
@@ -68,10 +66,8 @@ export class AppointmentService {
     await this.isScheduleAvailable(
       scheduleId,
       createAppointmentDto.appointmentDate,
-      adminId,
     );
 
-    const admin = await this.userService.findOne(adminId);
 
     const appointment = this.appointmentRepository.create({
       ...createAppointmentDto,
@@ -81,9 +77,6 @@ export class AppointmentService {
       },
       schedule: {
         id: scheduleId,
-      },
-      assignedAdmin: {
-        id: adminId,
       },
     });
 
@@ -102,7 +95,7 @@ export class AppointmentService {
       appointmentDate: createAppointmentDto.appointmentDate,
       appointmentTime: `${schedule.startTime} - ${schedule.endTime}`,
       email: user.email,
-      person: `${admin.firstName} ${admin.apellido_paterno} `,
+      person: `PERSONAL DE LA MUNICIPALIDAD `,
       service: section.sectionName,
       recipientName: `${user.firstName} ${user.apellido_paterno}`,
     });
@@ -117,11 +110,11 @@ export class AppointmentService {
     }
   }
 
-  findAll(user: User) {
+  findAll(user: User, sectionId: string) {
     return this.appointmentRepository.find({
       where: {
-        assignedAdmin: {
-          id: user.id,
+        section: {
+          id: sectionId,
         },
       },
       relations: ['section', 'reservedBy', 'schedule'],
@@ -131,16 +124,14 @@ export class AppointmentService {
     });
   }
 
-  async isScheduleAvailable(scheduleId: string, date: string, adminId: string) {
+  async isScheduleAvailable(scheduleId: string, date: string) {
     const appointmentDate = new Date(date);
 
     const existingAppointment = await this.appointmentRepository.findOne({
       where: {
         schedule: { id: scheduleId },
         appointmentDate: appointmentDate,
-        assignedAdmin: {
-          id: adminId,
-        },
+        status: AppointmentStatus.OPEN
       },
     });
 
@@ -155,14 +146,14 @@ export class AppointmentService {
 
   async findByWeek(
     date: Date,
-    platformOperatorId: string,
+    sectionId: string,
   ): Promise<Appointment[]> {
-    await this.userService.findOnePlatformOperator(platformOperatorId);
+    await this.userService.findOnePlatformOperator(sectionId);
     return this.appointmentRepository.find({
       where: {
         appointmentDate: date,
-        assignedAdmin: {
-          id: platformOperatorId,
+        section: {
+          id: sectionId,
         },
       },
       relations: ['section', 'reservedBy', 'schedule'],
@@ -239,7 +230,7 @@ export class AppointmentService {
         section: {
           id: sectionId,
         },
-        status: AppointmentStatus.PENDING,
+        status: AppointmentStatus.OPEN,
         reservedBy: {
           id: userId,
         },

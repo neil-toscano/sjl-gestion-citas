@@ -63,23 +63,15 @@ export class CreateUserDto {
   email: string;
 
   @IsOptional()
-  @IsArray()
-  @ArrayNotEmpty()
-  @IsString({ each: true })
-  @IsIn(['user', 'platform-operator', 'administrator'], { 
-    each: true,
-    message: 'El rol debe ser uno de los siguientes: user, platform-operator, administrator' 
-  })
-  roles?: string[] = ['user']; 
-
-  @IsOptional()
   @IsBoolean()
   isActive: boolean = true;
 
-  // @IsString({ message: 'La contraseña debe ser una cadena de texto' })
-  // @MinLength(6, { message: 'La contraseña debe tener al menos 6 caracteres' })
-  // @MaxLength(50, {
-  //   message: 'La contraseña no puede exceder los 50 caracteres',
-  // })
-  // password: string;
+  @IsString({ message: 'La contraseña debe ser una cadena de texto' })
+  @MinLength(5, {
+    message: 'La contraseña debe tener exactamente 5 caracteres',
+  })
+  @MaxLength(5, {
+    message: 'La contraseña debe tener exactamente 5 caracteres',
+  })
+  password: string;
 }

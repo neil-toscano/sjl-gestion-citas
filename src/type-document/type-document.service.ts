@@ -49,9 +49,9 @@ export class TypeDocumentService {
     if (!document) {
       throw new NotFoundException(`Document with ID ${id} not found`);
     }
-  
+
     await this.typeDocumentRepository.update(id, updateTypeDocumentDto);
-  
+
     return await this.findOne(id);
   }
 

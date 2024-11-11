@@ -24,20 +24,27 @@ import { EmailModule } from './email/email.module';
 import { CronModule } from './cron/cron.module';
 import { ProcessStatusModule } from './process-status/process-status.module';
 import { UserPermissionsModule } from './user-permissions/user-permissions.module';
+import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
+import { APP_GUARD } from '@nestjs/core';
 
 @Module({
   imports: [
+    ThrottlerModule.forRoot([
+      {
+        ttl: 600,
+        limit: 2,
+      },
+    ]),
     ConfigModule.forRoot(),
-
     TypeOrmModule.forRoot({
-      // ssl: true,
-      // extra: {
-      //   ssl: true ? { rejectUnauthorized: false } : null,
-      // },
+      ssl: true,
+      extra: {
+        ssl: true ? { rejectUnauthorized: false } : null,
+      },
       type: 'postgres',
       host: process.env.DB_HOST,
       port: +process.env.DB_PORT,
-      
+
       database: process.env.DB_NAME,
       username: process.env.DB_USERNAME,
       password: process.env.DB_PASSWORD,
@@ -83,6 +90,12 @@ import { UserPermissionsModule } from './user-permissions/user-permissions.modul
     ProcessStatusModule,
 
     UserPermissionsModule,
+  ],
+  providers: [
+    {
+      provide: APP_GUARD,
+      useClass: ThrottlerGuard,
+    },
   ],
 })
 export class AppModule {}

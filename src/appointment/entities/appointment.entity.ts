@@ -10,14 +10,12 @@ import { SectionDocument } from 'src/section-document/entities/section-document.
 import { Schedule } from 'src/schedule/entities/schedule.entity';
 
 export enum AppointmentStatus {
-  PENDING = 'PENDING',
-  CONFIRMED = 'CONFIRMED',
-  CANCELED = 'CANCELED',
-  COMPLETED = 'COMPLETED',
+  OPEN = 'OPEN',
+  CLOSED = 'CLOSED',
+  EXPIRED = 'EXPIRED',
 }
 
 @Entity()
-@Unique(['assignedAdmin', 'schedule', 'appointmentDate'])
 export class Appointment {
   @PrimaryGeneratedColumn('uuid')
   id: string;
@@ -31,7 +29,7 @@ export class Appointment {
   @Column({
     type: 'enum',
     enum: AppointmentStatus,
-    default: AppointmentStatus.PENDING,
+    default: AppointmentStatus.OPEN,
   })
   status: AppointmentStatus;
 
@@ -40,9 +38,6 @@ export class Appointment {
 
   @ManyToOne(() => Schedule, (schedule) => schedule.appointments)
   schedule: Schedule;
-
-  @ManyToOne(() => User, (user) => user.appointments)
-  assignedAdmin: User;
 
   @Column({ nullable: true })
   message: string;

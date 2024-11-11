@@ -16,40 +16,20 @@ export class LoginUserDto {
   @IsString({ message: 'El DNI debe ser una cadena de texto' })
   documentNumber: string;
 
-  @IsEmail({}, { message: 'El correo electrónico debe ser un email válido' })
-  @IsString({ message: 'El correo debe ser una cadena de texto' })
-  email: string;
-
-  @IsString({ message: 'El nombre debe ser una cadena de texto' })
-  @MinLength(2, { message: 'El nombre debe tener al menos 2 caracteres' })
-  @MaxLength(50, { message: 'El nombre no puede exceder los 50 caracteres' })
-  firstName: string;
-
-  @IsString({ message: 'El apellido debe ser una cadena de texto' })
-  @MinLength(0, { message: 'El apellido paterno' })
-  @MaxLength(50, { message: 'El apellido no puede exceder los 50 caracteres' })
-  apellido_paterno: string;
-
-  @IsString({ message: 'El apellido debe ser una cadena de texto' })
-  @MinLength(0, { message: 'El apellido materno' })
-  @MaxLength(50, { message: 'El apellido no puede exceder los 50 caracteres' })
-  apellido_materno: string;
-
-  @IsBoolean()
-  @IsOptional()
-  isVerified: boolean = true;
-
-  @IsOptional()
-  @IsBoolean()
-  isActive: boolean = true;
+  @IsString({ message: 'Debe ser un string' })
+  @Length(5, 5, {
+    message: 'La contraseña debe tener exactamente 5 caracteres',
+  })
+  password: string;
 
   @IsOptional()
   @IsArray()
   @ArrayNotEmpty()
   @IsString({ each: true })
-  @IsIn(['user', 'platform-operator', 'administrator'], { 
+  @IsIn(['user', 'platform-operator', 'administrator'], {
     each: true,
-    message: 'El rol debe ser uno de los siguientes: user, platform-operator, administrator' 
+    message:
+      'El rol debe ser uno de los siguientes: user, platform-operator, administrator',
   })
   roles?: string[] = ['user'];
 }

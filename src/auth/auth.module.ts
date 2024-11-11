@@ -9,11 +9,20 @@ import { AuthController } from './auth.controller';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { UserModule } from 'src/user/user.module';
 import { EmailModule } from 'src/email/email.module';
+import { CommonModule } from 'src/common/common.module';
+import { ThrottlerModule } from '@nestjs/throttler';
 
 @Module({
   controllers: [AuthController],
   providers: [AuthService, JwtStrategy],
   imports: [
+    ThrottlerModule.forRoot([
+      {
+        ttl: 15000,
+        limit: 2,
+      },
+    ]),
+    CommonModule,
     ConfigModule,
     UserModule,
     EmailModule,

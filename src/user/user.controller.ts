@@ -13,6 +13,7 @@ import { CreateUserDto } from 'src/auth/dto';
 import { AuthGuard } from '@nestjs/passport';
 import { Auth } from 'src/auth/decorators';
 import { TermDto } from 'src/common/dtos/term.dto';
+import { ValidRoles } from 'src/auth/interfaces';
 
 @Controller('user')
 export class UserController {
@@ -42,6 +43,8 @@ export class UserController {
   }
 
   @Patch(':id')
+  @Auth()
+  @Auth(ValidRoles.admin)
   update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
     return this.userService.update(id, updateUserDto);
   }

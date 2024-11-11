@@ -82,7 +82,7 @@ export class AdminService {
       sectionId,
       user,
     );
-    
+
     await this.processStatusService.remove(processStatus.id);
 
     const documents = await this.documentService.findBySection(sectionId, user);

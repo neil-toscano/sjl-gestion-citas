@@ -20,38 +20,50 @@ import { UserRoleGuard } from './guards/user-role.guard';
 import { ValidRoles } from './interfaces';
 import { User } from 'src/user/entities/user.entity';
 import { UpdatePassword } from 'src/common/dtos/password';
+import { Throttle } from '@nestjs/throttler';
+import { Request } from 'express';
 
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Post('register')
+  @Throttle({ default: { limit: 3, ttl: 60000 } })
   createUser(@Body() createUserDto: CreateUserDto) {
     return this.authService.create(createUserDto);
   }
 
   @Post('login')
-  loginUser(@Body() loginUserDto: LoginUserDto) {
+  @Throttle({ default: { limit: 3, ttl: 100000 } })
+  loginUser(@Body() loginUserDto: LoginUserDto, @Req() request: Request) {
+    const ipAddress = request.ip || request.headers['x-forwarded-for'] || 'IP no disponible';
+    console.log('IP del usuario:', ipAddress);
     return this.authService.login(loginUserDto);
   }
 
   @Post('verify-email')
+  @Throttle({ default: { limit: 3, ttl: 60000 } })
   verifyEmail(@Query('token') token: string) {
     return this.authService.verifyToken(token);
   }
 
+  // @Post('reset-password')
+  // resetPassword(@Query('email') email: string) {
+  //   return this.authService.resetPassword(email);
+  // }
   @Post('reset-password')
-  resetPassword(@Query('email') email: string) {
-    return this.authService.resetPassword(email);
+  @Throttle({ default: { limit: 3, ttl: 60000 } })
+  resetPassword(@Query('numero_documento') numero_documento: string) {
+    return this.authService.resetPassword(numero_documento);
   }
 
-  @Post('set-password')
-  setPassword(
-    @Query('token') token: string,
-    @Body() updatePassword: UpdatePassword,
-  ) {
-    return this.authService.setPassword(token, updatePassword.password);
-  }
+  // @Post('set-password')
+  // setPassword(
+  //   @Query('token') token: string,
+  //   @Body() updatePassword: UpdatePassword,
+  // ) {
+  //   return this.authService.setPassword(token, updatePassword.password);
+  // }
 
   @Get('check-status')
   @Auth()

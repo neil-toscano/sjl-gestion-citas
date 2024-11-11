@@ -6,6 +6,7 @@ import {
   Patch,
   Param,
   Delete,
+  ParseUUIDPipe,
 } from '@nestjs/common';
 import { UserPermissionsService } from './user-permissions.service';
 import { CreateUserPermissionDto } from './dto/create-user-permission.dto';
@@ -37,7 +38,7 @@ export class UserPermissionsController {
 
   @Get('platform-operators/:sectionId')
   @Auth()
-  findPlatformOperators(@Param('sectionId') sectionId: string) {
+  findPlatformOperators(@Param('sectionId', new ParseUUIDPipe()) sectionId: string) {
     return this.userPermissionsService.findPlatformOperators(sectionId);
   }
 
