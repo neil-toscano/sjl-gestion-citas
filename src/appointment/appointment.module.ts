@@ -9,6 +9,7 @@ import { UserModule } from 'src/user/user.module';
 import { ScheduleModule } from 'src/schedule/schedule.module';
 import { EmailModule } from 'src/email/email.module';
 import { ProcessStatusModule } from 'src/process-status/process-status.module';
+import { UserPermissionsModule } from 'src/user-permissions/user-permissions.module';
 
 @Module({
   controllers: [AppointmentController],
@@ -21,6 +22,7 @@ import { ProcessStatusModule } from 'src/process-status/process-status.module';
     ScheduleModule,
     EmailModule,
     ProcessStatusModule,
+    UserPermissionsModule,
   ],
   exports: [AppointmentService, TypeOrmModule],
 })

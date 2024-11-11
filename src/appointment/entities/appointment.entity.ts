@@ -41,4 +41,7 @@ export class Appointment {
 
   @Column({ nullable: true })
   message: string;
+
+  @Column({ nullable: true })
+  fileUrl: string;
 }

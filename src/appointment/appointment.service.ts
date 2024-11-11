@@ -17,6 +17,7 @@ import { ScheduleService } from 'src/schedule/schedule.service';
 import { EmailService } from 'src/email/email.service';
 import { ProcessStatusService } from 'src/process-status/process-status.service';
 import { ProcessStatusEnum } from 'src/process-status/interfaces/status.enum';
+import { UserPermissionsService } from 'src/user-permissions/user-permissions.service';
 
 @Injectable()
 export class AppointmentService {
@@ -28,6 +29,7 @@ export class AppointmentService {
     private readonly scheduleService: ScheduleService,
     private readonly emailService: EmailService,
     private readonly processStatusService: ProcessStatusService,
+    private readonly userPermissionsService: UserPermissionsService,
   ) {}
 
   async create(
@@ -63,9 +65,12 @@ export class AppointmentService {
       };
     }
 
+    const platformOperatorsCount = await this.userPermissionsService.findPlatformOperators(sectionId);
+
     await this.isScheduleAvailable(
       scheduleId,
       createAppointmentDto.appointmentDate,
+      platformOperatorsCount.length,
     );
 
 
@@ -124,25 +129,26 @@ export class AppointmentService {
     });
   }
 
-  async isScheduleAvailable(scheduleId: string, date: string) {
+  async isScheduleAvailable(scheduleId: string, date: string, operatorsCount: number) {
     const appointmentDate = new Date(date);
-
-    const existingAppointment = await this.appointmentRepository.findOne({
+  
+    const existingAppointments = await this.appointmentRepository.find({
       where: {
         schedule: { id: scheduleId },
         appointmentDate: appointmentDate,
         status: AppointmentStatus.OPEN
       },
     });
-
-    if (existingAppointment) {
+  
+    if (existingAppointments.length >= operatorsCount) {
       throw new NotFoundException(
-        `El horario para dicha fecha ya se encuentra reservada`,
+        `El horario para dicha fecha ya se encuentra reservado para el número máximo de operadores`,
       );
     }
-
-    return true; // Si no hay cita existente, el horario está disponible
+  
+    return true;
   }
+  
 
   async findByWeek(
     date: Date,
