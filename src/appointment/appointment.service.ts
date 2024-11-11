@@ -184,6 +184,7 @@ export class AppointmentService {
       where: {
         reservedBy: { id: userId },
         section: { id: sectionId },
+        status: AppointmentStatus.OPEN
       },
       relations: ['schedule'],
     });
@@ -192,7 +193,8 @@ export class AppointmentService {
       throw new NotFoundException('Cita no encontrado en la sección');
     }
 
-    await this.appointmentRepository.remove(appointment);
+    appointment.status = AppointmentStatus.CLOSED;
+    await this.appointmentRepository.save(appointment);
   }
 
   async removeBySection(userId: string, sectionId: string) {
