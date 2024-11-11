@@ -18,8 +18,8 @@ import { ThrottlerModule } from '@nestjs/throttler';
   imports: [
     ThrottlerModule.forRoot([
       {
-        ttl: 15000,
-        limit: 2,
+        ttl: 30000,
+        limit: 5,
       },
     ]),
     CommonModule,
