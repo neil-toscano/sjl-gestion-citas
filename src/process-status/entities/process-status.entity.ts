@@ -32,4 +32,7 @@ export class ProcessStatus {
 
   @UpdateDateColumn({ type: 'timestamptz' }) // Use timestamptz for timezone-aware timestamp
   updatedAt: Date;
+
+  @Column({ type: 'boolean', default: false })
+  isCompleted: boolean;
 }

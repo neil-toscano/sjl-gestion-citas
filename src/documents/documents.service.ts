@@ -2,7 +2,6 @@ import {
   ConflictException,
   Injectable,
   NotFoundException,
-  UnprocessableEntityException,
 } from '@nestjs/common';
 import { CreateDocumentDto } from './dto/create-document.dto';
 import { UpdateDocumentDto } from './dto/update-document.dto';
@@ -10,15 +9,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Document } from './entities/document.entity';
 import { Repository } from 'typeorm';
 import { FilesService } from 'src/files/files.service';
-import { SectionTypeDocumentService } from 'src/section-type-document/section-type-document.service';
 import { User } from 'src/user/entities/user.entity';
 import { SectionDocumentService } from 'src/section-document/section-document.service';
-import { UserService } from 'src/user/user.service';
-import { AssignmentsService } from 'src/assignments/assignments.service';
-import { groupDocumentsBySection } from './utils/organize-documents';
-import { AppointmentService } from 'src/appointment/appointment.service';
-import { SectionType } from 'src/section-type-document/interfaces/document';
-import { EmailService } from 'src/email/email.service';
 import { ProcessStatusService } from 'src/process-status/process-status.service';
 import { ProcessStatusEnum } from 'src/process-status/interfaces/status.enum';
 import { TypeDocumentService } from 'src/type-document/type-document.service';
@@ -29,13 +21,8 @@ export class DocumentsService {
     @InjectRepository(Document)
     private readonly documentRepository: Repository<Document>,
     private readonly fileService: FilesService,
-    private readonly sectionTypeService: SectionTypeDocumentService,
     private readonly sectionService: SectionDocumentService,
     private readonly typeDocumentService: TypeDocumentService,
-    private readonly userService: UserService,
-    private readonly assignmentService: AssignmentsService,
-    private readonly AppointmentService: AppointmentService,
-    private readonly emailService: EmailService,
     private readonly processStatusService: ProcessStatusService,
   ) {}
 
@@ -57,6 +44,7 @@ export class DocumentsService {
         user: {
           id: id,
         },
+        isDeleted: false,
       },
     });
 
@@ -74,7 +62,9 @@ export class DocumentsService {
     });
 
     const documentResult = await this.documentRepository.save(newDocument);
-
+    if (documentResult.user) {
+      delete documentResult.user.password;
+    }
     const section = await this.sectionService.findOne(sectionId);
 
     const documents = await this.documentRepository.find({
@@ -85,6 +75,7 @@ export class DocumentsService {
         user: {
           id: user.id,
         },
+        isDeleted: false,
       },
     });
 
@@ -120,7 +111,7 @@ export class DocumentsService {
       id: id,
     });
     if (!document)
-      throw new NotFoundException(`Document with id ${id} not found`);
+      throw new NotFoundException(`Documento con ${id} no encontrado`);
     return document;
   }
 

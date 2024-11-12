@@ -4,7 +4,14 @@ import {
   IsUUID,
   IsIn,
   IsOptional,
+  IsEnum,
 } from 'class-validator';
+
+export enum DocumentStatus {
+  EN_PROCESO = 'EN PROCESO',
+  VERIFICADO = 'VERIFICADO',
+  OBSERVADO = 'OBSERVADO',
+}
 export class CreateDocumentDto {
   @IsUUID()
   sectionId: string;
@@ -16,13 +23,11 @@ export class CreateDocumentDto {
   @IsNotEmpty()
   fileUrl: string;
 
-  @IsString()
-  @IsNotEmpty()
-  @IsIn(['EN PROCESO', 'VERIFICADO', 'OBSERVADO'], {
+  @IsEnum(DocumentStatus, {
     message:
       'El estado debe ser uno de los siguientes: EN PROCESO, VERIFICADO, OBSERVADO',
   })
-  status: string;
+  status: DocumentStatus;
 
   @IsString()
   @IsOptional()

@@ -6,7 +6,7 @@ import {
   OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import { Type } from 'class-transformer';
+import { Exclude, Type } from 'class-transformer';
 import { Document } from 'src/documents/entities/document.entity';
 import { Schedule } from 'src/schedule/entities/schedule.entity';
 import { Appointment } from 'src/appointment/entities/appointment.entity';
@@ -29,6 +29,7 @@ export class User {
   })
   email: string;
 
+  @Exclude()
   @Column('text')
   password: string;
 

@@ -9,6 +9,7 @@ import {
   ManyToOne,
   JoinColumn,
 } from 'typeorm';
+import { DocumentStatus } from '../dto/create-document.dto';
 
 @Entity('pdf_documents')
 export class Document {
@@ -35,11 +36,14 @@ export class Document {
 
   @Column({
     type: 'enum',
-    enum: ['EN PROCESO', 'VERIFICADO', 'OBSERVADO'],
-    default: 'EN PROCESO',
+    enum: DocumentStatus, // Usar el enum en lugar de valores de cadena directamente
+    default: DocumentStatus.EN_PROCESO,
   })
-  status: string;
+  status: DocumentStatus;
 
   @Column({ type: 'text', nullable: true })
   details?: string;
+
+  @Column({ type: 'boolean', default: false })
+  isDeleted: boolean;
 }

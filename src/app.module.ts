@@ -26,13 +26,15 @@ import { ProcessStatusModule } from './process-status/process-status.module';
 import { UserPermissionsModule } from './user-permissions/user-permissions.module';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { APP_GUARD } from '@nestjs/core';
+import { ProcessHistoryModule } from './process-history/process-history.module';
+import { AppointmentHistoryModule } from './appointment-history/appointment-history.module';
 
 @Module({
   imports: [
     ThrottlerModule.forRoot([
       {
         ttl: 600,
-        limit: 4,
+        limit: 40,
       },
     ]),
     ConfigModule.forRoot(),
@@ -90,6 +92,10 @@ import { APP_GUARD } from '@nestjs/core';
     ProcessStatusModule,
 
     UserPermissionsModule,
+
+    ProcessHistoryModule,
+
+    AppointmentHistoryModule,
   ],
   providers: [
     {

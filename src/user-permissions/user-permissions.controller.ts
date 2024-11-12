@@ -38,7 +38,9 @@ export class UserPermissionsController {
 
   @Get('platform-operators/:sectionId')
   @Auth()
-  findPlatformOperators(@Param('sectionId', new ParseUUIDPipe()) sectionId: string) {
+  findPlatformOperators(
+    @Param('sectionId', new ParseUUIDPipe()) sectionId: string,
+  ) {
     return this.userPermissionsService.findPlatformOperators(sectionId);
   }
 

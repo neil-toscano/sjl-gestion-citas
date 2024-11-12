@@ -65,14 +65,14 @@ export class AppointmentService {
       };
     }
 
-    const platformOperatorsCount = await this.userPermissionsService.findPlatformOperators(sectionId);
+    const platformOperatorsCount =
+      await this.userPermissionsService.findPlatformOperators(sectionId);
 
     await this.isScheduleAvailable(
       scheduleId,
       createAppointmentDto.appointmentDate,
       platformOperatorsCount.length,
     );
-
 
     const appointment = this.appointmentRepository.create({
       ...createAppointmentDto,
@@ -129,31 +129,31 @@ export class AppointmentService {
     });
   }
 
-  async isScheduleAvailable(scheduleId: string, date: string, operatorsCount: number) {
+  async isScheduleAvailable(
+    scheduleId: string,
+    date: string,
+    operatorsCount: number,
+  ) {
     const appointmentDate = new Date(date);
-  
+
     const existingAppointments = await this.appointmentRepository.find({
       where: {
         schedule: { id: scheduleId },
         appointmentDate: appointmentDate,
-        status: AppointmentStatus.OPEN
+        status: AppointmentStatus.OPEN,
       },
     });
-  
+
     if (existingAppointments.length >= operatorsCount) {
       throw new NotFoundException(
         `El horario para dicha fecha ya se encuentra reservado para el número máximo de operadores`,
       );
     }
-  
+
     return true;
   }
-  
 
-  async findByWeek(
-    date: Date,
-    sectionId: string,
-  ): Promise<Appointment[]> {
+  async findByWeek(date: Date, sectionId: string): Promise<Appointment[]> {
     await this.userService.findOnePlatformOperator(sectionId);
     return this.appointmentRepository.find({
       where: {
@@ -184,7 +184,7 @@ export class AppointmentService {
       where: {
         reservedBy: { id: userId },
         section: { id: sectionId },
-        status: AppointmentStatus.OPEN
+        status: AppointmentStatus.OPEN,
       },
       relations: ['schedule'],
     });

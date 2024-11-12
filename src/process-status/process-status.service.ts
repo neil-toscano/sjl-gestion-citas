@@ -205,6 +205,7 @@ export class ProcessStatusService {
       where: {
         user: { id: user.id },
         section: { id: sectionId },
+        isCompleted: false,
       },
     });
 

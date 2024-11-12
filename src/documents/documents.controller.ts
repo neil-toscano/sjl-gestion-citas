@@ -6,7 +6,6 @@ import {
   Patch,
   Param,
   ParseUUIDPipe,
-  UseGuards,
 } from '@nestjs/common';
 import { DocumentsService } from './documents.service';
 import { CreateDocumentDto } from './dto/create-document.dto';

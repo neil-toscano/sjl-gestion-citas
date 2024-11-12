@@ -36,7 +36,8 @@ export class AuthController {
   @Post('login')
   @Throttle({ default: { limit: 3, ttl: 100000 } })
   loginUser(@Body() loginUserDto: LoginUserDto, @Req() request: Request) {
-    const ipAddress = request.ip || request.headers['x-forwarded-for'] || 'IP no disponible';
+    const ipAddress =
+      request.ip || request.headers['x-forwarded-for'] || 'IP no disponible';
     console.log('IP del usuario:', ipAddress);
     return this.authService.login(loginUserDto);
   }
