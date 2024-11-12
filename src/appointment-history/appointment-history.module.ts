@@ -7,8 +7,6 @@ import { AppointmentHistory } from './entities/appointment-history.entity';
 @Module({
   controllers: [AppointmentHistoryController],
   providers: [AppointmentHistoryService],
-  imports: [
-    TypeOrmModule.forFeature([AppointmentHistory]),
-  ]
+  imports: [TypeOrmModule.forFeature([AppointmentHistory])],
 })
 export class AppointmentHistoryModule {}

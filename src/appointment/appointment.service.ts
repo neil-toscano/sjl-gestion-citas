@@ -18,6 +18,7 @@ import { EmailService } from 'src/email/email.service';
 import { ProcessStatusService } from 'src/process-status/process-status.service';
 import { ProcessStatusEnum } from 'src/process-status/interfaces/status.enum';
 import { UserPermissionsService } from 'src/user-permissions/user-permissions.service';
+import { EstadoDisponibilidad } from './interfaces/availability.enum';
 
 @Injectable()
 export class AppointmentService {
@@ -153,17 +154,46 @@ export class AppointmentService {
     return true;
   }
 
-  async findByWeek(date: Date, sectionId: string): Promise<Appointment[]> {
-    await this.userService.findOnePlatformOperator(sectionId);
-    return this.appointmentRepository.find({
-      where: {
-        appointmentDate: date,
-        section: {
-          id: sectionId,
-        },
-      },
-      relations: ['section', 'reservedBy', 'schedule'],
+  async findByWeek(date: Date, sectionId: string) {
+    const maxUsersPerProcess: string = process.env.MAXUSERS;
+    const platformUsers =
+      await this.userPermissionsService.findPlatformOperators(sectionId);
+
+    const totalMaxUsersPerProcess =
+      parseInt(maxUsersPerProcess) * platformUsers.length;
+    await this.sectionService.findOne(sectionId);
+
+    const schedules = await this.scheduleService.findAll();
+
+    const result = await this.appointmentRepository
+      .createQueryBuilder('appointment')
+      .select('appointment.scheduleId', 'scheduleId')
+      .addSelect('COUNT(appointment.id)', 'appointmentsCount')
+      .where('appointment.appointmentDate = :date', { date })
+      .andWhere('appointment.sectionId = :sectionId', { sectionId })
+      .andWhere('appointment.status = :status', {
+        status: AppointmentStatus.OPEN,
+      })
+      .groupBy('appointment.scheduleId')
+      .getRawMany();
+
+    const schedulesWithStatus = schedules.map((schedule) => {
+      const appointmentsCount =
+        result.find((r) => r.scheduleId === schedule.id)?.appointmentsCount ||
+        0;
+
+      const isAvailable = appointmentsCount < totalMaxUsersPerProcess;
+
+      return {
+        scheduleId: schedule.id,
+        startTime: schedule.startTime,
+        endTime: schedule.endTime,
+        status: isAvailable ? 'DISPONIBLE' : 'NO DISPONIBLE',
+        appointmentsCount,
+      };
     });
+
+    return schedulesWithStatus;
   }
 
   async findOne(id: string) {
