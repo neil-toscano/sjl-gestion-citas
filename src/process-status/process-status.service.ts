@@ -240,7 +240,7 @@ export class ProcessStatusService {
 
   async remove(id: string) {
     const processStatus = await this.processStatusRepository.findOneBy({ id });
-    await this.processStatusRepository.remove(processStatus);
-    return `Se eliminó correctamente`;
+    processStatus.isCompleted = true;
+    return this.processStatusRepository.save(processStatus);
   }
 }
