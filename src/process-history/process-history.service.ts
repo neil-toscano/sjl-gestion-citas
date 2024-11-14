@@ -32,9 +32,10 @@ export class ProcessHistoryService {
   }
 
   async findAll(paginationDto: PaginationDto) {
-    const { limit = 25, offset = 0 } = paginationDto;
+    const { pageSize = 25, page = 0 } = paginationDto;
+    const offset = pageSize*page;
     const proccessHistory = await this.processHistoryRepository.find({
-      take: limit,
+      take: pageSize,
       skip: offset,
     });
   
