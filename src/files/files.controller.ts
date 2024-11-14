@@ -21,8 +21,8 @@ import { Auth } from 'src/auth/decorators';
 export class FilesController {
   constructor(private readonly filesService: FilesService) {}
 
-  @Auth()
   @Post('pdf')
+  @Auth()
   @UseInterceptors(
     FileInterceptor('file', {
       fileFilter: (req, file, callback) => {

@@ -35,11 +35,9 @@ export class ProcessHistoryController {
   @Get()
   @Auth()
   findAll(
-    @Query() paginationDto: PaginationDto,
-    @Body() filterProcessHistoryDto: FilterProcessHistoryDto,
+    @Query() filterProcessHistoryDto: FilterProcessHistoryDto,
   ) {
     return this.processHistoryService.findAll(
-      paginationDto,
       filterProcessHistoryDto,
     );
   }

@@ -33,14 +33,11 @@ export class AppointmentHistoryService {
   }
 
   async findAll(
-    paginationDto: PaginationDto,
     filterProcessHistoryDto: FilterAppointmentHistoryDto,
   ) {
-    const { pageSize = 25, page = 0 } = paginationDto;
+    const { pageSize = 25, page = 0, fromDate, toDate, sectionId } = filterProcessHistoryDto;
     const offset = pageSize * page;
-  
-    const { fromDate, toDate, sectionId } = filterProcessHistoryDto;
-  
+    
     const queryBuilder =
       this.appointmentHistoryRepository.createQueryBuilder('appointmentHistory');
   

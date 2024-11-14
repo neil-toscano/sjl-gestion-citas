@@ -33,14 +33,12 @@ export class ProcessHistoryService {
   }
 
   async findAll(
-    paginationDto: PaginationDto,
     filterProcessHistoryDto: FilterProcessHistoryDto,
   ) {
-    const { pageSize = 25, page = 0 } = paginationDto;
+    console.log(filterProcessHistoryDto);
+    const { pageSize = 25, page = 0, fromDate, toDate, sectionId } = filterProcessHistoryDto;
     const offset = pageSize * page;
-  
-    const { fromDate, toDate, sectionId } = filterProcessHistoryDto;
-  
+    
     const queryBuilder =
       this.processHistoryRepository.createQueryBuilder('processHistory');
   
