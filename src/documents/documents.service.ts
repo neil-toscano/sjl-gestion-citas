@@ -336,6 +336,7 @@ export class DocumentsService {
         user: {
           id: user.id,
         },
+        isDeleted:false
       },
       relations: ['typeDocument', 'section'],
       order: {
