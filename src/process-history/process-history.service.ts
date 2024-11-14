@@ -6,6 +6,7 @@ import { Repository } from 'typeorm';
 import { ProcessHistory } from './entities/process-history.entity';
 import { User } from 'src/user/entities/user.entity';
 import { PaginationDto } from 'src/common/dtos/pagination.dto';
+import { FilterProcessHistoryDto } from './dto/filter-process-history.dto';
 
 @Injectable()
 export class ProcessHistoryService {
@@ -31,25 +32,54 @@ export class ProcessHistoryService {
     return this.processHistoryRepository.save(processHistory);
   }
 
-  async findAll(paginationDto: PaginationDto) {
+  async findAll(
+    paginationDto: PaginationDto,
+    filterProcessHistoryDto: FilterProcessHistoryDto,
+  ) {
     const { pageSize = 25, page = 0 } = paginationDto;
-    const offset = pageSize*page;
-    const proccessHistory = await this.processHistoryRepository.find({
-      take: pageSize,
-      skip: offset,
-    });
-  
+    const offset = pageSize * page;
+
+    const { fromDate, toDate, sectionId } = filterProcessHistoryDto;
+
+    const queryBuilder =
+      this.processHistoryRepository.createQueryBuilder('processHistory');
+
+    queryBuilder
+      .leftJoinAndSelect('processHistory.user', 'user')
+      .leftJoinAndSelect('processHistory.platformUser', 'platformUser')
+      .leftJoinAndSelect('processHistory.section', 'section');
+      
+    if (fromDate) {
+      queryBuilder.andWhere('processHistory.createdAt >= :fromDate', {
+        fromDate,
+      });
+    }
+    if (toDate) {
+      queryBuilder.andWhere('processHistory.createdAt <= :toDate', { toDate });
+    }
+
+    if (sectionId) {
+      queryBuilder.andWhere('processHistory.section.id = :sectionId', {
+        sectionId,
+      });
+    }
+
+    queryBuilder.take(pageSize).skip(offset);
+
+    const proccessHistory = await queryBuilder.getMany();
+
     return proccessHistory.map(({ user, platformUser, ...rest }) => {
       const { password, ...userWithoutPassword } = user || {};
-      const { password: platformPassword, ...platformUserWithoutPassword } = platformUser || {};
-  
+      const { password: platformPassword, ...platformUserWithoutPassword } =
+        platformUser || {};
+
       return {
         ...rest,
         user: userWithoutPassword,
         platformUser: platformUserWithoutPassword,
       };
     });
-  }  
+  }
 
   findOne(id: number) {
     return `This action returns a #${id} processHistory`;

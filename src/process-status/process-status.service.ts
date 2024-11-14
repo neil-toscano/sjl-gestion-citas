@@ -163,7 +163,7 @@ export class ProcessStatusService {
       where: {
         section: { id: sectionId },
         user: { id: user.id },
-        isCompleted: false, 
+        isCompleted: false,
       },
       relations: ['user'],
     });

@@ -5,6 +5,8 @@ import { User } from 'src/user/entities/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { AppointmentHistory } from './entities/appointment-history.entity';
+import { PaginationDto } from 'src/common/dtos/pagination.dto';
+import { FilterAppointmentHistoryDto } from './dto/filter-appointment-history.dto';
 
 @Injectable()
 export class AppointmentHistoryService {
@@ -30,8 +32,57 @@ export class AppointmentHistoryService {
     return this.appointmentHistoryRepository.save(appointmentHistory);
   }
 
-  findAll() {
-    return `This action returns all appointmentHistory`;
+  async findAll(
+    paginationDto: PaginationDto,
+    filterProcessHistoryDto: FilterAppointmentHistoryDto,
+  ) {
+    const { pageSize = 25, page = 0 } = paginationDto;
+    const offset = pageSize * page;
+
+    const { fromDate, toDate, sectionId } = filterProcessHistoryDto;
+
+    const queryBuilder =
+      this.appointmentHistoryRepository.createQueryBuilder(
+        'appointmentHistory',
+      );
+
+    queryBuilder
+      .leftJoinAndSelect('appointmentHistory.user', 'user')
+      .leftJoinAndSelect('appointmentHistory.platformUser', 'platformUser')
+      .leftJoinAndSelect('appointmentHistory.section', 'section');
+
+    if (fromDate) {
+      queryBuilder.andWhere('appointmentHistory.createdAt >= :fromDate', {
+        fromDate,
+      });
+    }
+    if (toDate) {
+      queryBuilder.andWhere('appointmentHistory.createdAt <= :toDate', {
+        toDate,
+      });
+    }
+
+    if (sectionId) {
+      queryBuilder.andWhere('appointmentHistory.section.id = :sectionId', {
+        sectionId,
+      });
+    }
+
+    queryBuilder.take(pageSize).skip(offset);
+
+    const proccessHistory = await queryBuilder.getMany();
+
+    return proccessHistory.map(({ user, platformUser, ...rest }) => {
+      const { password, ...userWithoutPassword } = user || {};
+      const { password: platformPassword, ...platformUserWithoutPassword } =
+        platformUser || {};
+
+      return {
+        ...rest,
+        user: userWithoutPassword,
+        platformUser: platformUserWithoutPassword,
+      };
+    });
   }
 
   findOne(id: number) {

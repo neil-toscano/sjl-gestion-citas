@@ -14,6 +14,7 @@ import { UpdateProcessHistoryDto } from './dto/update-process-history.dto';
 import { Auth, GetUser } from 'src/auth/decorators';
 import { User } from 'src/user/entities/user.entity';
 import { PaginationDto } from 'src/common/dtos/pagination.dto';
+import { FilterProcessHistoryDto } from './dto/filter-process-history.dto';
 
 @Controller('process-history')
 export class ProcessHistoryController {
@@ -33,8 +34,14 @@ export class ProcessHistoryController {
 
   @Get()
   @Auth()
-  findAll(@Query() paginationDto: PaginationDto) {
-    return this.processHistoryService.findAll(paginationDto);
+  findAll(
+    @Query() paginationDto: PaginationDto,
+    @Body() filterProcessHistoryDto: FilterProcessHistoryDto,
+  ) {
+    return this.processHistoryService.findAll(
+      paginationDto,
+      filterProcessHistoryDto,
+    );
   }
 
   @Get(':id')

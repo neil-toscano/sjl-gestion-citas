@@ -6,12 +6,15 @@ import {
   Patch,
   Param,
   Delete,
+  Query,
 } from '@nestjs/common';
 import { AppointmentHistoryService } from './appointment-history.service';
 import { CreateAppointmentHistoryDto } from './dto/create-appointment-history.dto';
 import { UpdateAppointmentHistoryDto } from './dto/update-appointment-history.dto';
 import { Auth, GetUser } from 'src/auth/decorators';
 import { User } from 'src/user/entities/user.entity';
+import { PaginationDto } from 'src/common/dtos/pagination.dto';
+import { FilterAppointmentHistoryDto } from './dto/filter-appointment-history.dto';
 
 @Controller('appointment-history')
 export class AppointmentHistoryController {
@@ -32,8 +35,15 @@ export class AppointmentHistoryController {
   }
 
   @Get()
-  findAll() {
-    return this.appointmentHistoryService.findAll();
+  @Auth()
+  findAll(
+    @Query() paginationDto: PaginationDto,
+    @Body() filterProcessHistoryDto: FilterAppointmentHistoryDto,
+  ) {
+    return this.appointmentHistoryService.findAll(
+      paginationDto,
+      filterProcessHistoryDto,
+    );
   }
 
   @Get(':id')

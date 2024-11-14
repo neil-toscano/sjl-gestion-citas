@@ -108,7 +108,10 @@ export class ProcessStatusController {
 
   @Get(':id')
   @Auth()
-  findOneByUserSection(@Param('id', new ParseUUIDPipe()) sectionId: string, @GetUser() user: User) {
+  findOneByUserSection(
+    @Param('id', new ParseUUIDPipe()) sectionId: string,
+    @GetUser() user: User,
+  ) {
     return this.processStatusService.findOneByUserSection(sectionId, user);
   }
 
