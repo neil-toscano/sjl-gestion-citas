@@ -6,12 +6,14 @@ import {
   Patch,
   Param,
   Delete,
+  Query,
 } from '@nestjs/common';
 import { ProcessHistoryService } from './process-history.service';
 import { CreateProcessHistoryDto } from './dto/create-process-history.dto';
 import { UpdateProcessHistoryDto } from './dto/update-process-history.dto';
 import { Auth, GetUser } from 'src/auth/decorators';
 import { User } from 'src/user/entities/user.entity';
+import { PaginationDto } from 'src/common/dtos/pagination.dto';
 
 @Controller('process-history')
 export class ProcessHistoryController {
@@ -30,8 +32,9 @@ export class ProcessHistoryController {
   }
 
   @Get()
-  findAll() {
-    return this.processHistoryService.findAll();
+  @Auth()
+  findAll(@Query() paginationDto: PaginationDto) {
+    return this.processHistoryService.findAll(paginationDto);
   }
 
   @Get(':id')

@@ -5,6 +5,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { ProcessHistory } from './entities/process-history.entity';
 import { User } from 'src/user/entities/user.entity';
+import { PaginationDto } from 'src/common/dtos/pagination.dto';
 
 @Injectable()
 export class ProcessHistoryService {
@@ -30,9 +31,24 @@ export class ProcessHistoryService {
     return this.processHistoryRepository.save(processHistory);
   }
 
-  findAll() {
-    return `This action returns all processHistory`;
-  }
+  async findAll(paginationDto: PaginationDto) {
+    const { limit = 25, offset = 0 } = paginationDto;
+    const proccessHistory = await this.processHistoryRepository.find({
+      take: limit,
+      skip: offset,
+    });
+  
+    return proccessHistory.map(({ user, platformUser, ...rest }) => {
+      const { password, ...userWithoutPassword } = user || {};
+      const { password: platformPassword, ...platformUserWithoutPassword } = platformUser || {};
+  
+      return {
+        ...rest,
+        user: userWithoutPassword,
+        platformUser: platformUserWithoutPassword,
+      };
+    });
+  }  
 
   findOne(id: number) {
     return `This action returns a #${id} processHistory`;
