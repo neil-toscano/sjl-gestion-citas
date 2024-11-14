@@ -38,19 +38,17 @@ export class AppointmentHistoryService {
   ) {
     const { pageSize = 25, page = 0 } = paginationDto;
     const offset = pageSize * page;
-
+  
     const { fromDate, toDate, sectionId } = filterProcessHistoryDto;
-
+  
     const queryBuilder =
-      this.appointmentHistoryRepository.createQueryBuilder(
-        'appointmentHistory',
-      );
-
+      this.appointmentHistoryRepository.createQueryBuilder('appointmentHistory');
+  
     queryBuilder
       .leftJoinAndSelect('appointmentHistory.user', 'user')
       .leftJoinAndSelect('appointmentHistory.platformUser', 'platformUser')
       .leftJoinAndSelect('appointmentHistory.section', 'section');
-
+  
     if (fromDate) {
       queryBuilder.andWhere('appointmentHistory.createdAt >= :fromDate', {
         fromDate,
@@ -61,29 +59,38 @@ export class AppointmentHistoryService {
         toDate,
       });
     }
-
+  
     if (sectionId) {
       queryBuilder.andWhere('appointmentHistory.section.id = :sectionId', {
         sectionId,
       });
     }
-
+  
     queryBuilder.take(pageSize).skip(offset);
-
-    const proccessHistory = await queryBuilder.getMany();
-
-    return proccessHistory.map(({ user, platformUser, ...rest }) => {
+  
+    const [appointmentHistory, totalCount] = await queryBuilder.getManyAndCount();
+  
+    const totalPages = Math.ceil(totalCount / pageSize);
+  
+    const data = appointmentHistory.map(({ user, platformUser, ...rest }) => {
       const { password, ...userWithoutPassword } = user || {};
       const { password: platformPassword, ...platformUserWithoutPassword } =
         platformUser || {};
-
+  
       return {
         ...rest,
         user: userWithoutPassword,
         platformUser: platformUserWithoutPassword,
       };
     });
+  
+    return {
+      data,
+      count: totalCount,
+      totalPages,
+    };
   }
+  
 
   findOne(id: number) {
     return `This action returns a #${id} appointmentHistory`;
