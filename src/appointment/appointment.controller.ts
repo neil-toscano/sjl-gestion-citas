@@ -16,6 +16,7 @@ import { UpdateAppointmentDto } from './dto/update-appointment.dto';
 import { Auth, GetUser } from 'src/auth/decorators';
 import { User } from 'src/user/entities/user.entity';
 import { FindByWeekDto } from 'src/common/dtos/date.dto';
+import { ValidRoles } from 'src/auth/interfaces';
 
 @Controller('appointment')
 export class AppointmentController {
@@ -54,8 +55,11 @@ export class AppointmentController {
   }
 
   @Get('section/:id')
-  @Auth()
-  findAll(@GetUser() user: User, @Param('id') sectionId: string) {
+  @Auth(ValidRoles.superUser, ValidRoles.admin)
+  findAll(
+    @GetUser() user: User,
+    @Param('id', new ParseUUIDPipe()) sectionId: string,
+  ) {
     return this.appointmentService.findAll(user, sectionId);
   }
 
@@ -86,7 +90,7 @@ export class AppointmentController {
   @Patch(':id')
   @Auth()
   update(
-    @Param('id') id: string,
+    @Param('id', new ParseUUIDPipe()) id: string,
     @Body() updateAppointmentDto: UpdateAppointmentDto,
   ) {
     return this.appointmentService.update(id, updateAppointmentDto);

@@ -348,13 +348,12 @@ export class DocumentsService {
   }
 
   async removeDocuments(documents: Document[]) {
-    documents.forEach(document => {
+    documents.forEach((document) => {
       document.isDeleted = true;
     });
-  
+
     return await this.documentRepository.save(documents);
   }
-  
 
   async getAllUrl() {
     const filesUrl = await this.documentRepository.find({

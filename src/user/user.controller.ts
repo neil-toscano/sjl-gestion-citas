@@ -43,7 +43,6 @@ export class UserController {
   }
 
   @Patch(':id')
-  @Auth()
   @Auth(ValidRoles.admin)
   update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
     return this.userService.update(id, updateUserDto);

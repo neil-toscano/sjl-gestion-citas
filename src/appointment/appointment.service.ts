@@ -122,6 +122,7 @@ export class AppointmentService {
         section: {
           id: sectionId,
         },
+        status: AppointmentStatus.OPEN,
       },
       relations: ['section', 'reservedBy', 'schedule'],
       order: {
@@ -316,7 +317,7 @@ export class AppointmentService {
     await this.appointmentRepository
       .createQueryBuilder()
       .update(Appointment)
-      .set(updateAppointmentDto) // Solo campos válidos de la entidad
+      .set(updateAppointmentDto)
       .where('id = :id', { id })
       .execute();
 
