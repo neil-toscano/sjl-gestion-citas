@@ -19,6 +19,7 @@ import { ProcessStatusService } from 'src/process-status/process-status.service'
 import { ProcessStatusEnum } from 'src/process-status/interfaces/status.enum';
 import { UserPermissionsService } from 'src/user-permissions/user-permissions.service';
 import { EstadoDisponibilidad } from './interfaces/availability.enum';
+import { FilterAppointmentDto } from './dto/filter-appointment.dto';
 
 @Injectable()
 export class AppointmentService {
@@ -130,6 +131,57 @@ export class AppointmentService {
       },
     });
   }
+  
+  async findByFilter(filterAppointmentDto: FilterAppointmentDto) {
+    const { pageSize = 25, page = 0, fromDate, toDate, sectionId, status } = filterAppointmentDto;
+    const offset = pageSize * page;
+  
+    const queryBuilder = this.appointmentRepository.createQueryBuilder('appointment');
+  
+    queryBuilder
+      .leftJoinAndSelect('appointment.section', 'section')
+      .leftJoinAndSelect('appointment.reservedBy', 'reservedBy')
+      .leftJoinAndSelect('appointment.schedule', 'schedule');
+  
+    if (sectionId) {
+      queryBuilder.andWhere('section.id = :sectionId', { sectionId });
+    }
+  
+    if (status) {
+      queryBuilder.andWhere('appointment.status = :status', { status });
+    }
+  
+    if (fromDate) {
+      queryBuilder.andWhere('appointment.appointmentDate >= :fromDate', { fromDate });
+    }
+  
+    if (toDate) {
+      queryBuilder.andWhere('appointment.appointmentDate <= :toDate', { toDate });
+    }
+  
+    queryBuilder.take(pageSize).skip(offset);
+  
+    queryBuilder.orderBy('appointment.appointmentDate', 'ASC');
+  
+    const [appointments, totalCount] = await queryBuilder.getManyAndCount();
+  
+    const totalPages = Math.ceil(totalCount / pageSize);
+  
+    const data = appointments.map(({ reservedBy, ...rest }) => {
+      const { password, ...reservedByWithoutPassword } = reservedBy || {};
+      return {
+        ...rest,
+        reservedBy: reservedByWithoutPassword,
+      };
+    });
+  
+    return {
+      data,
+      count: totalCount,
+      totalPages,
+    };
+  }
+  
 
   async isScheduleAvailable(
     scheduleId: string,

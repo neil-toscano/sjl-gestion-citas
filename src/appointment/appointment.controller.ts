@@ -17,6 +17,7 @@ import { Auth, GetUser } from 'src/auth/decorators';
 import { User } from 'src/user/entities/user.entity';
 import { FindByWeekDto } from 'src/common/dtos/date.dto';
 import { ValidRoles } from 'src/auth/interfaces';
+import { FilterAppointmentDto } from './dto/filter-appointment.dto';
 
 @Controller('appointment')
 export class AppointmentController {
@@ -61,6 +62,14 @@ export class AppointmentController {
     @Param('id', new ParseUUIDPipe()) sectionId: string,
   ) {
     return this.appointmentService.findAll(user, sectionId);
+  }
+
+  @Get('filter')
+  @Auth(ValidRoles.superUser, ValidRoles.admin)
+  findByFilter(
+    @Query() filterAppointmentDto: FilterAppointmentDto,
+  ) {
+    return this.appointmentService.findByFilter(filterAppointmentDto);
   }
 
   @Get('week/:sectionId')
