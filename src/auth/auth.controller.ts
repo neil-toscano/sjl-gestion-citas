@@ -54,8 +54,8 @@ export class AuthController {
   // }
   @Post('reset-password')
   @Throttle({ default: { limit: 3, ttl: 60000 } })
-  resetPassword(@Query('numero_documento') numero_documento: string) {
-    return this.authService.resetPassword(numero_documento);
+  resetPassword(@Query('documentNumber') documentNumber: string) {
+    return this.authService.resetPassword(documentNumber);
   }
 
   // @Post('set-password')

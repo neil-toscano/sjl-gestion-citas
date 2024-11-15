@@ -205,7 +205,7 @@ export class AuthService {
     }
   }
 
-  async resetPassword(dni: string) {
+  async resetPassword(documentNumber: string) {
     const plataformaVirtualUrl = process.env.PLATAFORMA_VIRTUAL_API;
     const plataformaVirtualEmail = process.env.PLATAFORMA_VIRTUAL_EMAIL;
     const plataformaVirtualPassword = process.env.PLATAFORMA_VIRTUAL_PASSWORD;
@@ -225,7 +225,7 @@ export class AuthService {
       };
 
       const resetPassword: any = await this.http.post(
-        `${plataformaVirtualUrl}/recuperar-credenciales?numero_documento=${dni}`,
+        `${plataformaVirtualUrl}/recuperar-credenciales?numero_documento=${documentNumber}`,
         null,
         contentHeader,
       );

@@ -352,6 +352,9 @@ export class AppointmentService {
       .where('appointment.appointmentDate < :currentTime', {
         currentTime: currentLimaTime,
       })
+      .andWhere('appointment.status = :status', {
+        status: 'OPEN',
+      })
       .leftJoinAndSelect('appointment.reservedBy', 'user')
       .leftJoinAndSelect('appointment.section', 'section')
       .getMany();
