@@ -67,13 +67,17 @@ export class AppointmentService {
       };
     }
 
-    const platformOperatorsCount =
+    const maxUsersPerProcess: string = process.env.MAXUSERS;
+    const platformUsers =
       await this.userPermissionsService.findPlatformOperators(sectionId);
 
+    const totalMaxUsersPerProcess =
+      parseInt(maxUsersPerProcess) * platformUsers.length;
     await this.isScheduleAvailable(
       scheduleId,
       createAppointmentDto.appointmentDate,
-      platformOperatorsCount.length,
+      totalMaxUsersPerProcess,
+      sectionId,
     );
 
     const appointment = this.appointmentRepository.create({
@@ -186,7 +190,8 @@ export class AppointmentService {
   async isScheduleAvailable(
     scheduleId: string,
     date: string,
-    operatorsCount: number,
+    maxUsersPerProcess: number,
+    sectionId: string,
   ) {
     const appointmentDate = new Date(date);
 
@@ -195,10 +200,13 @@ export class AppointmentService {
         schedule: { id: scheduleId },
         appointmentDate: appointmentDate,
         status: AppointmentStatus.OPEN,
+        section: {
+          id: sectionId,
+        }
       },
     });
 
-    if (existingAppointments.length >= operatorsCount) {
+    if (existingAppointments.length >= maxUsersPerProcess) {
       throw new NotFoundException(
         `El horario para dicha fecha ya se encuentra reservado para el número máximo de operadores`,
       );
@@ -230,6 +238,7 @@ export class AppointmentService {
       .groupBy('appointment.scheduleId')
       .getRawMany();
 
+      console.log(result, 'result');
     const schedulesWithStatus = schedules.map((schedule) => {
       const appointmentsCount =
         result.find((r) => r.scheduleId === schedule.id)?.appointmentsCount ||
