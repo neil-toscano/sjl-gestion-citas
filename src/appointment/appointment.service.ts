@@ -241,7 +241,7 @@ export class AppointmentService {
         scheduleId: schedule.id,
         startTime: schedule.startTime,
         endTime: schedule.endTime,
-        status: isAvailable ? 'DISPONIBLE' : 'NO DISPONIBLE',
+        status: isAvailable ? EstadoDisponibilidad.DISPONIBLE : EstadoDisponibilidad.NO_DISPONIBLE,
         appointmentsCount,
       };
     });
