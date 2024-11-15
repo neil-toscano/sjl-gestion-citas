@@ -1,3 +1,4 @@
+import { Appointment } from 'src/appointment/entities/appointment.entity';
 import { SectionDocument } from 'src/section-document/entities/section-document.entity';
 import { User } from 'src/user/entities/user.entity';
 import {
@@ -6,6 +7,7 @@ import {
   ManyToOne,
   JoinColumn,
   CreateDateColumn,
+  OneToOne,
 } from 'typeorm';
 
 @Entity('appointment_history')
@@ -24,6 +26,10 @@ export class AppointmentHistory {
   @ManyToOne(() => User, { eager: true })
   @JoinColumn({ name: 'user_id' })
   user: User;
+  
+  @OneToOne(() => Appointment, { eager: true })
+  @JoinColumn({ name: 'appointment_id' })
+  appointment: Appointment;
 
   @CreateDateColumn({ type: 'timestamp' })
   createdAt: Date;

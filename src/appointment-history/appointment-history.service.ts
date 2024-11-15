@@ -18,7 +18,7 @@ export class AppointmentHistoryService {
     platformUser: User,
     createAppointmentHistoryDto: CreateAppointmentHistoryDto,
   ) {
-    const { sectionId, userId } = createAppointmentHistoryDto;
+    const { sectionId, userId, appointmentId } = createAppointmentHistoryDto;
     const appointmentHistory = this.appointmentHistoryRepository.create({
       platformUser: platformUser,
       section: {
@@ -27,6 +27,9 @@ export class AppointmentHistoryService {
       user: {
         id: userId,
       },
+      appointment: {
+        id: appointmentId
+      }
     });
 
     return this.appointmentHistoryRepository.save(appointmentHistory);
