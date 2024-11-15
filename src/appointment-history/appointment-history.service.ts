@@ -47,7 +47,8 @@ export class AppointmentHistoryService {
     queryBuilder
       .leftJoinAndSelect('appointmentHistory.user', 'user')
       .leftJoinAndSelect('appointmentHistory.platformUser', 'platformUser')
-      .leftJoinAndSelect('appointmentHistory.section', 'section');
+      .leftJoinAndSelect('appointmentHistory.section', 'section')
+      .leftJoinAndSelect('appointmentHistory.appointment', 'appointment');
   
     if (fromDate) {
       queryBuilder.andWhere('appointmentHistory.createdAt >= :fromDate', {
