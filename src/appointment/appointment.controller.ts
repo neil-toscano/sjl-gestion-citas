@@ -5,7 +5,6 @@ import {
   Body,
   Patch,
   Param,
-  Delete,
   ParseUUIDPipe,
   Query,
   BadRequestException,
@@ -85,13 +84,8 @@ export class AppointmentController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
+  findOne(@Param('id', new ParseUUIDPipe()) id: string) {
     return this.appointmentService.findOne(id);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.appointmentService.remove(+id);
   }
 
   @Patch(':id')
@@ -103,19 +97,9 @@ export class AppointmentController {
     return this.appointmentService.update(id, updateAppointmentDto);
   }
 
-  @Delete('section/:sectionId/:userId')
-  @Auth()
-  removeBySection(
-    @Param('sectionId') sectionId: string,
-    @Param('userId') userId: string,
-    @GetUser() user: User,
-  ) {
-    return this.appointmentService.removeBySection(userId, sectionId);
-  }
-
   @Get('verify/:id')
   @Auth()
-  verifyAppointmentBySection(@Param('id') id: string, @GetUser() user: User) {
+  verifyAppointmentBySection(@Param('id', new ParseUUIDPipe) id: string, @GetUser() user: User) {
     return this.appointmentService.hasOpenAppointmentBySection(id, user.id);
   }
 }

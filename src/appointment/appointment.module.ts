@@ -13,10 +13,16 @@ import { UserPermissionsModule } from 'src/user-permissions/user-permissions.mod
 import { CqrsModule } from '@nestjs/cqrs';
 import { CommandHandlers } from './commands/handlers';
 import { AppointmentRepository } from './repository/appointment.repository';
+import { QueryHandlers } from './queries/handlers';
 
 @Module({
   controllers: [AppointmentController],
-  providers: [AppointmentService, ...CommandHandlers, AppointmentRepository],
+  providers: [
+    AppointmentService,
+    ...CommandHandlers,
+    ...QueryHandlers,
+    AppointmentRepository,
+  ],
   imports: [
     CqrsModule,
     TypeOrmModule.forFeature([Appointment]),

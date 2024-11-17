@@ -54,7 +54,6 @@ export class CreateAppointmentHandler
     const maxUsersPerProcess: string = process.env.MAXUSERS;
     const platformUsers =
       await this.userPermissionsService.findPlatformOperators(sectionId);
-    console.log(platformUsers, 'platform');
     const totalMaxUsersPerProcess =
       parseInt(maxUsersPerProcess) * platformUsers.length;
 

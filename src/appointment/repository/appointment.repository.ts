@@ -1,13 +1,11 @@
-import {
-  ConflictException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { ConflictException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { FindOptionsWhere, Repository } from 'typeorm';
 import { Appointment, AppointmentStatus } from '../entities/appointment.entity';
 import { User } from 'src/user/entities/user.entity';
 import { CreateAppointmentDto } from '../dto/create-appointment.dto';
+import { UpdateAppointmentDto } from '../dto/update-appointment.dto';
+import { FilterAppointmentDto } from '../dto/filter-appointment.dto';
 
 @Injectable()
 export class AppointmentRepository {
@@ -72,5 +70,124 @@ export class AppointmentRepository {
       },
     });
     return existingAppointments;
+  }
+
+  async findOneByFilter(filter: FindOptionsWhere<Appointment>) {
+    const appointment = await this.appointmentRepository.findOne({
+      where: filter,
+      relations: ['schedule'],
+    });
+
+    return appointment;
+  }
+
+  async update(id: string, updateAppointmentDto: UpdateAppointmentDto) {
+    return await this.appointmentRepository
+      .createQueryBuilder()
+      .update(Appointment)
+      .set(updateAppointmentDto)
+      .where('id = :id', { id: id })
+      .execute();
+  }
+
+  async findByFilter(filterAppointmentDto: FilterAppointmentDto) {
+    const {
+      pageSize = 25,
+      page = 0,
+      fromDate,
+      toDate,
+      sectionId,
+      status,
+    } = filterAppointmentDto;
+
+    const offset = pageSize * page;
+
+    const queryBuilder =
+      this.appointmentRepository.createQueryBuilder('appointment');
+
+    queryBuilder
+      .leftJoinAndSelect('appointment.section', 'section')
+      .leftJoinAndSelect('appointment.reservedBy', 'reservedBy')
+      .leftJoinAndSelect('appointment.schedule', 'schedule');
+
+    if (sectionId) {
+      queryBuilder.andWhere('section.id = :sectionId', { sectionId });
+    }
+
+    if (status) {
+      queryBuilder.andWhere('appointment.status = :status', { status });
+    }
+
+    if (fromDate) {
+      queryBuilder.andWhere('appointment.appointmentDate >= :fromDate', {
+        fromDate,
+      });
+    }
+
+    if (toDate) {
+      queryBuilder.andWhere('appointment.appointmentDate <= :toDate', {
+        toDate,
+      });
+    }
+
+    queryBuilder.take(pageSize).skip(offset);
+
+    queryBuilder.orderBy('appointment.appointmentDate', 'ASC');
+
+    return await queryBuilder.getManyAndCount();
+  }
+
+  async getAppointmentCountBySchedule(date: Date, sectionId: string) {
+    const result = await this.appointmentRepository
+      .createQueryBuilder('appointment')
+      .select('appointment.scheduleId', 'scheduleId')
+      .addSelect('COUNT(appointment.id)', 'appointmentsCount')
+      .where('appointment.appointmentDate = :date', { date })
+      .andWhere('appointment.sectionId = :sectionId', { sectionId })
+      .andWhere('appointment.status = :status', {
+        status: AppointmentStatus.OPEN,
+      })
+      .groupBy('appointment.scheduleId')
+      .getRawMany();
+
+    return result;
+  }
+
+  findAll(user: User, sectionId: string) {
+    return this.appointmentRepository.find({
+      where: {
+        section: {
+          id: sectionId,
+        },
+        status: AppointmentStatus.OPEN,
+      },
+      relations: ['section', 'reservedBy', 'schedule'],
+      order: {
+        appointmentDate: 'ASC',
+      },
+    });
+  }
+
+  async getExpiredAppointments(currentLimaTime: Date) {
+    const appointments = await this.appointmentRepository
+      .createQueryBuilder('appointment')
+      .where('appointment.appointmentDate < :currentTime', {
+        currentTime: currentLimaTime,
+      })
+      .andWhere('appointment.status = :status', {
+        status: 'OPEN',
+      })
+      .leftJoinAndSelect('appointment.reservedBy', 'user')
+      .leftJoinAndSelect('appointment.section', 'section')
+      .getMany();
+
+    return appointments;
+  }
+
+  async findOneById(id: string) {
+    const appointment = await this.appointmentRepository.findOneBy({
+      id: id,
+    });
+    return appointment;
   }
 }
