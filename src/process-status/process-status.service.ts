@@ -175,7 +175,6 @@ export class ProcessStatusService {
     } else {
       timeRemaining = { expired: false, days: 0, hours: 0, minutes: 0 };
     }
-
     return {
       hasProcess: processStatus ? true : false,
       processStatus: processStatus,

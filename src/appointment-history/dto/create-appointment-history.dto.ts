@@ -8,7 +8,7 @@ export class CreateAppointmentHistoryDto {
   @IsUUID()
   @IsNotEmpty()
   userId: string;
-  
+
   @IsUUID()
   @IsNotEmpty()
   appointmentId: string;

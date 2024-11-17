@@ -34,12 +34,8 @@ export class ProcessHistoryController {
 
   @Get()
   @Auth()
-  findAll(
-    @Query() filterProcessHistoryDto: FilterProcessHistoryDto,
-  ) {
-    return this.processHistoryService.findAll(
-      filterProcessHistoryDto,
-    );
+  findAll(@Query() filterProcessHistoryDto: FilterProcessHistoryDto) {
+    return this.processHistoryService.findAll(filterProcessHistoryDto);
   }
 
   @Get(':id')

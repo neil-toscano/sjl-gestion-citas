@@ -26,7 +26,7 @@ export class AppointmentHistory {
   @ManyToOne(() => User, { eager: true })
   @JoinColumn({ name: 'user_id' })
   user: User;
-  
+
   @OneToOne(() => Appointment, { eager: true })
   @JoinColumn({ name: 'appointment_id' })
   appointment: Appointment;

@@ -28,8 +28,8 @@ export class AppointmentController {
   create(
     @Body() createAppointmentDto: CreateAppointmentDto,
     @GetUser() user: User,
-    @Param('sectionId') sectionId: string,
-    @Param('scheduleId') scheduleId: string,
+    @Param('sectionId', new ParseUUIDPipe()) sectionId: string,
+    @Param('scheduleId', new ParseUUIDPipe()) scheduleId: string,
   ) {
     const inputDate = new Date(createAppointmentDto.appointmentDate);
     if (isNaN(inputDate.getTime()) || inputDate.getUTCDay() !== 6) {
@@ -66,9 +66,7 @@ export class AppointmentController {
 
   @Get('filter')
   @Auth(ValidRoles.superUser, ValidRoles.admin)
-  findByFilter(
-    @Query() filterAppointmentDto: FilterAppointmentDto,
-  ) {
+  findByFilter(@Query() filterAppointmentDto: FilterAppointmentDto) {
     return this.appointmentService.findByFilter(filterAppointmentDto);
   }
 

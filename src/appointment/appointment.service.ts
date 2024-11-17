@@ -20,6 +20,8 @@ import { ProcessStatusEnum } from 'src/process-status/interfaces/status.enum';
 import { UserPermissionsService } from 'src/user-permissions/user-permissions.service';
 import { EstadoDisponibilidad } from './interfaces/availability.enum';
 import { FilterAppointmentDto } from './dto/filter-appointment.dto';
+import { CommandBus } from '@nestjs/cqrs';
+import { CreateAppointmentCommand } from './commands/create-appointment.command';
 
 @Injectable()
 export class AppointmentService {
@@ -32,6 +34,7 @@ export class AppointmentService {
     private readonly emailService: EmailService,
     private readonly processStatusService: ProcessStatusService,
     private readonly userPermissionsService: UserPermissionsService,
+    private commandBus: CommandBus
   ) {}
 
   async create(
@@ -40,85 +43,88 @@ export class AppointmentService {
     createAppointmentDto: CreateAppointmentDto,
     user: User,
   ) {
-    const checkEligibility =
-      await this.processStatusService.checkEligibilityForAppointment(
-        sectionId,
-        user,
-      );
-    if (!checkEligibility.hasProcess) {
-      throw new NotFoundException('No tiene ningún proceso');
-    }
-
-    // if (!checkEligibility.timeRemaining.expired) {
-    //   throw new BadRequestException('Aún no cumple la fecha para sacar cita.');
+    return this.commandBus.execute(
+      new CreateAppointmentCommand(sectionId, scheduleId, createAppointmentDto, user)
+    );
+    // const checkEligibility =
+    //   await this.processStatusService.checkEligibilityForAppointment(
+    //     sectionId,
+    //     user,
+    //   );
+    // if (!checkEligibility.hasProcess) {
+    //   throw new NotFoundException('No tiene ningún proceso');
     // }
 
-    const section = await this.sectionService.findOne(sectionId);
-    const schedule = await this.scheduleService.findOne(scheduleId);
+    // // if (!checkEligibility.timeRemaining.expired) {
+    // //   throw new BadRequestException('Aún no cumple la fecha para sacar cita.');
+    // // }
 
-    const { ok, msg } = await this.hasOpenAppointmentBySection(
-      sectionId,
-      user.id,
-    );
-    if (ok) {
-      return {
-        ok,
-        message: msg,
-      };
-    }
+    // const section = await this.sectionService.findOne(sectionId);
+    // const schedule = await this.scheduleService.findOne(scheduleId);
 
-    const maxUsersPerProcess: string = process.env.MAXUSERS;
-    const platformUsers =
-      await this.userPermissionsService.findPlatformOperators(sectionId);
+    // const { ok, msg } = await this.hasOpenAppointmentBySection(
+    //   sectionId,
+    //   user.id,
+    // );
+    // if (ok) {
+    //   return {
+    //     ok,
+    //     message: msg,
+    //   };
+    // }
 
-    const totalMaxUsersPerProcess =
-      parseInt(maxUsersPerProcess) * platformUsers.length;
-    await this.isScheduleAvailable(
-      scheduleId,
-      createAppointmentDto.appointmentDate,
-      totalMaxUsersPerProcess,
-      sectionId,
-    );
+    // const maxUsersPerProcess: string = process.env.MAXUSERS;
+    // const platformUsers =
+    //   await this.userPermissionsService.findPlatformOperators(sectionId);
 
-    const appointment = this.appointmentRepository.create({
-      ...createAppointmentDto,
-      reservedBy: user,
-      section: {
-        id: sectionId,
-      },
-      schedule: {
-        id: scheduleId,
-      },
-    });
+    // const totalMaxUsersPerProcess =
+    //   parseInt(maxUsersPerProcess) * platformUsers.length;
+    // await this.isScheduleAvailable(
+    //   scheduleId,
+    //   createAppointmentDto.appointmentDate,
+    //   totalMaxUsersPerProcess,
+    //   sectionId,
+    // );
 
-    const processStatus = await this.processStatusService.findOneByUserSection(
-      sectionId,
-      user,
-      true,
-    );
+    // const appointment = this.appointmentRepository.create({
+    //   ...createAppointmentDto,
+    //   reservedBy: user,
+    //   section: {
+    //     id: sectionId,
+    //   },
+    //   schedule: {
+    //     id: scheduleId,
+    //   },
+    // });
 
-    await this.processStatusService.update(processStatus.id, {
-      status: ProcessStatusEnum.APPOINTMENT_SCHEDULED,
-    });
+    // const processStatus = await this.processStatusService.findOneByUserSection(
+    //   sectionId,
+    //   user,
+    //   true,
+    // );
 
-    await this.emailService.sendAppointmentConfirmation({
-      isFirstTime: createAppointmentDto.isFirstTime,
-      appointmentDate: createAppointmentDto.appointmentDate,
-      appointmentTime: `${schedule.startTime} - ${schedule.endTime}`,
-      email: user.email,
-      person: `PERSONAL DE LA MUNICIPALIDAD `,
-      service: section.sectionName,
-      recipientName: `${user.firstName} ${user.apellido_paterno}`,
-    });
+    // await this.processStatusService.update(processStatus.id, {
+    //   status: ProcessStatusEnum.APPOINTMENT_SCHEDULED,
+    // });
 
-    try {
-      const newAppointment = await this.appointmentRepository.save(appointment);
-      return newAppointment;
-    } catch (error) {
-      throw new ConflictException(
-        'Upss!! alguien ya acaba de usar esa hora, recargue la página',
-      );
-    }
+    // await this.emailService.sendAppointmentConfirmation({
+    //   isFirstTime: createAppointmentDto.isFirstTime,
+    //   appointmentDate: createAppointmentDto.appointmentDate,
+    //   appointmentTime: `${schedule.startTime} - ${schedule.endTime}`,
+    //   email: user.email,
+    //   person: `PERSONAL DE LA MUNICIPALIDAD `,
+    //   service: section.sectionName,
+    //   recipientName: `${user.firstName} ${user.apellido_paterno}`,
+    // });
+
+    // try {
+    //   const newAppointment = await this.appointmentRepository.save(appointment);
+    //   return newAppointment;
+    // } catch (error) {
+    //   throw new ConflictException(
+    //     'Upss!! alguien ya acaba de usar esa hora, recargue la página',
+    //   );
+    // }
   }
 
   findAll(user: User, sectionId: string) {
@@ -135,42 +141,54 @@ export class AppointmentService {
       },
     });
   }
-  
+
   async findByFilter(filterAppointmentDto: FilterAppointmentDto) {
-    const { pageSize = 25, page = 0, fromDate, toDate, sectionId, status } = filterAppointmentDto;
+    const {
+      pageSize = 25,
+      page = 0,
+      fromDate,
+      toDate,
+      sectionId,
+      status,
+    } = filterAppointmentDto;
     const offset = pageSize * page;
-  
-    const queryBuilder = this.appointmentRepository.createQueryBuilder('appointment');
-  
+
+    const queryBuilder =
+      this.appointmentRepository.createQueryBuilder('appointment');
+
     queryBuilder
       .leftJoinAndSelect('appointment.section', 'section')
       .leftJoinAndSelect('appointment.reservedBy', 'reservedBy')
       .leftJoinAndSelect('appointment.schedule', 'schedule');
-  
+
     if (sectionId) {
       queryBuilder.andWhere('section.id = :sectionId', { sectionId });
     }
-  
+
     if (status) {
       queryBuilder.andWhere('appointment.status = :status', { status });
     }
-  
+
     if (fromDate) {
-      queryBuilder.andWhere('appointment.appointmentDate >= :fromDate', { fromDate });
+      queryBuilder.andWhere('appointment.appointmentDate >= :fromDate', {
+        fromDate,
+      });
     }
-  
+
     if (toDate) {
-      queryBuilder.andWhere('appointment.appointmentDate <= :toDate', { toDate });
+      queryBuilder.andWhere('appointment.appointmentDate <= :toDate', {
+        toDate,
+      });
     }
-  
+
     queryBuilder.take(pageSize).skip(offset);
-  
+
     queryBuilder.orderBy('appointment.appointmentDate', 'ASC');
-  
+
     const [appointments, totalCount] = await queryBuilder.getManyAndCount();
-  
+
     const totalPages = Math.ceil(totalCount / pageSize);
-  
+
     const data = appointments.map(({ reservedBy, ...rest }) => {
       const { password, ...reservedByWithoutPassword } = reservedBy || {};
       return {
@@ -178,14 +196,13 @@ export class AppointmentService {
         reservedBy: reservedByWithoutPassword,
       };
     });
-  
+
     return {
       data,
       count: totalCount,
       totalPages,
     };
   }
-  
 
   async isScheduleAvailable(
     scheduleId: string,
@@ -202,7 +219,7 @@ export class AppointmentService {
         status: AppointmentStatus.OPEN,
         section: {
           id: sectionId,
-        }
+        },
       },
     });
 
@@ -238,7 +255,7 @@ export class AppointmentService {
       .groupBy('appointment.scheduleId')
       .getRawMany();
 
-      console.log(result, 'result');
+    console.log(result, 'result');
     const schedulesWithStatus = schedules.map((schedule) => {
       const appointmentsCount =
         result.find((r) => r.scheduleId === schedule.id)?.appointmentsCount ||
@@ -250,7 +267,9 @@ export class AppointmentService {
         scheduleId: schedule.id,
         startTime: schedule.startTime,
         endTime: schedule.endTime,
-        status: isAvailable ? EstadoDisponibilidad.DISPONIBLE : EstadoDisponibilidad.NO_DISPONIBLE,
+        status: isAvailable
+          ? EstadoDisponibilidad.DISPONIBLE
+          : EstadoDisponibilidad.NO_DISPONIBLE,
         appointmentsCount,
       };
     });

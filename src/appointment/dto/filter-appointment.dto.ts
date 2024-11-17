@@ -14,11 +14,10 @@ export class FilterAppointmentDto extends PaginationDto {
   @IsOptional()
   @IsUUID()
   sectionId?: string;
-  
+
   @IsOptional()
   @IsEnum(AppointmentStatus, {
     message: `status must be one of: ${Object.values(AppointmentStatus).join(', ')}`,
   })
   status?: AppointmentStatus;
 }
-

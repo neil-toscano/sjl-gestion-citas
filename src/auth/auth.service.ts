@@ -90,7 +90,6 @@ export class AuthService {
 
   async login(loginUserDto: LoginUserDto) {
     const { documentNumber, password } = loginUserDto;
-
     const plataformaVirtualUrl = process.env.PLATAFORMA_VIRTUAL_API;
     const plataformaVirtualEmail = process.env.PLATAFORMA_VIRTUAL_EMAIL;
     const plataformaVirtualPassword = process.env.PLATAFORMA_VIRTUAL_PASSWORD;
@@ -139,15 +138,14 @@ export class AuthService {
 
     if (!user) {
       const newUser = await this.userService.create({
-        apellido_materno: userPlataforma.apellido_materno,
-        apellido_paterno: userPlataforma.apellido_paterno,
-        documentNumber: userPlataforma.numero_documento,
-        email: userPlataforma.email,
-        firstName: userPlataforma.nombres,
+        apellido_materno: userPlataforma.usuario.apellido_materno,
+        apellido_paterno: userPlataforma.usuario.apellido_paterno,
+        documentNumber: userPlataforma.usuario.numero_documento,
+        email: userPlataforma.usuario.email,
+        firstName: userPlataforma.usuario.nombres,
         isActive: true,
         password: 'P',
       });
-
       delete newUser.password;
       return {
         ...newUser,

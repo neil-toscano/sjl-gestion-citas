@@ -36,12 +36,8 @@ export class AppointmentHistoryController {
 
   @Get()
   @Auth()
-  findAll(
-    @Query() filterProcessHistoryDto: FilterAppointmentHistoryDto,
-  ) {
-    return this.appointmentHistoryService.findAll(
-      filterProcessHistoryDto,
-    );
+  findAll(@Query() filterProcessHistoryDto: FilterAppointmentHistoryDto) {
+    return this.appointmentHistoryService.findAll(filterProcessHistoryDto);
   }
 
   @Get(':id')
