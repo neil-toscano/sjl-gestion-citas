@@ -22,7 +22,7 @@ import {
 @Injectable()
 export class AppointmentService {
   constructor(
-    private commandBus: CommandBus,
+    private readonly commandBus: CommandBus,
     private readonly queryBus: QueryBus,
   ) {}
 

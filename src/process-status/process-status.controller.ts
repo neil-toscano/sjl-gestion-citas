@@ -27,11 +27,6 @@ export class ProcessStatusController {
     return this.processStatusService.create(createProcessStatusDto, user);
   }
 
-  @Get()
-  findAll() {
-    return this.processStatusService.findAll();
-  }
-
   @Get('next-review/:sectionId')
   @Auth()
   async getNextUserForReview(

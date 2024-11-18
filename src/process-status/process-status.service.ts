@@ -1,199 +1,78 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
-import { CreateProcessStatusDto } from './dto/create-process-status.dto';
-import { UpdateProcessStatusDto } from './dto/update-process-status.dto';
-import { InjectRepository } from '@nestjs/typeorm';
-import { ProcessStatus } from './entities/process-status.entity';
-import { In, LessThan, Not, Repository } from 'typeorm';
+import { Injectable } from '@nestjs/common';
 import { User } from 'src/user/entities/user.entity';
-import { ProcessStatusEnum } from './interfaces/status.enum';
-import { AssignmentsService } from 'src/assignments/assignments.service';
-import { getTimeRemaining } from './utils/time.util';
-import { TimeRemaining } from './interfaces/time-remaining';
+import { CommandBus, QueryBus } from '@nestjs/cqrs';
+import {
+  RemoveProcessStatusCommand,
+  UpdateProcessStatusCommand,
+  CreateProcessStatusCommand
+  
+} from './commands';
+
+import {
+  CheckEligibilityQuery,
+  CountByStatusQuery,
+  FindOneByUserSectionQuery,
+  ObservedDocumentsQuery,
+  UnresolvedDocumentsQuery,
+  ListCompletedStatusQuery,
+  NextUserCorrectedDocumentsQuery,
+  CorrectedDocumentsQuery,
+  NextUserForReviewQuery,
+} from './queries';
+
+import { UpdateProcessStatusDto } from './dto/update-process-status.dto';
+import { CreateProcessStatusDto } from './dto/create-process-status.dto';
 
 @Injectable()
 export class ProcessStatusService {
   constructor(
-    @InjectRepository(ProcessStatus)
-    private readonly processStatusRepository: Repository<ProcessStatus>,
-    private readonly assignmentService: AssignmentsService,
+    private readonly commandBus: CommandBus,
+    private readonly queryBus: QueryBus,
   ) {}
   async create(createProcessStatusDto: CreateProcessStatusDto, user: User) {
-    const processStatus = this.processStatusRepository.create({
-      user: {
-        id: user.id,
-      },
-      section: {
-        id: createProcessStatusDto.sectionDocumentId,
-      },
-      status: createProcessStatusDto.status,
-    });
-    await this.processStatusRepository.save(processStatus);
-  }
-
-  findAll() {
-    return `This action returns all processStatus`;
+    return this.commandBus.execute(
+      new CreateProcessStatusCommand(createProcessStatusDto, user),
+    );
   }
 
   async findUsersWithCompletedDocuments(sectionId: string, admin: User) {
-    await this.assignmentService.remove(admin.id);
-    const assignedUsers =
-      await this.assignmentService.findAllBySection(sectionId);
-
-    const assignedUserIds = assignedUsers.map((a) => a.user.id);
-
-    return await this.processStatusRepository.find({
-      where: {
-        status: ProcessStatusEnum.EN_PROCESO, //todo: cambio completo => en proceso
-        section: { id: sectionId },
-        user: { id: Not(In(assignedUserIds)) },
-      },
-      relations: ['user'],
-    });
+    return this.queryBus.execute(
+      new ListCompletedStatusQuery(admin, sectionId),
+    );
   }
 
   async findNextUserForReview(sectionId: string, adminId: string) {
-    await this.assignmentService.remove(adminId);
-    const assignedUsers =
-      await this.assignmentService.findAllBySection(sectionId);
-
-    const assignedUserIds = assignedUsers.map((a) => a.user.id);
-
-    const userForReview = await this.processStatusRepository.findOne({
-      where: {
-        status: ProcessStatusEnum.EN_PROCESO, //todo: cambio completo => en proceso
-        section: { id: sectionId },
-        user: { id: Not(In(assignedUserIds)) },
-      },
-      relations: ['user'],
-    });
-
-    if (!userForReview) {
-      return [];
-    }
-
-    await this.assignmentService.create(
-      {
-        sectionDocumentId: sectionId,
-        userId: userForReview.user.id,
-      },
-      adminId,
+    return this.queryBus.execute(
+      new NextUserForReviewQuery(sectionId, adminId),
     );
-    return [userForReview];
   }
 
   async getAllUsersWithCorrectedDocuments(sectionId: string, admin: User) {
-    await this.assignmentService.remove(admin.id);
-    const assignedUsers =
-      await this.assignmentService.findAllBySection(sectionId);
-
-    const assignedUserIds = assignedUsers.map((a) => a.user.id);
-
-    return await this.processStatusRepository.find({
-      where: {
-        status: ProcessStatusEnum.CORRECTED,
-        section: { id: sectionId },
-        user: { id: Not(In(assignedUserIds)) },
-      },
-      relations: ['user'],
-    });
+    return this.queryBus.execute(new CorrectedDocumentsQuery(sectionId, admin));
   }
 
   async NextUserCorrected(sectionId: string, adminId: string) {
-    await this.assignmentService.remove(adminId);
-    const assignedUsers =
-      await this.assignmentService.findAllBySection(sectionId);
-
-    const assignedUserIds = assignedUsers.map((a) => a.user.id);
-
-    const userForReview = await this.processStatusRepository.findOne({
-      where: {
-        status: ProcessStatusEnum.CORRECTED,
-        section: { id: sectionId },
-        user: { id: Not(In(assignedUserIds)) },
-      },
-      relations: ['user'],
-    });
-
-    if (!userForReview) {
-      return [];
-    }
-
-    await this.assignmentService.create(
-      {
-        sectionDocumentId: sectionId,
-        userId: userForReview.user.id,
-      },
-      adminId,
+    return this.queryBus.execute(
+      new NextUserCorrectedDocumentsQuery(sectionId, adminId),
     );
-    return [userForReview];
   }
 
   async getAllUsersWithUnresolvedDocuments(sectionId: string, admin: User) {
-    await this.assignmentService.remove(admin.id);
-    const assignedUsers =
-      await this.assignmentService.findAllBySection(sectionId);
-
-    const assignedUserIds = assignedUsers.map((a) => a.user.id);
-
-    return await this.processStatusRepository.find({
-      where: {
-        status: ProcessStatusEnum.UNDER_OBSERVATION,
-        section: { id: sectionId },
-        user: { id: Not(In(assignedUserIds)) },
-      },
-      relations: ['user'],
-    });
+    return this.queryBus.execute(
+      new UnresolvedDocumentsQuery(sectionId, admin),
+    );
   }
 
   async getAllUsersWithObservedDocuments() {
-    const dateLimit = new Date();
-    dateLimit.setHours(dateLimit.getHours() - 48);
-
-    return await this.processStatusRepository.find({
-      where: {
-        status: ProcessStatusEnum.UNDER_OBSERVATION,
-        updatedAt: LessThan(dateLimit),
-      },
-      relations: ['user', 'section'],
-    });
+    return this.queryBus.execute(new ObservedDocumentsQuery());
   }
 
   async checkEligibilityForAppointment(sectionId: string, user: User) {
-    const processStatus = await this.processStatusRepository.findOne({
-      where: {
-        section: { id: sectionId },
-        user: { id: user.id },
-        isCompleted: false,
-      },
-      relations: ['user'],
-    });
-
-    let timeRemaining: TimeRemaining;
-
-    if (processStatus) {
-      timeRemaining = getTimeRemaining(processStatus.updatedAt);
-    } else {
-      timeRemaining = { expired: false, days: 0, hours: 0, minutes: 0 };
-    }
-    return {
-      hasProcess: processStatus ? true : false,
-      processStatus: processStatus,
-      timeRemaining: timeRemaining,
-    };
+    return this.queryBus.execute(new CheckEligibilityQuery(sectionId, user));
   }
 
   async countByStatus() {
-    //TODO: CAMBIOS
-    const result = await this.processStatusRepository
-      .createQueryBuilder('processStatus')
-      .select('processStatus.sectionId', 'sectionId') // Agrupamos por sectionId
-      .addSelect('processStatus.status', 'status')
-      .addSelect('COUNT(processStatus.id)', 'count')
-      .groupBy('processStatus.sectionId') // Agrupamos por sectionId
-      .addGroupBy('processStatus.status') // Agrupamos por status también
-      .getRawMany();
-
-    return result;
+    return this.queryBus.execute(new CountByStatusQuery());
   }
 
   async findOneByUserSection(
@@ -201,46 +80,18 @@ export class ProcessStatusService {
     user: User,
     throwErrorIfNotFound = true,
   ) {
-    const processStatus = await this.processStatusRepository.findOne({
-      where: {
-        user: { id: user.id },
-        section: { id: sectionId },
-        isCompleted: false,
-      },
-    });
-
-    if (!processStatus && throwErrorIfNotFound) {
-      throw new NotFoundException(`El usuario no ha iniciado ningún proceso`);
-    }
-
-    return processStatus;
+    return this.queryBus.execute(
+      new FindOneByUserSectionQuery(sectionId, user, throwErrorIfNotFound),
+    );
   }
 
   async update(id: string, updateProcessStatusDto: UpdateProcessStatusDto) {
-    const { status } = updateProcessStatusDto;
-    const processStatus = await this.processStatusRepository.findOne({
-      where: { id },
-    });
-
-    if (!processStatus) {
-      throw new Error('Process status not found');
-    }
-
-    await this.processStatusRepository
-      .createQueryBuilder()
-      .update(ProcessStatus)
-      .set({ status: status })
-      .where('id = :id', { id: id })
-      .execute();
-
-    return await this.processStatusRepository.findOne({
-      where: { id },
-    });
+    return this.commandBus.execute(
+      new UpdateProcessStatusCommand(id, updateProcessStatusDto),
+    );
   }
 
   async remove(id: string) {
-    const processStatus = await this.processStatusRepository.findOneBy({ id });
-    processStatus.isCompleted = true;
-    return this.processStatusRepository.save(processStatus);
+    return this.commandBus.execute(new RemoveProcessStatusCommand(id));
   }
 }
