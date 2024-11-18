@@ -69,7 +69,7 @@ export class AppointmentService {
   }
 
   async hasOpenAppointmentBySection(sectionId: string, userId: string) {
-    return this.commandBus.execute(
+    return this.queryBus.execute(
       new HasOpenAppointmentQuery(sectionId, userId),
     );
   }
