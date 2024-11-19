@@ -13,13 +13,11 @@ export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Post('register')
-  @Throttle({ default: { limit: 3, ttl: 60000 } })
   createUser(@Body() createUserDto: CreateUserDto) {
     return this.authService.create(createUserDto);
   }
 
   @Post('login')
-  @Throttle({ default: { limit: 3, ttl: 100000 } })
   loginUser(@Body() loginUserDto: LoginUserDto, @Req() request: Request) {
     const ipAddress =
       request.ip || request.headers['x-forwarded-for'] || 'IP no disponible';
@@ -28,13 +26,11 @@ export class AuthController {
   }
 
   @Post('verify-email')
-  @Throttle({ default: { limit: 3, ttl: 60000 } })
   verifyEmail(@Query('token') token: string) {
     return this.authService.verifyToken(token);
   }
 
   @Post('reset-password')
-  @Throttle({ default: { limit: 3, ttl: 60000 } })
   resetPassword(@Query('documentNumber') documentNumber: string) {
     return this.authService.resetPassword(documentNumber);
   }

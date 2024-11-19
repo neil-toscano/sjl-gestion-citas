@@ -31,12 +31,6 @@ import { AppointmentHistoryModule } from './appointment-history/appointment-hist
 
 @Module({
   imports: [
-    ThrottlerModule.forRoot([
-      {
-        ttl: 600,
-        limit: 40,
-      },
-    ]),
     ConfigModule.forRoot(),
     TypeOrmModule.forRoot({
       ssl: true,

@@ -16,12 +16,6 @@ import { ThrottlerModule } from '@nestjs/throttler';
   controllers: [AuthController],
   providers: [AuthService, JwtStrategy],
   imports: [
-    ThrottlerModule.forRoot([
-      {
-        ttl: 30000,
-        limit: 50,
-      },
-    ]),
     CommonModule,
     ConfigModule,
     UserModule,
