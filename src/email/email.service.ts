@@ -5,8 +5,7 @@ import { AppointmentDetails } from './interface/appointment-confirm';
 @Injectable()
 export class EmailService {
   transporter: any;
-  constructor(
-  ) {
+  constructor() {
     this.transporter = nodemailer.createTransport({
       service: 'gmail',
       auth: {
@@ -269,7 +268,7 @@ export class EmailService {
 
     return await this.sendEmail(mailOptions);
   }
-  
+
   async resetPassword(email: string, url: string) {
     const mailOptions = {
       from: '"Municipalidad de San Juan de Lurigancho" <luriganchomunicipalidad@gmail.com>',

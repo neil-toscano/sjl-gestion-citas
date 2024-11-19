@@ -26,4 +26,10 @@ export class ProcessHistoryController {
   findAll(@Query() filterProcessHistoryDto: FilterProcessHistoryDto) {
     return this.processHistoryService.findAll(filterProcessHistoryDto);
   }
+
+  @Get('chart')
+  // @Auth()
+  findAllForChart(@Query() filterProcessHistoryDto: FilterProcessHistoryDto) {
+    return this.processHistoryService.findAllForChart(filterProcessHistoryDto);
+  }
 }

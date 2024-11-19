@@ -31,7 +31,6 @@ export class ProcessHistoryService {
   }
 
   async findAll(filterProcessHistoryDto: FilterProcessHistoryDto) {
-    console.log(filterProcessHistoryDto);
     const {
       pageSize = 25,
       page = 0,
@@ -84,6 +83,65 @@ export class ProcessHistoryService {
       data,
       count: totalCount,
       totalPages,
+    };
+  }
+
+  async findAllForChart(filterProcessHistoryDto: FilterProcessHistoryDto) {
+    const { fromDate, toDate, sectionId } = filterProcessHistoryDto;
+
+    const startDate = fromDate
+      ? new Date(fromDate)
+      : new Date(new Date().getFullYear(), 0, 1);
+
+    const endDate = toDate
+      ? new Date(toDate).setHours(23, 59, 0, 0)
+      : new Date().setHours(23, 59, 0, 0);
+
+    const formattedStartDate = new Date(startDate).toISOString();
+    const formattedEndDate = new Date(endDate).toISOString();
+
+    const queryBuilder =
+      this.processHistoryRepository.createQueryBuilder('processHistory');
+
+    if (formattedStartDate) {
+      queryBuilder.andWhere('processHistory.createdAt >= :startDate', {
+        startDate: formattedStartDate,
+      });
+    }
+    if (formattedEndDate) {
+      queryBuilder.andWhere('processHistory.createdAt <= :endDate', {
+        endDate: formattedEndDate,
+      });
+    }
+
+    if (sectionId) {
+      queryBuilder.andWhere('processHistory.section.id = :sectionId', {
+        sectionId,
+      });
+    }
+
+    queryBuilder
+      .select([
+        "DATE_TRUNC('month', processHistory.createdAt) AS month",
+        'COUNT(processHistory.id) AS processcount',
+      ])
+      .groupBy('month')
+      .orderBy('month', 'ASC');
+
+    const result = await queryBuilder.getRawMany();
+    const labels: string[] = [];
+    const data: number[] = [];
+
+    result.forEach(({ month, processcount }) => {
+      const date = new Date(month);
+      const monthName = date.toLocaleString('default', { month: 'long' });
+      labels.push(monthName);
+      data.push(processcount ? Number(processcount) : 0);
+    });
+
+    return {
+      labels, // Meses (x-axis)
+      data, // Cantidades de procesos (y-axis)
     };
   }
 }
