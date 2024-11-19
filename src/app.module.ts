@@ -91,11 +91,6 @@ import { AppointmentHistoryModule } from './appointment-history/appointment-hist
 
     AppointmentHistoryModule,
   ],
-  providers: [
-    {
-      provide: APP_GUARD,
-      useClass: ThrottlerGuard,
-    },
-  ],
+  providers: [],
 })
 export class AppModule {}

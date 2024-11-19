@@ -5,7 +5,6 @@ import { GetUser, Auth } from './decorators';
 
 import { CreateUserDto, LoginUserDto } from './dto';
 import { User } from 'src/user/entities/user.entity';
-import { Throttle } from '@nestjs/throttler';
 import { Request } from 'express';
 
 @Controller('auth')
