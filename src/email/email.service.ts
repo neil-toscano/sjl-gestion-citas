@@ -1,17 +1,11 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { CreateEmailDto } from './dto/create-email.dto';
-import { UpdateEmailDto } from './dto/update-email.dto';
 import * as nodemailer from 'nodemailer';
 import { AppointmentDetails } from './interface/appointment-confirm';
-import { InjectRepository } from '@nestjs/typeorm';
-import { TemporaryEmail } from './entities/temporary-email.entity';
-import { Repository } from 'typeorm';
 @Injectable()
 export class EmailService {
   transporter: any;
   constructor(
-    @InjectRepository(TemporaryEmail)
-    private readonly temporaryEmailRepository: Repository<TemporaryEmail>,
   ) {
     this.transporter = nodemailer.createTransport({
       service: 'gmail',
@@ -23,29 +17,6 @@ export class EmailService {
   }
   create(createEmailDto: CreateEmailDto) {
     return 'This action adds a new email';
-  }
-  async createTemporaryEmail(email: string) {
-    const temporaryEmail = this.temporaryEmailRepository.create({ email });
-    return await this.temporaryEmailRepository.save(temporaryEmail);
-  }
-
-  async notifyObservedUsers() {
-    const temporaryEmails = await this.temporaryEmailRepository.find();
-
-    const uniqueEmails = [
-      ...new Set(temporaryEmails.map((email) => email.email)),
-    ];
-
-    for (const email of uniqueEmails) {
-      await this.temporaryEmailRepository.delete({ email });
-    }
-
-    const emailPromises = uniqueEmails.map((email) =>
-      this.sendStateChangeNotification(email),
-    );
-    await Promise.all(emailPromises);
-
-    return uniqueEmails; // Retornar los correos únicos si es necesario
   }
 
   async sendStateChangeNotification(email: string) {
@@ -298,6 +269,7 @@ export class EmailService {
 
     return await this.sendEmail(mailOptions);
   }
+  
   async resetPassword(email: string, url: string) {
     const mailOptions = {
       from: '"Municipalidad de San Juan de Lurigancho" <luriganchomunicipalidad@gmail.com>',
@@ -355,21 +327,5 @@ export class EmailService {
         emailSent: true,
       },
     };
-  }
-
-  findAll() {
-    return `This action returns all email`;
-  }
-
-  findOne(id: number) {
-    return `This action returns a #${id} email`;
-  }
-
-  update(id: number, updateEmailDto: UpdateEmailDto) {
-    return `This action updates a #${id} email`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} email`;
   }
 }

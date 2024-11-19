@@ -3,14 +3,12 @@ import {
   Get,
   Post,
   Body,
-  Patch,
   Param,
   Delete,
   ParseUUIDPipe,
 } from '@nestjs/common';
 import { UserPermissionsService } from './user-permissions.service';
 import { CreateUserPermissionDto } from './dto/create-user-permission.dto';
-import { UpdateUserPermissionDto } from './dto/update-user-permission.dto';
 import { Auth } from 'src/auth/decorators';
 
 @Controller('user-permissions')
@@ -25,11 +23,6 @@ export class UserPermissionsController {
     return this.userPermissionsService.create(createUserPermissionDto);
   }
 
-  @Get()
-  findAll() {
-    return this.userPermissionsService.findAll();
-  }
-
   @Get(':id')
   @Auth()
   findByUser(@Param('id') id: string) {
@@ -42,14 +35,6 @@ export class UserPermissionsController {
     @Param('sectionId', new ParseUUIDPipe()) sectionId: string,
   ) {
     return this.userPermissionsService.findPlatformOperators(sectionId);
-  }
-
-  @Patch(':id')
-  update(
-    @Param('id') id: string,
-    @Body() updateUserPermissionDto: UpdateUserPermissionDto,
-  ) {
-    return this.userPermissionsService.update(+id, updateUserPermissionDto);
   }
 
   @Delete(':id')

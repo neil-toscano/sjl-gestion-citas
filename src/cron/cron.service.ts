@@ -1,10 +1,7 @@
 import { Injectable } from '@nestjs/common';
-import { CreateCronDto } from './dto/create-cron.dto';
-import { UpdateCronDto } from './dto/update-cron.dto';
 import { CronJob } from 'cron';
 import { AppointmentService } from 'src/appointment/appointment.service';
 import { AdminService } from 'src/admin/admin.service';
-import { EmailService } from 'src/email/email.service';
 import { ProcessStatusService } from 'src/process-status/process-status.service';
 import { DocumentsService } from 'src/documents/documents.service';
 
@@ -15,7 +12,6 @@ export class CronService {
   constructor(
     private readonly appointmentService: AppointmentService,
     private readonly adminService: AdminService,
-    private readonly emailService: EmailService,
     private readonly processStatusService: ProcessStatusService,
     private readonly documentService: DocumentsService,
   ) {}
@@ -31,25 +27,25 @@ export class CronService {
         }).format(date);
 
         await this.expiredAppoinments();
+        await this.getAllUsersWithObservedDocuments();
       },
       null,
       true,
       'America/Lima',
-    ); // Establece la zona horaria de Lima
+    );
 
     this.job.start();
 
-    const jobEveryMinute = new CronJob(
-      '0 0 * * *',
+    const jobEvery30Days = new CronJob(
+      '0 0 */30 * *',
       async () => {
-        await this.getAllUsersWithObservedDocuments();
         await this.deleteUnusedFiles();
       },
       null,
       true,
       'America/Lima',
     );
-    jobEveryMinute.start();
+    jobEvery30Days.start();
   }
 
   async expiredAppoinments() {
@@ -67,29 +63,7 @@ export class CronService {
     };
   }
 
-  async removeObservedDocuments() {
-    const expiredAppointments =
-      await this.appointmentService.expiredAppointments();
-
-    expiredAppointments.forEach(async (appointment) => {
-      const sectionId = appointment.section.id;
-      const userId = appointment.reservedBy.id;
-
-      await this.adminService.finalizeAndRemoveAll(userId, sectionId);
-    });
-
-    return {
-      ok: true,
-      msg: 'Se removieron todas las citas de usuarios que nunca corrigieron sus documentos',
-    };
-  }
-
-  async notifyObservedUsers() {
-    await this.emailService.notifyObservedUsers();
-  }
-
   async getAllUsersWithObservedDocuments() {
-    //TODO:
     const observedUsers =
       await this.processStatusService.getAllUsersWithObservedDocuments();
     const deletePromises = observedUsers.map(async (processStatus) => {
@@ -116,25 +90,5 @@ export class CronService {
       message: 'eliminando todo los pdf no usados...',
       ok: true,
     };
-  }
-
-  create(createCronDto: CreateCronDto) {
-    return 'This action adds a new cron';
-  }
-
-  findAll() {
-    return `This action returns all cron`;
-  }
-
-  findOne(id: number) {
-    return `This action returns a #${id} cron`;
-  }
-
-  update(id: number, updateCronDto: UpdateCronDto) {
-    return `This action updates a #${id} cron`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} cron`;
   }
 }

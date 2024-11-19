@@ -1,18 +1,7 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  Patch,
-  Param,
-  Delete,
-  ParseUUIDPipe,
-} from '@nestjs/common';
+import { Controller, Get, Post, Body, Param } from '@nestjs/common';
 import { ScheduleService } from './schedule.service';
 import { CreateScheduleDto } from './dto/create-schedule.dto';
-import { UpdateScheduleDto } from './dto/update-schedule.dto';
-import { User } from 'src/user/entities/user.entity';
-import { Auth, GetUser } from 'src/auth/decorators';
+import { Auth } from 'src/auth/decorators';
 
 @Controller('schedule')
 export class ScheduleController {
@@ -32,21 +21,5 @@ export class ScheduleController {
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.scheduleService.findOne(id);
-  }
-
-  @Patch(':id/:sectionId')
-  @Auth()
-  update(
-    @Param('id') id: string,
-    @Param('sectionId') sectionId: string,
-    @Body() updateScheduleDto: UpdateScheduleDto,
-    @GetUser() user: User,
-  ) {
-    return this.scheduleService.update();
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.scheduleService.remove(+id);
   }
 }

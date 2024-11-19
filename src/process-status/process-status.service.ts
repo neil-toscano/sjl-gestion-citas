@@ -4,8 +4,7 @@ import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import {
   RemoveProcessStatusCommand,
   UpdateProcessStatusCommand,
-  CreateProcessStatusCommand
-  
+  CreateProcessStatusCommand,
 } from './commands';
 
 import {

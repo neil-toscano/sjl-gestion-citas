@@ -1,14 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
-import { initialData } from './data/seed-data';
-import { User } from 'src/user/entities/user.entity';
 import { Schedule } from 'src/schedule/entities/schedule.entity';
 import { SectionDocumentService } from 'src/section-document/section-document.service';
 import { TypeDocumentService } from 'src/type-document/type-document.service';
-import { SectionTypeDocument } from 'src/section-type-document/entities/section-type-document.entity';
 import { SectionTypeDocumentService } from 'src/section-type-document/section-type-document.service';
-import { CreateSectionDocumentDto } from 'src/section-document/dto/create-section-document.dto';
 import { CreateSectionTypeDocumentDto } from 'src/section-type-document/dto/create-section-type-document.dto';
 @Injectable()
 export class SeedService {
@@ -16,22 +12,9 @@ export class SeedService {
     private readonly sectionService: SectionDocumentService,
     private readonly typeDocumentService: TypeDocumentService,
     private readonly sectionTypeDocumentService: SectionTypeDocumentService,
-
-    @InjectRepository(User)
-    private readonly userRepository: Repository<User>,
-
     @InjectRepository(Schedule)
     private scheduleRepository: Repository<Schedule>,
   ) {}
-
-  async runSeed() {
-    await this.deleteTables();
-    const adminUser = await this.insertUsers();
-
-    // await this.insertNewProducts(adminUser);
-
-    return 'SEED EXECUTED';
-  }
 
   async runSeedSchedule() {
     const schedules = [
@@ -139,39 +122,4 @@ export class SeedService {
     }
     return 'ejecutado correctamente';
   }
-
-  private async deleteTables() {
-    const queryBuilder = this.userRepository.createQueryBuilder();
-    await queryBuilder.delete().where({}).execute();
-  }
-
-  private async insertUsers() {
-    const seedUsers = initialData.users;
-
-    const users: User[] = [];
-
-    seedUsers.forEach((user) => {
-      users.push(this.userRepository.create(user));
-    });
-
-    const dbUsers = await this.userRepository.save(seedUsers);
-
-    return dbUsers[0];
-  }
-
-  // private async insertNewProducts(user: User) {
-  //   await this.productsService.deleteAllProducts();
-
-  //   const products = initialData.products;
-
-  //   const insertPromises = [];
-
-  //   products.forEach((product) => {
-  //     insertPromises.push(this.productsService.create(product, user));
-  //   });
-
-  //   await Promise.all(insertPromises);
-
-  //   return true;
-  // }
 }

@@ -4,7 +4,6 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { CreateUserPermissionDto } from './dto/create-user-permission.dto';
-import { UpdateUserPermissionDto } from './dto/update-user-permission.dto';
 import { UserPermission } from './entities/user-permission.entity';
 import { Any, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -78,17 +77,5 @@ export class UserPermissionsService {
         error: error.message,
       });
     }
-  }
-
-  update(id: number, updateUserPermissionDto: UpdateUserPermissionDto) {
-    return `This action updates a #${id} userPermission`;
-  }
-
-  findAll() {
-    return `This action returns all userPermissions`;
-  }
-
-  findOne(id: number) {
-    return `This action returns a #${id} userPermission`;
   }
 }

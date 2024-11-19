@@ -37,9 +37,4 @@ export class TypeDocumentController {
   ) {
     return this.typeDocumentService.update(id, updateTypeDocumentDto);
   }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.typeDocumentService.remove(+id);
-  }
 }

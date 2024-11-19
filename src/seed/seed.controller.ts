@@ -1,4 +1,4 @@
-import { Controller, Get, Post } from '@nestjs/common';
+import { Controller, Post } from '@nestjs/common';
 
 import { ValidRoles } from '../auth/interfaces';
 import { Auth } from '../auth/decorators';
@@ -9,27 +9,25 @@ import { SeedService } from './seed.service';
 export class SeedController {
   constructor(private readonly seedService: SeedService) {}
 
-  @Get()
-  // @Auth( ValidRoles.admin )
-  executeSeed() {
-    return this.seedService.runSeed();
-  }
-
   @Post('schedule')
+  @Auth(ValidRoles.admin)
   executeSeedSchedule() {
     return this.seedService.runSeedSchedule();
   }
 
   @Post('sections')
+  @Auth(ValidRoles.admin)
   executeSeedSections() {
     return this.seedService.runSeedSections();
   }
 
   @Post('type-documents')
+  @Auth(ValidRoles.admin)
   executeTypeDocuments() {
     return this.seedService.runSeedTypeDocument();
   }
   @Post('section-types')
+  @Auth(ValidRoles.admin)
   executeSectionTypes() {
     return this.seedService.runSeedSectionTypeDocuments();
   }

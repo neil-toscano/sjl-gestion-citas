@@ -99,7 +99,10 @@ export class AppointmentController {
 
   @Get('verify/:id')
   @Auth()
-  verifyAppointmentBySection(@Param('id', new ParseUUIDPipe) id: string, @GetUser() user: User) {
+  verifyAppointmentBySection(
+    @Param('id', new ParseUUIDPipe()) id: string,
+    @GetUser() user: User,
+  ) {
     return this.appointmentService.hasOpenAppointmentBySection(id, user.id);
   }
 }

@@ -220,6 +220,7 @@ export class DocumentsService {
     }
     return this.documentRepository.findOneBy({ id });
   }
+
   async updateByAdmin(id: string, updateDocumentDto: UpdateDocumentDto) {
     const document = await this.documentRepository.findOne({
       where: {
@@ -314,7 +315,6 @@ export class DocumentsService {
             await this.processStatusService.update(processStatus.id, {
               status: ProcessStatusEnum.UNDER_OBSERVATION,
             });
-            // await this.emailService.createTemporaryEmail(user.email);
           } catch (error) {
             console.log(error, 'error');
           }

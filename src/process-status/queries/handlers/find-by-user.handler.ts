@@ -3,7 +3,7 @@ import { ProcessStatusRepository } from 'src/process-status/repository/process-s
 import { FindOneByUserSectionQuery } from '../find-by-user.query';
 
 @QueryHandler(FindOneByUserSectionQuery)
-export class UnresolvedDocumentsHandler
+export class FindOneByUserSectionHandler
   implements IQueryHandler<FindOneByUserSectionQuery>
 {
   constructor(

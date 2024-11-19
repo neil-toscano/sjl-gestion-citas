@@ -126,17 +126,6 @@ export class SectionTypeDocumentService {
     return result;
   }
 
-  update(
-    id: number,
-    updateSectionTypeDocumentDto: UpdateSectionTypeDocumentDto,
-  ) {
-    return `This action updates a #${id} sectionTypeDocument`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} sectionTypeDocument`;
-  }
-
   organizeData(data: any) {
     return data.reduce((acc: any, item: any) => {
       const {
@@ -157,11 +146,10 @@ export class SectionTypeDocumentService {
         };
       }
 
-      // Push the type document with its id, name, and sectionTypeDocumentId
       acc[sectionid].typedocument.push({
         id: typedocumentid,
         name: typedocumentname,
-        sectionTypeId: sectiontypedocumentid, // Adding the id from the junction table
+        sectionTypeId: sectiontypedocumentid,
       });
 
       return acc;

@@ -55,10 +55,6 @@ export class TypeDocumentService {
     return await this.findOne(id);
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} typeDocument`;
-  }
-
   private handleDBErrors(error: any): never {
     if (error.code === '23505') throw new BadRequestException(error.detail);
 

@@ -1,11 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { CreateAppointmentHistoryDto } from './dto/create-appointment-history.dto';
-import { UpdateAppointmentHistoryDto } from './dto/update-appointment-history.dto';
 import { User } from 'src/user/entities/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { AppointmentHistory } from './entities/appointment-history.entity';
-import { PaginationDto } from 'src/common/dtos/pagination.dto';
 import { FilterAppointmentHistoryDto } from './dto/filter-appointment-history.dto';
 
 @Injectable()
@@ -14,6 +12,7 @@ export class AppointmentHistoryService {
     @InjectRepository(AppointmentHistory)
     private readonly appointmentHistoryRepository: Repository<AppointmentHistory>,
   ) {}
+
   create(
     platformUser: User,
     createAppointmentHistoryDto: CreateAppointmentHistoryDto,
@@ -97,17 +96,5 @@ export class AppointmentHistoryService {
       count: totalCount,
       totalPages,
     };
-  }
-
-  findOne(id: number) {
-    return `This action returns a #${id} appointmentHistory`;
-  }
-
-  update(id: number, updateAppointmentHistoryDto: UpdateAppointmentHistoryDto) {
-    return `This action updates a #${id} appointmentHistory`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} appointmentHistory`;
   }
 }

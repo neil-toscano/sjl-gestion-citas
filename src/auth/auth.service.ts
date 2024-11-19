@@ -6,8 +6,6 @@ import {
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 
-import * as bcrypt from 'bcrypt';
-
 import { LoginUserDto, CreateUserDto } from './dto';
 import { JwtPayload } from './interfaces/jwt-payload.interface';
 import { UserService } from 'src/user/user.service';
@@ -162,32 +160,6 @@ export class AuthService {
       ...user,
       token: this.getJwtToken({ id: user.id }),
     };
-
-    // throw new UnauthorizedException('Credentials are not valid (dni)');
-    // if (!bcrypt.compareSync(password, user.password))
-    //   throw new UnauthorizedException('Credentials are not valid (password)');
-    // if (!user.isVerified) {
-    //   const token = this.getJwtToken({ id: user.id });
-    //   const verificationLink = `${process.env.APP_URL}/auth/verify-email?token=${token}`;
-
-    //   await this.emailService.sendVerificationEmail(
-    //     user.email,
-    //     verificationLink,
-    //   );
-
-    //   return {
-    //     message:
-    //       'Por favor, verifica tu correo electrónico antes de iniciar sesión.',
-    //     emailVerified: false,
-    //   };
-    // }
-
-    // return {
-    //   ...user,
-    //   password: ':P',
-    //   token: this.getJwtToken({ id: user.id }),
-    //   emailVerified: true,
-    // };
   }
 
   async verifyToken(token: string) {
@@ -232,26 +204,9 @@ export class AuthService {
         throw new Error('Ha ocurrido un error');
       }
     } catch (error) {
-      // console.log(error);
+      console.log(error);
       throw new InternalServerErrorException(error.message);
     }
-  }
-  // async resetPassword(email: string) {
-  //   const user = await this.userService.findByTerm({
-  //     field: 'email',
-  //     value: email,
-  //   });
-
-  //   const token = this.getJwtToken({ id: user.id });
-  //   const verificationLink = `${process.env.APP_URL}/auth/reset-password?token=${token}`;
-
-  //   return await this.emailService.resetPassword(user.email, verificationLink);
-  // }
-
-  async setPassword(token: string, password: string) {
-    const decoded = this.jwtService.verify(token);
-    const user = await this.userService.findOne(decoded.id);
-    return await this.userService.updatePassword(user, password);
   }
 
   async checkAuthStatus(user: User) {

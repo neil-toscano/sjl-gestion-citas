@@ -129,15 +129,6 @@ export class UserService {
     };
   }
 
-  async updatePassword(user: User, password: string) {
-    user.password = bcrypt.hashSync(password, 10);
-    await this.userRepository.save(user);
-    return {
-      statusCode: 201,
-      message: 'Contraseña modificado correctamente',
-    };
-  }
-
   async update(id: string, updateUserDto: UpdateUserDto) {
     await this.userRepository
       .createQueryBuilder()
@@ -149,10 +140,6 @@ export class UserService {
       ok: true,
       message: `se actualizó los datos del usuario`,
     };
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} user`;
   }
 
   private handleDBErrors(error: any): never {

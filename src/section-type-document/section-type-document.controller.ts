@@ -3,14 +3,11 @@ import {
   Get,
   Post,
   Body,
-  Patch,
   Param,
-  Delete,
   ParseUUIDPipe,
 } from '@nestjs/common';
 import { SectionTypeDocumentService } from './section-type-document.service';
 import { CreateSectionTypeDocumentDto } from './dto/create-section-type-document.dto';
-import { UpdateSectionTypeDocumentDto } from './dto/update-section-type-document.dto';
 import { Auth, GetUser } from 'src/auth/decorators';
 import { User } from 'src/user/entities/user.entity';
 
@@ -34,21 +31,5 @@ export class SectionTypeDocumentController {
   @Get(':id')
   findOne(@Param('id', new ParseUUIDPipe()) id: string) {
     return this.sectionTypeDocumentService.findOne(id);
-  }
-
-  @Patch(':id')
-  update(
-    @Param('id') id: string,
-    @Body() updateSectionTypeDocumentDto: UpdateSectionTypeDocumentDto,
-  ) {
-    return this.sectionTypeDocumentService.update(
-      +id,
-      updateSectionTypeDocumentDto,
-    );
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.sectionTypeDocumentService.remove(+id);
   }
 }
