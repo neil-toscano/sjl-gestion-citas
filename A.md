@@ -1,8 +1,10 @@
 # Docu
+```Clonar repositorio ```
+#
 ```npm install --global yarn```
 #
 ```yarn install```
 #
 ```yarn build```
 #
-```node dist/main```
+```pm2 start dist/main.js```

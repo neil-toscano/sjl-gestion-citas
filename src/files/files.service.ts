@@ -19,14 +19,15 @@ export class FilesService {
     const filePath = join(__dirname, '../../static/pdf', filename);
 
     if (!existsSync(filePath)) {
-      throw new BadRequestException(`No file found with name ${filename}`);
+      throw new BadRequestException(`Archivo no encontrado, inténtelo mas tarde`);
     }
 
     try {
       unlinkSync(filePath);
       return { message: `File ${filename} deleted successfully` };
     } catch (error) {
-      throw new BadRequestException(`Error deleting file: ${error.message}`);
+      console.log(error.message, filename);
+      throw new BadRequestException(`Error al encontrar el archivo`);
     }
   }
 
