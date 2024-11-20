@@ -33,10 +33,10 @@ import { AppointmentHistoryModule } from './appointment-history/appointment-hist
   imports: [
     ConfigModule.forRoot(),
     TypeOrmModule.forRoot({
-      ssl: true,
-      extra: {
-        ssl: true ? { rejectUnauthorized: false } : null,
-      },
+      // ssl: true,
+      // extra: {
+      //   ssl: true ? { rejectUnauthorized: false } : null,
+      // },
       type: 'postgres',
       host: process.env.DB_HOST,
       port: +process.env.DB_PORT,
