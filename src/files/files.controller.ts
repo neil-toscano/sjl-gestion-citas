@@ -7,7 +7,6 @@ import {
   UseInterceptors,
   BadRequestException,
   Res,
-  Delete,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { FileInterceptor } from '@nestjs/platform-express';
@@ -36,12 +35,11 @@ export class FilesController {
         callback(null, true);
       },
       storage: diskStorage({
-        destination: './static/pdf', // debe existir la ruta
+        destination: './static/pdf', // Asegúrate de tener este directorio para almacenar PDFs
         filename: fileNamer,
       }),
     }),
   )
-
   uploadDocumentPDF(@UploadedFile() file: Express.Multer.File) {
     if (!file) {
       throw new BadRequestException('Make sure that the file is a PDF');
@@ -52,10 +50,10 @@ export class FilesController {
     return { fileUrl };
   }
 
-  @Delete('pdf/:filename')
-  deleteFile(@Param('filename') filename: string) {
-    return this.filesService.deleteFile(filename);
+  @Get('pdf/:pdfName')
+  getFile(@Res() res: Response, @Param('pdfName') pdfName: string) {
+    const path = this.filesService.getFile(pdfName);
+
+    res.sendFile(path);
   }
-  
-  
 }
