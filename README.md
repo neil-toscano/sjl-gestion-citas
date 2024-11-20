@@ -16,7 +16,7 @@ docker-compose up -d
 
 6. Levantar: `yarn start:dev`
 
-7. Ejecutar SEED
+7. Ejecutar SEED con los documentos
 
 7.1 Ejecutar los trámites con sus requisitos
 ```
