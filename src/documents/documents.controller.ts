@@ -12,6 +12,7 @@ import { CreateDocumentDto } from './dto/create-document.dto';
 import { UpdateDocumentDto } from './dto/update-document.dto';
 import { Auth, GetUser } from 'src/auth/decorators';
 import { User } from 'src/user/entities/user.entity';
+import { ValidRoles } from 'src/auth/interfaces';
 
 @Controller('documents')
 export class DocumentsController {
@@ -41,7 +42,7 @@ export class DocumentsController {
   }
 
   @Patch('admin/:id')
-  @Auth()
+  @Auth(ValidRoles.superUser, ValidRoles.admin)
   updateByAdmin(
     @Param('id', new ParseUUIDPipe()) id: string,
     @Body() updateDocumentDto: UpdateDocumentDto,

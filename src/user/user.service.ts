@@ -62,7 +62,7 @@ export class UserService {
   async findAll() {
     return await this.userRepository
       .createQueryBuilder('user')
-      .where(':role = ANY(user.roles)', { role: 'user' })
+      // .where(':role = ANY(user.roles)', { role: 'user' })
       .getMany();
   }
 

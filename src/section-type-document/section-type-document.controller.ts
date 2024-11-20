@@ -10,6 +10,7 @@ import { SectionTypeDocumentService } from './section-type-document.service';
 import { CreateSectionTypeDocumentDto } from './dto/create-section-type-document.dto';
 import { Auth, GetUser } from 'src/auth/decorators';
 import { User } from 'src/user/entities/user.entity';
+import { ValidRoles } from 'src/auth/interfaces';
 
 @Controller('section-type-document')
 export class SectionTypeDocumentController {
@@ -18,6 +19,7 @@ export class SectionTypeDocumentController {
   ) {}
 
   @Post()
+  @Auth(ValidRoles.admin)
   create(@Body() createSectionTypeDocumentDto: CreateSectionTypeDocumentDto) {
     return this.sectionTypeDocumentService.create(createSectionTypeDocumentDto);
   }
@@ -29,6 +31,7 @@ export class SectionTypeDocumentController {
   }
 
   @Get(':id')
+  @Auth()
   findOne(@Param('id', new ParseUUIDPipe()) id: string) {
     return this.sectionTypeDocumentService.findOne(id);
   }

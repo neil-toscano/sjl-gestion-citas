@@ -8,6 +8,7 @@ import { UserService } from 'src/user/user.service';
 import { User } from 'src/user/entities/user.entity';
 import { AppointmentService } from 'src/appointment/appointment.service';
 import { ProcessStatusService } from 'src/process-status/process-status.service';
+import { UpdateUserByAdminDto } from './dto/update-user-by-admin.dto';
 
 @Injectable()
 export class AdminService {
@@ -74,5 +75,9 @@ export class AdminService {
       ok: true,
       msg: 'Se inicializó todo el proceso',
     };
+  }
+
+  async updateUserByAdmin(id: string, updateUserDto: UpdateUserByAdminDto) {
+    return await this.userService.update(id, updateUserDto);
   }
 }

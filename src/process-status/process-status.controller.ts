@@ -13,6 +13,7 @@ import { CreateProcessStatusDto } from './dto/create-process-status.dto';
 import { UpdateProcessStatusDto } from './dto/update-process-status.dto';
 import { Auth, GetUser } from 'src/auth/decorators';
 import { User } from 'src/user/entities/user.entity';
+import { ValidRoles } from 'src/auth/interfaces';
 
 @Controller('process-status')
 export class ProcessStatusController {
@@ -28,7 +29,7 @@ export class ProcessStatusController {
   }
 
   @Get('next-review/:sectionId')
-  @Auth()
+  @Auth(ValidRoles.superUser, ValidRoles.admin)
   async getNextUserForReview(
     @Param('sectionId') sectionId: string,
     @GetUser() admin: User,
@@ -40,7 +41,7 @@ export class ProcessStatusController {
   }
 
   @Get('completed-users/:sectionId')
-  @Auth()
+  @Auth(ValidRoles.superUser, ValidRoles.admin)
   findCompletedUsers(
     @Param('sectionId') sectionId: string,
     @GetUser() admin: User,
@@ -52,7 +53,7 @@ export class ProcessStatusController {
   }
 
   @Get('corrected/:sectionId')
-  @Auth()
+  @Auth(ValidRoles.superUser, ValidRoles.admin)
   async findAllUsersWithCorrectedDocuments(
     @Param('sectionId', new ParseUUIDPipe()) sectionId: string,
     @GetUser() admin: User,
@@ -64,7 +65,7 @@ export class ProcessStatusController {
   }
 
   @Get('next-corrected/:sectionId')
-  @Auth()
+  @Auth(ValidRoles.superUser, ValidRoles.admin)
   async NextUserCorrected(
     @Param('sectionId', new ParseUUIDPipe()) sectionId: string,
     @GetUser() admin: User,
@@ -73,7 +74,7 @@ export class ProcessStatusController {
   }
 
   @Get('unresolved-documents/:sectionId')
-  @Auth()
+  @Auth(ValidRoles.superUser, ValidRoles.admin)
   async findAllUsersWithUnresolvedDocuments(
     @Param('sectionId', new ParseUUIDPipe()) sectionId: string,
     @GetUser() admin: User,
@@ -97,6 +98,7 @@ export class ProcessStatusController {
   }
 
   @Get('status/count')
+  @Auth()
   async countByStatus() {
     return this.processStatusService.countByStatus();
   }
@@ -120,6 +122,7 @@ export class ProcessStatusController {
   }
 
   @Delete(':id')
+  @Auth()
   remove(@Param('id') id: string) {
     return this.processStatusService.remove(id);
   }

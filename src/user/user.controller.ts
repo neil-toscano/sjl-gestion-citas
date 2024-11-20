@@ -17,7 +17,7 @@ export class UserController {
   }
 
   @Get()
-  @Auth()
+  @Auth(ValidRoles.admin)
   findAll() {
     return this.userService.findAll();
   }
@@ -29,13 +29,13 @@ export class UserController {
   }
 
   @Get('roles/platform-operators')
-  @Auth()
+  @Auth(ValidRoles.admin)
   findPlatformOperators() {
     return this.userService.findPlatformOperators();
   }
 
   @Patch(':id')
-  @Auth()
+  @Auth(ValidRoles.admin)
   update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
     return this.userService.update(id, updateUserDto);
   }

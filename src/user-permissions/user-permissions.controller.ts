@@ -10,6 +10,7 @@ import {
 import { UserPermissionsService } from './user-permissions.service';
 import { CreateUserPermissionDto } from './dto/create-user-permission.dto';
 import { Auth } from 'src/auth/decorators';
+import { ValidRoles } from 'src/auth/interfaces';
 
 @Controller('user-permissions')
 export class UserPermissionsController {
@@ -18,7 +19,7 @@ export class UserPermissionsController {
   ) {}
 
   @Post()
-  @Auth()
+  @Auth(ValidRoles.admin)
   create(@Body() createUserPermissionDto: CreateUserPermissionDto) {
     return this.userPermissionsService.create(createUserPermissionDto);
   }
@@ -38,7 +39,7 @@ export class UserPermissionsController {
   }
 
   @Delete(':id')
-  @Auth()
+  @Auth(ValidRoles.admin)
   remove(@Param('id') id: string) {
     return this.userPermissionsService.remove(id);
   }
