@@ -88,38 +88,40 @@ export class ProcessHistoryService {
 
   async findAllForChart(filterProcessHistoryDto: FilterProcessHistoryDto) {
     const { fromDate, toDate, sectionId } = filterProcessHistoryDto;
-
+  
     const startDate = fromDate
-      ? new Date(fromDate)
-      : new Date(new Date().getFullYear(), 0, 1);
-
+      ? new Date(fromDate).setHours(0, 0, 0, 0)
+      : (() => {
+          const date = new Date();
+          date.setMonth(date.getMonth() - 5);
+          date.setDate(1);
+          date.setHours(0, 0, 0, 0);
+          return date;
+        })();
+  
     const endDate = toDate
       ? new Date(toDate).setHours(23, 59, 0, 0)
       : new Date().setHours(23, 59, 0, 0);
-
+  
     const formattedStartDate = new Date(startDate).toISOString();
     const formattedEndDate = new Date(endDate).toISOString();
-
+  
     const queryBuilder =
       this.processHistoryRepository.createQueryBuilder('processHistory');
-
-    if (formattedStartDate) {
-      queryBuilder.andWhere('processHistory.createdAt >= :startDate', {
-        startDate: formattedStartDate,
-      });
-    }
-    if (formattedEndDate) {
-      queryBuilder.andWhere('processHistory.createdAt <= :endDate', {
-        endDate: formattedEndDate,
-      });
-    }
-
+  
+    queryBuilder.andWhere('processHistory.createdAt >= :startDate', {
+      startDate: formattedStartDate,
+    });
+    queryBuilder.andWhere('processHistory.createdAt <= :endDate', {
+      endDate: formattedEndDate,
+    });
+  
     if (sectionId) {
       queryBuilder.andWhere('processHistory.section.id = :sectionId', {
         sectionId,
       });
     }
-
+  
     queryBuilder
       .select([
         "DATE_TRUNC('month', processHistory.createdAt) AS month",
@@ -127,21 +129,34 @@ export class ProcessHistoryService {
       ])
       .groupBy('month')
       .orderBy('month', 'ASC');
-
+  
     const result = await queryBuilder.getRawMany();
-    const labels: string[] = [];
-    const data: number[] = [];
-
-    result.forEach(({ month, processcount }) => {
-      const date = new Date(month);
-      const monthName = date.toLocaleString('default', { month: 'long' });
-      labels.push(monthName);
-      data.push(processcount ? Number(processcount) : 0);
-    });
-
-    return {
-      labels, // Meses (x-axis)
-      data, // Cantidades de procesos (y-axis)
-    };
-  }
+  
+    // Generar los últimos 6 meses
+    const months = [];
+    const currentDate = new Date(endDate);
+    for (let i = 0; i < 6; i++) {
+      const date = new Date(currentDate);
+      date.setMonth(currentDate.getMonth() - i);
+      months.unshift({
+        key: date.toISOString().slice(0, 7), // Formato YYYY-MM
+        name: date.toLocaleString('default', { month: 'long' }),
+      });
+    }
+  
+    // Mapear los resultados a los meses generados
+    const dataMap = result.reduce((map, { month, processcount }) => {
+      const monthKey = typeof month === 'string' ? month.slice(0, 7) : month.toISOString().slice(0, 7);
+      map[monthKey] = processcount;
+      return map;
+    }, {});
+  
+    const chartData = months.map(({ key, name }) => ({
+      month: name.charAt(0).toUpperCase() + name.slice(1), // Nombre del mes capitalizado
+      Revisiones: dataMap[key] ? Number(dataMap[key]) : 0,
+    }));
+  
+    return chartData;
+  }  
+  
 }
