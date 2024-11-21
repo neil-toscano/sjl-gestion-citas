@@ -1,6 +1,6 @@
 import { join } from 'path';
 
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ServeStaticModule } from '@nestjs/serve-static';
@@ -28,6 +28,7 @@ import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { APP_GUARD } from '@nestjs/core';
 import { ProcessHistoryModule } from './process-history/process-history.module';
 import { AppointmentHistoryModule } from './appointment-history/appointment-history.module';
+import { NotFoundMiddleware } from './common/middlewares/not-found.middleware';
 
 @Module({
   imports: [
@@ -93,4 +94,8 @@ import { AppointmentHistoryModule } from './appointment-history/appointment-hist
   ],
   providers: [],
 })
-export class AppModule {}
+export class AppModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(NotFoundMiddleware).forRoutes('*');
+  }
+}
