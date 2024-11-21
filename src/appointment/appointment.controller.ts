@@ -38,7 +38,7 @@ export class AppointmentController {
     if (isNaN(inputDate.getTime()) || inputDate.getUTCDay() === 0) {
       throw new BadRequestException('La fecha no puede ser un domingo');
     }
-    
+
     const currentDate = new Date();
 
     currentDate.setHours(0, 0, 0, 0);
@@ -80,8 +80,12 @@ export class AppointmentController {
     @Query() query: FindByWeekDto,
   ) {
     const inputDate = new Date(query.date);
-    if (isNaN(inputDate.getTime()) || inputDate.getUTCDay() !== 6) {
-      throw new BadRequestException('La fecha debe ser un sábado válido.');
+    // if (isNaN(inputDate.getTime()) || inputDate.getUTCDay() !== 6) {
+    //   throw new BadRequestException('La fecha debe ser un sábado válido.');
+    // }
+
+    if (isNaN(inputDate.getTime()) || inputDate.getUTCDay() === 0) {
+      throw new BadRequestException('La fecha no puede ser un domingo');
     }
 
     return this.appointmentService.findByWeek(inputDate, sectionId);
