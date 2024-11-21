@@ -6,6 +6,7 @@ import { GetUser, Auth } from './decorators';
 import { CreateUserDto, LoginUserDto } from './dto';
 import { User } from 'src/user/entities/user.entity';
 import { Request } from 'express';
+import { Throttle } from '@nestjs/throttler';
 
 @Controller('auth')
 export class AuthController {
@@ -29,11 +30,12 @@ export class AuthController {
     return this.authService.verifyToken(token);
   }
 
+  @Throttle({ default: { limit: 3, ttl: 60000 } })
   @Post('reset-password')
   resetPassword(@Query('documentNumber') documentNumber: string) {
     return this.authService.resetPassword(documentNumber);
   }
-
+  
   @Get('check-status')
   @Auth()
   checkAuthStatus(@GetUser() user: User) {
