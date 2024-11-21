@@ -39,7 +39,7 @@ export class CronService {
     const jobEvery30Days = new CronJob(
       '0 0 */30 * *',
       async () => {
-        await this.deleteUnusedFiles();
+        // await this.deleteUnusedFiles();
       },
       null,
       true,
