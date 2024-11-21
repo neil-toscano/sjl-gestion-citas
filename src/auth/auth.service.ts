@@ -210,6 +210,7 @@ export class AuthService {
   }
 
   async checkAuthStatus(user: User) {
+    delete user.password;
     return {
       ...user,
       token: this.getJwtToken({ id: user.id }),

@@ -1,6 +1,6 @@
 import { join } from 'path';
 
-import { MiddlewareConsumer, Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ServeStaticModule } from '@nestjs/serve-static';
@@ -24,14 +24,18 @@ import { EmailModule } from './email/email.module';
 import { CronModule } from './cron/cron.module';
 import { ProcessStatusModule } from './process-status/process-status.module';
 import { UserPermissionsModule } from './user-permissions/user-permissions.module';
-import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
-import { APP_GUARD } from '@nestjs/core';
 import { ProcessHistoryModule } from './process-history/process-history.module';
 import { AppointmentHistoryModule } from './appointment-history/appointment-history.module';
 import { NotFoundMiddleware } from './common/middlewares/not-found.middleware';
+import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
+import { APP_GUARD } from '@nestjs/core';
 
 @Module({
   imports: [
+    ThrottlerModule.forRoot([{
+      ttl: 0,
+      limit: 0,
+    }]),
     ConfigModule.forRoot(),
     TypeOrmModule.forRoot({
       // ssl: true,
@@ -92,10 +96,12 @@ import { NotFoundMiddleware } from './common/middlewares/not-found.middleware';
 
     AppointmentHistoryModule,
   ],
-  providers: [],
+  providers: [
+    {
+      provide: APP_GUARD,
+      useClass: ThrottlerGuard
+    }
+  ],
 })
 export class AppModule {
-  configure(consumer: MiddlewareConsumer) {
-    consumer.apply(NotFoundMiddleware).forRoutes('*');
-  }
 }
