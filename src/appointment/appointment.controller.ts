@@ -31,10 +31,14 @@ export class AppointmentController {
     @Param('scheduleId', new ParseUUIDPipe()) scheduleId: string,
   ) {
     const inputDate = new Date(createAppointmentDto.appointmentDate);
-    if (isNaN(inputDate.getTime()) || inputDate.getUTCDay() !== 6) {
-      throw new BadRequestException('La fecha debe ser un sábado válido');
-    }
+    // if (isNaN(inputDate.getTime()) || inputDate.getUTCDay() !== 6) {
+    //   throw new BadRequestException('La fecha debe ser un sábado válido');
+    // }
 
+    if (isNaN(inputDate.getTime()) || inputDate.getUTCDay() === 0) {
+      throw new BadRequestException('La fecha no puede ser un domingo');
+    }
+    
     const currentDate = new Date();
 
     currentDate.setHours(0, 0, 0, 0);
