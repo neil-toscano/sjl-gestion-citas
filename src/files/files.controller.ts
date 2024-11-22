@@ -8,12 +8,13 @@ import {
   BadRequestException,
   Res,
 } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { Response } from 'express';
 import { diskStorage } from 'multer';
 import { FilesService } from './files.service';
 
-import { fileNamer } from './helpers';
+import { fileFilter, fileNamer } from './helpers';
 import { Auth } from 'src/auth/decorators';
 
 @Controller('files')
@@ -56,6 +57,3 @@ export class FilesController {
     res.sendFile(path);
   }
 }
-
-
-
