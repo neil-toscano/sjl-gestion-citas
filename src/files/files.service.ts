@@ -1,4 +1,4 @@
-import { existsSync, unlinkSync } from 'fs';
+import { existsSync, readdirSync, unlinkSync } from 'fs';
 import { join } from 'path';
 
 import { Injectable, BadRequestException } from '@nestjs/common';
@@ -9,6 +9,7 @@ export class FilesService {
 
   getFile(filename: string) {
     const path = join(__dirname, '../../static/pdf', filename);
+
     if (!existsSync(path))
       throw new BadRequestException(`No file(pdf) found with name ${filename}`);
     return path;
@@ -28,5 +29,19 @@ export class FilesService {
       console.log(error.message, filename);
       throw new BadRequestException(`Error al encontrar el archivo`);
     }
+  }
+
+  async getAllPdfFiles() {
+    const pdfDirectory = join(__dirname, '../../static/pdf');
+
+    if (!existsSync(pdfDirectory)) {
+      throw new BadRequestException(`Directory not found: ${pdfDirectory}`);
+    }
+
+    const files = readdirSync(pdfDirectory);
+
+    const pdfFiles = files.filter((file) => file.endsWith('.pdf'));
+
+    return pdfFiles;
   }
 }
