@@ -32,11 +32,25 @@ export class AxiosAdapter implements HttpAdapter {
         status: true,
       };
     } catch (error: any) {
-      console.log(error.message, 'error-message');
       if (error.response) {
-        console.log(error.response.data, 'error-data');
+        if(error?.response?.data?.message) {
+          throw new BadRequestException(
+            error.response.data.message || 'Error desconocido',
+          );
+        }
+
+        if(error?.response?.data?.errors?.numero_documento) {
+          throw new BadRequestException(
+            error.response.data.errors.numero_documento[0] || 'Error desconocido',
+          );
+        }
+        else if(error?.response?.data?.errors?.correo) {
+          throw new BadRequestException(
+            error.response.data.errors.correo[0] || 'Error desconocido',
+          );
+        }
         throw new BadRequestException(
-          error.response.data || 'Error desconocido',
+          error.response?.data?.error || 'Error desconocido',
         );
       }
       throw new InternalServerErrorException('Error de conexión');
