@@ -38,10 +38,10 @@ import { APP_GUARD } from '@nestjs/core';
     }]),
     ConfigModule.forRoot(),
     TypeOrmModule.forRoot({
-      // ssl: true,
-      // extra: {
-      //   ssl: true ? { rejectUnauthorized: false } : null,
-      // },
+      ssl: true,
+      extra: {
+        ssl: true ? { rejectUnauthorized: false } : null,
+      },
       type: 'postgres',
       host: process.env.DB_HOST,
       port: +process.env.DB_PORT,
