@@ -82,7 +82,7 @@ export class AuthService {
           'Error al crear usuario: El código de estado es 401',
         );
       }
-      throw new BadRequestException(error);
+      throw new BadRequestException(error.response.message);
     }
   }
 
@@ -122,7 +122,6 @@ export class AuthService {
         throw new Error('Ha ocurrido un error');
       }
     } catch (error) {
-      console.log(error);
       throw new InternalServerErrorException(error.message);
     }
 
@@ -199,14 +198,16 @@ export class AuthService {
         null,
         contentHeader,
       );
-
+      
       if (resetPassword.codigo === 401) {
         throw new Error('Ha ocurrido un error');
       }
+      return resetPassword;
     } catch (error) {
       console.log(error);
       throw new InternalServerErrorException(error.message);
     }
+
   }
 
   async checkAuthStatus(user: User) {
