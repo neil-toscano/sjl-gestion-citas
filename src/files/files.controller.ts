@@ -7,8 +7,9 @@ import {
   UseInterceptors,
   BadRequestException,
   Res,
+  ParseUUIDPipe,
+  Delete,
 } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { Response } from 'express';
 import { diskStorage } from 'multer';
@@ -16,6 +17,9 @@ import { FilesService } from './files.service';
 
 import { fileFilter, fileNamer } from './helpers';
 import { Auth } from 'src/auth/decorators';
+import { access, constants, existsSync, readdirSync, readFileSync } from 'fs';
+import { validateFolderExists } from './helpers/existPath.helper';
+import { ValidRoles } from 'src/auth/interfaces';
 
 @Controller('files')
 export class FilesController {
@@ -35,7 +39,23 @@ export class FilesController {
         callback(null, true);
       },
       storage: diskStorage({
-        destination: './static/pdf', // Asegúrate de tener este directorio para almacenar PDFs
+        destination: (req, file, callback) => {
+          const folderPath = process.env.FILE_URL_SERVER;
+
+          if (!folderPath) {
+            return callback(
+              new BadRequestException('File storage path is not defined in the environment variables'),
+              null,
+            );
+          }
+
+          try {
+            validateFolderExists(folderPath);
+            callback(null, folderPath);
+          } catch (error) {
+            callback(error, null);
+          }
+        },
         filename: fileNamer,
       }),
     }),
@@ -44,16 +64,27 @@ export class FilesController {
     if (!file) {
       throw new BadRequestException('Make sure that the file is a PDF');
     }
-
     const fileUrl = `${file.filename}`;
-
     return { fileUrl };
   }
+  
+
+
 
   @Get('pdf/:pdfName')
   getFile(@Res() res: Response, @Param('pdfName') pdfName: string) {
-    const path = this.filesService.getFile(pdfName);
+    return this.filesService.getFile(pdfName, res);
+  }
 
-    res.sendFile(path);
+  @Get('list')
+  @Auth(ValidRoles.admin)
+  getFileList() {
+    return this.filesService.getFileList();
+  }
+  
+  @Delete('pdf/:pdfName')
+  @Auth()
+  deleteFile(@Param('pdfName') pdfName: string) {
+    return this.filesService.deleteFile(pdfName);
   }
 }

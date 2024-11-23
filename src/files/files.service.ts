@@ -1,5 +1,6 @@
 import { existsSync, readdirSync, unlinkSync } from 'fs';
-import { join } from 'path';
+import * as path from 'path';
+import * as fs from 'fs';
 
 import { Injectable, BadRequestException } from '@nestjs/common';
 
@@ -7,32 +8,67 @@ import { Injectable, BadRequestException } from '@nestjs/common';
 export class FilesService {
   constructor() {}
 
-  getFile(filename: string) {
-    const path = join(__dirname, '../../static/pdf', filename);
+  getFile(filename: string, res: any) {
+    const FILE_URL_SERVER = process.env.FILE_URL_SERVER;
 
-    if (!existsSync(path))
-      throw new BadRequestException(`No file(pdf) found with name ${filename}`);
-    return path;
+    const filePath = path.join(FILE_URL_SERVER, filename);
+
+    if (!existsSync(filePath))
+      throw new BadRequestException(`Pdf no encontrado ${filename}`);
+
+    res.sendFile(filePath, (err: any) => {
+      if (err) {
+        throw new BadRequestException(`error al enviar pdf: ${err.message}`);
+      }
+    });
   }
 
   deleteFile(filename: string) {
-    const filePath = join(__dirname, '../../static/pdf', filename);
+    const FILE_URL_SERVER = process.env.FILE_URL_SERVER;
 
-    if (!existsSync(filePath)) {
-      throw new BadRequestException(`Archivo no encontrado, inténtelo mas tarde`);
+    if (!FILE_URL_SERVER) {
+      throw new BadRequestException('La ruta de almacenamiento no está configurada.');
+    }
+
+    const filePath = path.join(FILE_URL_SERVER, filename);
+
+    if (!fs.existsSync(filePath)) {
+      throw new BadRequestException(`Archivo ${filename} no encontrado, inténtelo más tarde`);
     }
 
     try {
-      unlinkSync(filePath);
-      return { message: `File ${filename} deleted successfully` };
+      fs.unlinkSync(filePath);
+      return { message: `El archivo ${filename} se eliminó correctamente` };
     } catch (error) {
-      console.log(error.message, filename);
-      throw new BadRequestException(`Error al encontrar el archivo`);
+      console.error(`Error al eliminar el archivo: ${error.message}`);
+      throw new BadRequestException(`Error al intentar eliminar el archivo ${filename}`);
+    }
+  }
+
+  getFileList() {
+    const FILE_URL_SERVER = process.env.FILE_URL_SERVER;
+
+    if (!FILE_URL_SERVER) {
+      throw new BadRequestException('La ruta de almacenamiento no está configurada.');
+    }
+
+    if (!fs.existsSync(FILE_URL_SERVER)) {
+      throw new BadRequestException('El directorio de almacenamiento no existe.');
+    }
+
+    try {
+      const files = fs.readdirSync(FILE_URL_SERVER);
+      return {
+        files: files.filter((file) => fs.lstatSync(path.join(FILE_URL_SERVER, file)).isFile()),
+      };
+    } catch (error) {
+      console.error(`Error al listar archivos: ${error.message}`);
+      throw new BadRequestException('Error al intentar listar los archivos.');
     }
   }
 
   async getAllPdfFiles() {
-    const pdfDirectory = join(__dirname, '../../static/pdf');
+    const pdfDirectory = path.join(__dirname, '../../static/pdf');
 
     if (!existsSync(pdfDirectory)) {
       throw new BadRequestException(`Directory not found: ${pdfDirectory}`);
