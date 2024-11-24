@@ -36,7 +36,9 @@ import { APP_GUARD } from '@nestjs/core';
       ttl: 0,
       limit: 0,
     }]),
-    ConfigModule.forRoot(),
+    ConfigModule.forRoot({
+      isGlobal: true,
+    }),
     TypeOrmModule.forRoot({
       // ssl: true,
       // extra: {

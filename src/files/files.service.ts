@@ -9,9 +9,10 @@ export class FilesService {
   constructor() {}
 
   getFile(filename: string, res: any) {
-    const FILE_URL_SERVER = process.env.FILE_URL_SERVER;
+    const FILE_URL_SERVER = String(process.env.FILE_URL_SERVER).trim();
 
-    const filePath = path.join(FILE_URL_SERVER, filename);
+    let filePath = path.join(FILE_URL_SERVER, filename);
+    filePath = filePath.replace(/[/\\](?=[^/\\]*$)/, '\\');
 
     if (!existsSync(filePath))
       throw new BadRequestException(`Pdf no encontrado ${filename}`);
@@ -27,13 +28,17 @@ export class FilesService {
     const FILE_URL_SERVER = process.env.FILE_URL_SERVER;
 
     if (!FILE_URL_SERVER) {
-      throw new BadRequestException('La ruta de almacenamiento no está configurada.');
+      throw new BadRequestException(
+        'La ruta de almacenamiento no está configurada.',
+      );
     }
 
     const filePath = path.join(FILE_URL_SERVER, filename);
 
     if (!fs.existsSync(filePath)) {
-      throw new BadRequestException(`Archivo ${filename} no encontrado, inténtelo más tarde`);
+      throw new BadRequestException(
+        `Archivo ${filename} no encontrado, inténtelo más tarde`,
+      );
     }
 
     try {
@@ -41,7 +46,9 @@ export class FilesService {
       return { message: `El archivo ${filename} se eliminó correctamente` };
     } catch (error) {
       console.error(`Error al eliminar el archivo: ${error.message}`);
-      throw new BadRequestException(`Error al intentar eliminar el archivo ${filename}`);
+      throw new BadRequestException(
+        `Error al intentar eliminar el archivo ${filename}`,
+      );
     }
   }
 
@@ -49,17 +56,23 @@ export class FilesService {
     const FILE_URL_SERVER = process.env.FILE_URL_SERVER;
 
     if (!FILE_URL_SERVER) {
-      throw new BadRequestException('La ruta de almacenamiento no está configurada.');
+      throw new BadRequestException(
+        'La ruta de almacenamiento no está configurada.',
+      );
     }
 
     if (!fs.existsSync(FILE_URL_SERVER)) {
-      throw new BadRequestException('El directorio de almacenamiento no existe.');
+      throw new BadRequestException(
+        'El directorio de almacenamiento no existe.',
+      );
     }
 
     try {
       const files = fs.readdirSync(FILE_URL_SERVER);
       return {
-        files: files.filter((file) => fs.lstatSync(path.join(FILE_URL_SERVER, file)).isFile()),
+        files: files.filter((file) =>
+          fs.lstatSync(path.join(FILE_URL_SERVER, file)).isFile(),
+        ),
       };
     } catch (error) {
       console.error(`Error al listar archivos: ${error.message}`);
