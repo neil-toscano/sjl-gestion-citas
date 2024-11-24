@@ -21,12 +21,16 @@ import { access, constants, existsSync, readdirSync, readFileSync } from 'fs';
 import { validateFolderExists } from './helpers/existPath.helper';
 import { ValidRoles } from 'src/auth/interfaces';
 
+function getFileExtension(filename) {
+    const ext = filename.substring(filename.lastIndexOf('.'));
+    return ext ? ext.toLowerCase() : '';
+}
 @Controller('files')
 export class FilesController {
   constructor(private readonly filesService: FilesService) {}
 
   @Post('pdf')
-  @Auth()
+  // @Auth()
   @UseInterceptors(
     FileInterceptor('file', {
       fileFilter: (req, file, callback) => {
@@ -62,6 +66,7 @@ export class FilesController {
   )
   uploadDocumentPDF(@UploadedFile() file: Express.Multer.File) {
     if (!file) {
+      console.log(file, 'file');
       throw new BadRequestException('Make sure that the file is a PDF');
     }
     const fileUrl = `${file.filename}`;
