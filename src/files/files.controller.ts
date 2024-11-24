@@ -20,6 +20,7 @@ import { Auth } from 'src/auth/decorators';
 import { access, constants, existsSync, readdirSync, readFileSync } from 'fs';
 import { validateFolderExists } from './helpers/existPath.helper';
 import { ValidRoles } from 'src/auth/interfaces';
+import * as path from 'path';
 
 function getFileExtension(filename) {
     const ext = filename.substring(filename.lastIndexOf('.'));
@@ -43,22 +44,8 @@ export class FilesController {
         callback(null, true);
       },
       storage: diskStorage({
-        destination: (req, file, callback) => {
-          const folderPath = process.env.FILE_URL_SERVER;
-
-          if (!folderPath) {
-            return callback(
-              new BadRequestException('File storage path is not defined in the environment variables'),
-              null,
-            );
-          }
-
-          try {
-            validateFolderExists(folderPath);
-            callback(null, folderPath);
-          } catch (error) {
-            callback(error, null);
-          }
+        destination: function (req, file, cb) {
+          cb(null, '\destination')
         },
         filename: fileNamer,
       }),
