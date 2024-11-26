@@ -18,11 +18,16 @@ export class FilesService {
     if (!existsSync(filePath))
       throw new BadRequestException(`Pdf no encontrado ${filename}`);
 
-    res.sendFile(filePath, (err: any) => {
-      if (err) {
-        throw new BadRequestException(`error al enviar pdf: ${err.message}`);
-      }
-    });
+    try {
+      res.sendFile(filePath, (err: any) => {
+        if (err) {
+          throw new BadRequestException(`Error al enviar PDF: ${err.message}`);
+        }
+      });
+    } catch (error) {
+      console.error(`Error al enviar el archivo: ${error.message}`);
+      throw new BadRequestException('Error interno al intentar enviar el archivo.');
+    }
   }
 
   deleteFile(filename: string) {
