@@ -33,18 +33,18 @@ export class AxiosAdapter implements HttpAdapter {
       };
     } catch (error: any) {
       if (error.response) {
-        if(error?.response?.data?.message) {
+        if (error?.response?.data?.message) {
           throw new BadRequestException(
             error.response.data.message || 'Error desconocido',
           );
         }
 
-        if(error?.response?.data?.errors?.numero_documento) {
+        if (error?.response?.data?.errors?.numero_documento) {
           throw new BadRequestException(
-            error.response.data.errors.numero_documento[0] || 'Error desconocido',
+            error.response.data.errors.numero_documento[0] ||
+              'Error desconocido',
           );
-        }
-        else if(error?.response?.data?.errors?.correo) {
+        } else if (error?.response?.data?.errors?.correo) {
           throw new BadRequestException(
             error.response.data.errors.correo[0] || 'Error desconocido',
           );

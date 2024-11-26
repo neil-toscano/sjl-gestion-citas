@@ -12,7 +12,6 @@ export class FilesService {
     const FILE_URL_SERVER = String(process.env.FILE_URL_SERVER).trim();
 
     let filePath = path.join(FILE_URL_SERVER, filename);
-    filePath = filePath.replace(/[/\\](?=[^/\\]*$)/, '\\');
 
     if (!existsSync(filePath))
       throw new BadRequestException(`Pdf no encontrado ${filename}`);
@@ -53,7 +52,7 @@ export class FilesService {
   }
 
   getFileList() {
-    const FILE_URL_SERVER = process.env.FILE_URL_SERVER;
+    const FILE_URL_SERVER = String(process.env.FILE_URL_SERVER).trim();
 
     if (!FILE_URL_SERVER) {
       throw new BadRequestException(

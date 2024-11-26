@@ -25,35 +25,30 @@ import * as fs from 'fs';
 
 import { v4 as uuid } from 'uuid';
 
-function getFileExtension(filename) {
-  const ext = filename.substring(filename.lastIndexOf('.'));
-  return ext ? ext.toLowerCase() : '';
-}
 @Controller('files')
 export class FilesController {
   constructor(private readonly filesService: FilesService) {}
 
   @Post('pdf')
+  @Auth()
   @UseInterceptors(FileInterceptor('file'))
   async uploadDocumentPDF(@UploadedFile() file: Express.Multer.File) {
-
     if (!file || file.mimetype !== 'application/pdf') {
       throw new BadRequestException('Make sure that the file is a PDF');
     }
-  
-    const folderPath = process.env.FILE_URL_SERVER;
-  
+
+    const folderPath = String(process.env.FILE_URL_SERVER).trim();
+
     if (!fs.existsSync(folderPath)) {
-    console.error(`EL DIRECTORIO NO EXISTE: ${folderPath}`);
-    throw new BadRequestException(`EL DIRECTORIO NO EXISTE: ${folderPath}`);
-  }
-  
-  
+      console.error(`EL DIRECTORIO NO EXISTE: ${folderPath}`);
+      fs.mkdirSync(folderPath, { recursive: true });
+      console.log(`Directorio creado: ${folderPath}`);
+    }
+
     const fileName = `${uuid()}.pdf`;
-  
+
     let filePath = path.join(folderPath, fileName);
-    filePath = filePath.replace(/[/\\](?=[^/\\]*$)/, '\\');
-  
+
     fs.writeFile(filePath, file.buffer, (err) => {
       if (err) {
         console.error('Error al guardar el archivo:', err.message);
@@ -62,7 +57,7 @@ export class FilesController {
         console.log('Archivo guardado exitosamente en:', filePath);
       }
     });
-  
+
     return { fileUrl: fileName };
   }
 
@@ -72,26 +67,24 @@ export class FilesController {
   }
 
   @Post('crear-archivo')
+  @Auth()
   crearArchivo() {
     const sharedDir = String(process.env.FILE_URL_SERVER).trim();
+
     fs.access(sharedDir, fs.constants.W_OK, (err) => {
       if (err) {
-        console.error(
-          'No se puede acceder al directorio compartido:',
-          err.message,
-        );
+        console.error('No se puede acceder al directorio compartido:', err.message);
+        throw new BadRequestException('No se puede acceder al recurso compartido');
       } else {
         console.log('El directorio es accesible para escritura.');
 
-        // Ejemplo de escritura de un archivo
-        let filePath = path.join(sharedDir, 'nuevo_archivo.txt');
-        filePath = filePath.replace(/[/\\](?=[^/\\]*$)/, '\\');
-        console.log(filePath, 'filepath');
+        const filePath = path.join(sharedDir, 'nuevo_archivo.txt');
         const data = 'Este es un archivo creado desde Node.js.';
 
         fs.writeFile(filePath, data, (err) => {
           if (err) {
             console.error('Error al guardar el archivo:', err.message);
+            throw new BadRequestException('Error al guardar el archivo');
           } else {
             console.log('Archivo guardado exitosamente en:', filePath);
           }
@@ -99,7 +92,7 @@ export class FilesController {
       }
     });
   }
-
+  
   @Get('list')
   @Auth(ValidRoles.admin)
   getFileList() {

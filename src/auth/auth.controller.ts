@@ -35,7 +35,7 @@ export class AuthController {
   resetPassword(@Query('documentNumber') documentNumber: string) {
     return this.authService.resetPassword(documentNumber);
   }
-  
+
   @Get('check-status')
   @Auth()
   checkAuthStatus(@GetUser() user: User) {

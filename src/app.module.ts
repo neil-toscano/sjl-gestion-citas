@@ -32,18 +32,20 @@ import { APP_GUARD } from '@nestjs/core';
 
 @Module({
   imports: [
-    ThrottlerModule.forRoot([{
-      ttl: 0,
-      limit: 0,
-    }]),
+    ThrottlerModule.forRoot([
+      {
+        ttl: 0,
+        limit: 0,
+      },
+    ]),
     ConfigModule.forRoot({
       isGlobal: true,
     }),
     TypeOrmModule.forRoot({
-      // ssl: true,
-      // extra: {
-      //   ssl: true ? { rejectUnauthorized: false } : null,
-      // },
+      ssl: true,
+      extra: {
+        ssl: true ? { rejectUnauthorized: false } : null,
+      },
       type: 'postgres',
       host: process.env.DB_HOST,
       port: +process.env.DB_PORT,
@@ -101,9 +103,8 @@ import { APP_GUARD } from '@nestjs/core';
   providers: [
     {
       provide: APP_GUARD,
-      useClass: ThrottlerGuard
-    }
+      useClass: ThrottlerGuard,
+    },
   ],
 })
-export class AppModule {
-}
+export class AppModule {}
