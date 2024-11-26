@@ -10,8 +10,10 @@ export class FilesService {
 
   getFile(filename: string, res: any) {
     const FILE_URL_SERVER = String(process.env.FILE_URL_SERVER).trim();
+    const subFolder = 'PDF';
+    let filePath = path.join(FILE_URL_SERVER, subFolder);
 
-    let filePath = path.join(FILE_URL_SERVER, filename);
+    filePath = path.join(filePath, filename);
 
     if (!existsSync(filePath))
       throw new BadRequestException(`Pdf no encontrado ${filename}`);
@@ -26,13 +28,16 @@ export class FilesService {
   deleteFile(filename: string) {
     const FILE_URL_SERVER = process.env.FILE_URL_SERVER;
 
+    const subFolder = 'PDF';
+    let filePath = path.join(FILE_URL_SERVER, subFolder);
+
     if (!FILE_URL_SERVER) {
       throw new BadRequestException(
         'La ruta de almacenamiento no está configurada.',
       );
     }
 
-    const filePath = path.join(FILE_URL_SERVER, filename);
+    filePath = path.join(filePath, filename);
 
     if (!fs.existsSync(filePath)) {
       throw new BadRequestException(
@@ -54,23 +59,26 @@ export class FilesService {
   getFileList() {
     const FILE_URL_SERVER = String(process.env.FILE_URL_SERVER).trim();
 
-    if (!FILE_URL_SERVER) {
+    const subFolder = 'PDF';
+    let filePath = path.join(FILE_URL_SERVER, subFolder);
+
+    if (!filePath) {
       throw new BadRequestException(
         'La ruta de almacenamiento no está configurada.',
       );
     }
 
-    if (!fs.existsSync(FILE_URL_SERVER)) {
+    if (!fs.existsSync(filePath)) {
       throw new BadRequestException(
         'El directorio de almacenamiento no existe.',
       );
     }
 
     try {
-      const files = fs.readdirSync(FILE_URL_SERVER);
+      const files = fs.readdirSync(filePath);
       return {
         files: files.filter((file) =>
-          fs.lstatSync(path.join(FILE_URL_SERVER, file)).isFile(),
+          fs.lstatSync(path.join(filePath, file)).isFile(),
         ),
       };
     } catch (error) {

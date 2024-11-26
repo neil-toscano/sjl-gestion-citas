@@ -37,7 +37,9 @@ export class FilesController {
       throw new BadRequestException('Make sure that the file is a PDF');
     }
 
-    const folderPath = String(process.env.FILE_URL_SERVER).trim();
+    let folderPath = String(process.env.FILE_URL_SERVER).trim();
+    const subFolder = 'PDF';
+    folderPath = path.join(folderPath, subFolder);
 
     if (!fs.existsSync(folderPath)) {
       console.error(`EL DIRECTORIO NO EXISTE: ${folderPath}`);
