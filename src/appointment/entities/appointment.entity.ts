@@ -44,4 +44,11 @@ export class Appointment {
 
   @Column({ nullable: true })
   fileUrl: string;
+
+  @Column({
+    type: 'boolean',
+    default: false,
+  })
+  isRescheduled: boolean;
+
 }

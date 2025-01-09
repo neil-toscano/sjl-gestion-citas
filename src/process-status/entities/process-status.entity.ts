@@ -35,4 +35,10 @@ export class ProcessStatus {
 
   @Column({ type: 'boolean', default: false })
   isCompleted: boolean;
+
+  @Column({
+    type: 'boolean',
+    default: false,
+  })
+  isRescheduled: boolean;
 }

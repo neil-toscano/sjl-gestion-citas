@@ -32,11 +32,15 @@ import { APP_GUARD } from '@nestjs/core';
 
 @Module({
   imports: [
-    ThrottlerModule.forRoot([{
-      ttl: 0,
-      limit: 0,
-    }]),
-    ConfigModule.forRoot(),
+    ThrottlerModule.forRoot([
+      {
+        ttl: 0,
+        limit: 0,
+      },
+    ]),
+    ConfigModule.forRoot({
+      isGlobal: true,
+    }),
     TypeOrmModule.forRoot({
       ssl: true,
       extra: {
@@ -99,9 +103,8 @@ import { APP_GUARD } from '@nestjs/core';
   providers: [
     {
       provide: APP_GUARD,
-      useClass: ThrottlerGuard
-    }
+      useClass: ThrottlerGuard,
+    },
   ],
 })
-export class AppModule {
-}
+export class AppModule {}

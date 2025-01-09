@@ -12,7 +12,7 @@ export class ProcessStatusRepository {
   constructor(
     @InjectRepository(ProcessStatus)
     private processStatusRepository: Repository<ProcessStatus>,
-  ) {}
+  ) { }
 
   async create(createProcessStatusDto: CreateProcessStatusDto, user: User) {
     const processStatus = this.processStatusRepository.create({
@@ -40,12 +40,12 @@ export class ProcessStatusRepository {
   }
 
   async update(id: string, updateProcessStatusDto: UpdateProcessStatusDto) {
-    const { status } = updateProcessStatusDto;
+    const { status, isRescheduled } = updateProcessStatusDto;
 
     return await this.processStatusRepository
       .createQueryBuilder()
       .update(ProcessStatus)
-      .set({ status: status })
+      .set({ status: status, isRescheduled: isRescheduled })
       .where('id = :id', { id: id })
       .execute();
   }
