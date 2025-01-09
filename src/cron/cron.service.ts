@@ -26,7 +26,7 @@ export class CronService {
           timeStyle: 'long',
         }).format(date);
 
-        await this.expiredAppoinments();
+        // await this.expiredAppoinments();
         await this.getAllUsersWithObservedDocuments();
       },
       null,

@@ -48,6 +48,10 @@ export class AxiosAdapter implements HttpAdapter {
           throw new BadRequestException(
             error.response.data.errors.correo[0] || 'Error desconocido',
           );
+        } else if (error?.response?.data?.errors?.contrasena) {
+          throw new BadRequestException(
+            error.response.data.errors.contrasena[0] || 'Error desconocido',
+          );
         }
         throw new BadRequestException(
           error.response?.data?.error || 'Error desconocido',

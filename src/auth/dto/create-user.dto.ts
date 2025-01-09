@@ -12,6 +12,7 @@ import {
   IsIn,
   ArrayNotEmpty,
   IsArray,
+  Matches,
 } from 'class-validator';
 
 export class CreateUserDto {
@@ -72,6 +73,9 @@ export class CreateUserDto {
   })
   @MaxLength(5, {
     message: 'La contraseña debe tener exactamente 5 caracteres',
+  })
+  @Matches(/^[a-zA-Z0-9]*$/, {
+    message: 'La contraseña solo puede contener letras y números',
   })
   password: string;
 }

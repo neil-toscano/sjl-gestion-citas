@@ -12,5 +12,4 @@ export const QueryHandlers = [
   ListAppointmentHandler,
   ListExpiredAppointmentsHandler,
   FindOneAppointmentHandler,
-  HasOpenAppointmentHandler,
 ];
