@@ -12,7 +12,7 @@ export class AppointmentRepository {
   constructor(
     @InjectRepository(Appointment)
     private appointmentRepository: Repository<Appointment>,
-  ) {}
+  ) { }
 
   async create(
     sectionId: string,
@@ -185,8 +185,9 @@ export class AppointmentRepository {
   }
 
   async findOneById(id: string) {
-    const appointment = await this.appointmentRepository.findOneBy({
-      id: id,
+    const appointment = await this.appointmentRepository.findOne({
+      where: { id: id },
+      relations: ['reservedBy', 'section']
     });
     return appointment;
   }

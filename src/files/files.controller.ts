@@ -75,8 +75,13 @@ export class FilesController {
 
     fs.access(sharedDir, fs.constants.W_OK, (err) => {
       if (err) {
-        console.error('No se puede acceder al directorio compartido:', err.message);
-        throw new BadRequestException('No se puede acceder al recurso compartido');
+        console.error(
+          'No se puede acceder al directorio compartido:',
+          err.message,
+        );
+        throw new BadRequestException(
+          'No se puede acceder al recurso compartido',
+        );
       } else {
         console.log('El directorio es accesible para escritura.');
 
@@ -94,7 +99,7 @@ export class FilesController {
       }
     });
   }
-  
+
   @Get('list')
   @Auth(ValidRoles.admin)
   getFileList() {
