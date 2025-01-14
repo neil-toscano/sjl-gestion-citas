@@ -1,4 +1,5 @@
 import { CheckEligibilityHandler } from './check-eligibility.handler';
+import { CheackStatusHandler } from './checkStatus.query';
 import { CorrectedDocumentsStatusHandler } from './corrected-documents.handler';
 import { CountByStatusHandler } from './count-status.handler';
 import { FindOneByUserSectionHandler } from './find-by-user.handler';
@@ -18,4 +19,5 @@ export const QueryHandlers = [
   NextUserCorrectedDocumentsHandler,
   FindOneByUserSectionHandler,
   CountByStatusHandler,
+  CheackStatusHandler,
 ];

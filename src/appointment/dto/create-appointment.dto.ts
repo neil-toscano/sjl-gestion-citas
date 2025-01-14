@@ -35,4 +35,8 @@ export class CreateAppointmentDto {
   @IsString()
   @IsOptional()
   fileUrl?: string;
+
+  @IsBoolean()
+  @IsOptional()
+  isRescheduled: boolean = false;
 }

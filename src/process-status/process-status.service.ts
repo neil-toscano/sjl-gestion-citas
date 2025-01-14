@@ -21,6 +21,7 @@ import {
 
 import { UpdateProcessStatusDto } from './dto/update-process-status.dto';
 import { CreateProcessStatusDto } from './dto/create-process-status.dto';
+import { CheckStatusQuery } from './queries/checkStatus.query';
 
 @Injectable()
 export class ProcessStatusService {
@@ -68,6 +69,10 @@ export class ProcessStatusService {
 
   async checkEligibilityForAppointment(sectionId: string, user: User) {
     return this.queryBus.execute(new CheckEligibilityQuery(sectionId, user));
+  }
+
+  async processStatusByUserSection(sectionId: string, userId: string) {
+    return this.queryBus.execute(new CheckStatusQuery(sectionId, userId));
   }
 
   async countByStatus() {

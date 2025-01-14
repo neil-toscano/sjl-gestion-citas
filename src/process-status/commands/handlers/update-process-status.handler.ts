@@ -5,8 +5,9 @@ import { UpdateProcessStatusCommand } from '../updated-process-status.command';
 
 @CommandHandler(UpdateProcessStatusCommand)
 export class UpdateProcessStatusHandler
-  implements ICommandHandler<UpdateProcessStatusCommand> {
-  constructor(private processStatusRepository: ProcessStatusRepository) { }
+  implements ICommandHandler<UpdateProcessStatusCommand>
+{
+  constructor(private processStatusRepository: ProcessStatusRepository) {}
 
   async execute(command: UpdateProcessStatusCommand) {
     const { id, updateProcessStatusDto } = command;
@@ -16,7 +17,10 @@ export class UpdateProcessStatusHandler
     if (!processStatus) {
       throw new Error('Proceso no encontrado');
     }
-    const process = await this.processStatusRepository.update(id, updateProcessStatusDto);
+    const process = await this.processStatusRepository.update(
+      id,
+      updateProcessStatusDto,
+    );
 
     return this.processStatusRepository.findOneById(id);
   }

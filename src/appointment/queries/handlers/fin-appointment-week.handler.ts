@@ -37,23 +37,37 @@ export class GetAppointmentsByWeekHandler
         sectionId,
       );
 
-    const schedulesWithStatus = schedules.map((schedule) => {
-      const appointmentsCount =
-        appointments.find((r) => r.scheduleId === schedule.id)
-          ?.appointmentsCount || 0;
+    const schedulesWithStatus = schedules
+      .filter((schedule) => {
+        const dayOfWeek = new Date(date).getUTCDay(); //0 Domingo 1 Lunes
+        if (dayOfWeek >= 1 && dayOfWeek <= 5) {
+          return (
+            schedule.startTime >= '15:00:00' && schedule.endTime <= '17:00:00'
+          );
+        } else if (dayOfWeek === 6) {
+          return (
+            schedule.startTime >= '08:00:00' && schedule.endTime <= '12:00:00'
+          );
+        }
+        return false;
+      })
+      .map((schedule) => {
+        const appointmentsCount =
+          appointments.find((r) => r.scheduleId === schedule.id)
+            ?.appointmentsCount || 0;
 
-      const isAvailable = appointmentsCount < totalMaxUsersPerProcess;
+        const isAvailable = appointmentsCount < totalMaxUsersPerProcess;
 
-      return {
-        scheduleId: schedule.id,
-        startTime: schedule.startTime,
-        endTime: schedule.endTime,
-        status: isAvailable
-          ? EstadoDisponibilidad.DISPONIBLE
-          : EstadoDisponibilidad.NO_DISPONIBLE,
-        appointmentsCount,
-      };
-    });
+        return {
+          scheduleId: schedule.id,
+          startTime: schedule.startTime,
+          endTime: schedule.endTime,
+          status: isAvailable
+            ? EstadoDisponibilidad.DISPONIBLE
+            : EstadoDisponibilidad.NO_DISPONIBLE,
+          appointmentsCount,
+        };
+      });
 
     return schedulesWithStatus;
   }

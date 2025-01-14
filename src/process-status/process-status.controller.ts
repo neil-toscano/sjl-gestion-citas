@@ -97,6 +97,18 @@ export class ProcessStatusController {
     );
   }
 
+  @Get(':userId/:sectionId')
+  @Auth(ValidRoles.superUser)
+  async processStatusByUserSection(
+    @Param('sectionId', new ParseUUIDPipe()) sectionId: string,
+    @Param('userId', new ParseUUIDPipe()) userId: string,
+  ) {
+    return this.processStatusService.processStatusByUserSection(
+      sectionId,
+      userId,
+    );
+  }
+
   @Get('status/count')
   @Auth()
   async countByStatus() {

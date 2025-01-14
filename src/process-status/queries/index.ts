@@ -1,3 +1,4 @@
+export * from './checkStatus.query';
 export * from './list-completed-status.query';
 export * from './next-user-review.query';
 export * from './next-corrected.query';
