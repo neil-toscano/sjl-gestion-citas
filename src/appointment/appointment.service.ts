@@ -78,9 +78,13 @@ export class AppointmentService {
     return this.queryBus.execute(new ListExpiredAppointmentsQuery());
   }
 
-  async update(id: string, updateAppointmentDto: UpdateAppointmentDto) {
+  async update(
+    id: string,
+    updateAppointmentDto: UpdateAppointmentDto,
+    user: User,
+  ) {
     return this.commandBus.execute(
-      new UpdateAppointmentCommand(id, updateAppointmentDto),
+      new UpdateAppointmentCommand(id, updateAppointmentDto, user),
     );
   }
 }

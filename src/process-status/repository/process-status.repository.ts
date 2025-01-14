@@ -12,7 +12,7 @@ export class ProcessStatusRepository {
   constructor(
     @InjectRepository(ProcessStatus)
     private processStatusRepository: Repository<ProcessStatus>,
-  ) { }
+  ) {}
 
   async create(createProcessStatusDto: CreateProcessStatusDto, user: User) {
     const processStatus = this.processStatusRepository.create({
@@ -42,10 +42,22 @@ export class ProcessStatusRepository {
   async update(id: string, updateProcessStatusDto: UpdateProcessStatusDto) {
     const { status, isRescheduled } = updateProcessStatusDto;
 
+    const currentProcessStatus = await this.processStatusRepository.findOneBy({
+      id,
+    });
+    const verifiedAtUpdate =
+      status === ProcessStatusEnum.VERIFIED && !currentProcessStatus.verifiedAt
+        ? { verifiedAt: new Date() }
+        : {};
+
     return await this.processStatusRepository
       .createQueryBuilder()
       .update(ProcessStatus)
-      .set({ status: status, isRescheduled: isRescheduled })
+      .set({
+        status: status,
+        isRescheduled: isRescheduled,
+        ...verifiedAtUpdate,
+      })
       .where('id = :id', { id: id })
       .execute();
   }
@@ -150,6 +162,26 @@ export class ProcessStatusRepository {
     const processStatus = await this.processStatusRepository.findOne({
       where: {
         user: { id: user.id },
+        section: { id: sectionId },
+        isCompleted: false,
+      },
+    });
+
+    if (!processStatus && throwErrorIfNotFound) {
+      throw new NotFoundException(`El usuario no ha iniciado ningún proceso`);
+    }
+
+    return processStatus;
+  }
+
+  async checkStatus(
+    sectionId: string,
+    userId: string,
+    throwErrorIfNotFound = true,
+  ) {
+    const processStatus = await this.processStatusRepository.findOne({
+      where: {
+        user: { id: userId },
         section: { id: sectionId },
         isCompleted: false,
       },

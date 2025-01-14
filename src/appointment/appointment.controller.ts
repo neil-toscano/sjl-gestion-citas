@@ -101,8 +101,9 @@ export class AppointmentController {
   update(
     @Param('id', new ParseUUIDPipe()) id: string,
     @Body() updateAppointmentDto: UpdateAppointmentDto,
+    @GetUser() user: User,
   ) {
-    return this.appointmentService.update(id, updateAppointmentDto);
+    return this.appointmentService.update(id, updateAppointmentDto, user);
   }
 
   @Get('verify/:id')

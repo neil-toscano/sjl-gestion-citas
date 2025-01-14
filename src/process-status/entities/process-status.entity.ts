@@ -41,4 +41,7 @@ export class ProcessStatus {
     default: false,
   })
   isRescheduled: boolean;
+
+  @Column({ type: 'timestamptz', nullable: true })
+  verifiedAt: Date;
 }

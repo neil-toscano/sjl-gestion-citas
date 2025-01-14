@@ -50,5 +50,4 @@ export class Appointment {
     default: false,
   })
   isRescheduled: boolean;
-
 }

@@ -6,13 +6,17 @@ import { User } from 'src/user/entities/user.entity';
 import { CreateAppointmentDto } from '../dto/create-appointment.dto';
 import { UpdateAppointmentDto } from '../dto/update-appointment.dto';
 import { FilterAppointmentDto } from '../dto/filter-appointment.dto';
+import { ScheduleService } from 'src/schedule/schedule.service';
+import { ProcessStatusService } from 'src/process-status/process-status.service';
 
 @Injectable()
 export class AppointmentRepository {
   constructor(
     @InjectRepository(Appointment)
     private appointmentRepository: Repository<Appointment>,
-  ) { }
+    private scheduleService: ScheduleService,
+    private processSatusService: ProcessStatusService,
+  ) {}
 
   async create(
     sectionId: string,
@@ -20,6 +24,14 @@ export class AppointmentRepository {
     createAppointmentDto: CreateAppointmentDto,
     user: User,
   ) {
+    const processStatus = await this.processSatusService.findOneByUserSection(
+      sectionId,
+      user,
+      false,
+    );
+    if (processStatus?.isRescheduled) {
+      createAppointmentDto.isRescheduled = true;
+    }
     const appointment = this.appointmentRepository.create({
       ...createAppointmentDto,
       reservedBy: user,
@@ -82,10 +94,24 @@ export class AppointmentRepository {
   }
 
   async update(id: string, updateAppointmentDto: UpdateAppointmentDto) {
+    const { scheduleId } = updateAppointmentDto;
+    delete updateAppointmentDto.scheduleId;
+
+    const updateData: any = {
+      ...updateAppointmentDto,
+    };
+
+    if (scheduleId) {
+      await this.scheduleService.findOne(scheduleId);
+      updateData.schedule = {
+        id: scheduleId,
+      };
+    }
+
     return await this.appointmentRepository
       .createQueryBuilder()
       .update(Appointment)
-      .set(updateAppointmentDto)
+      .set(updateData)
       .where('id = :id', { id: id })
       .execute();
   }
@@ -153,8 +179,8 @@ export class AppointmentRepository {
     return result;
   }
 
-  findAll(user: User, sectionId: string) {
-    return this.appointmentRepository.find({
+  async findAll(user: User, sectionId: string) {
+    const appointments = await this.appointmentRepository.find({
       where: {
         section: {
           id: sectionId,
@@ -166,6 +192,7 @@ export class AppointmentRepository {
         appointmentDate: 'ASC',
       },
     });
+    return appointments;
   }
 
   async getExpiredAppointments(currentLimaTime: Date) {
@@ -187,7 +214,7 @@ export class AppointmentRepository {
   async findOneById(id: string) {
     const appointment = await this.appointmentRepository.findOne({
       where: { id: id },
-      relations: ['reservedBy', 'section']
+      relations: ['reservedBy', 'section'],
     });
     return appointment;
   }
