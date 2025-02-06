@@ -7,6 +7,7 @@ import { CreateUserDto, LoginUserDto } from './dto';
 import { User } from 'src/user/entities/user.entity';
 import { Request } from 'express';
 import { Throttle } from '@nestjs/throttler';
+import { LoginDocumentUserDto } from './dto/login-document.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -23,6 +24,11 @@ export class AuthController {
       request.ip || request.headers['x-forwarded-for'] || 'IP no disponible';
     console.log('IP del usuario:', ipAddress);
     return this.authService.login(loginUserDto);
+  }
+  
+  @Post('document')
+  loginDocumentUser(@Body() loginDocumentUserDto: LoginDocumentUserDto) {
+    return this.authService.loginDocument(loginDocumentUserDto);
   }
 
   @Post('verify-email')

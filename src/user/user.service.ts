@@ -21,7 +21,7 @@ export class UserService {
   ) {}
 
   async create(createUserDto: CreateUserDto) {
-    const { documentNumber, email } = createUserDto;
+    const { documentNumber } = createUserDto;
 
     const existUserByDni = await this.userRepository.findOne({
       where: {
@@ -33,21 +33,9 @@ export class UserService {
       throw new ConflictException('El Documento ya está registrado.');
     }
 
-    const existUserByEmail = await this.userRepository.findOne({
-      where: {
-        email,
-      },
-    });
-
-    if (existUserByEmail) {
-      throw new ConflictException('El correo ya está registrado.');
-    }
-
     try {
-      const { ...userData } = createUserDto;
-
       const user = this.userRepository.create({
-        ...userData,
+        documentNumber: documentNumber,
         password: bcrypt.hashSync('P', 10),
       });
 

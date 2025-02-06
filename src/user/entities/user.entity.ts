@@ -25,7 +25,8 @@ export class User {
   documentNumber: string;
 
   @Column('text', {
-    unique: true,
+    nullable: true,
+    default: null,
   })
   email: string;
 
@@ -33,13 +34,22 @@ export class User {
   @Column('text')
   password: string;
 
-  @Column('text')
+  @Column('text', {
+    nullable: true,
+    default: null,
+  })
   firstName: string;
 
-  @Column('text')
+  @Column('text', {
+    nullable: true,
+    default: null,
+  })
   apellido_paterno: string;
 
-  @Column('text')
+  @Column('text', {
+    nullable: true,
+    default: null,
+  })
   apellido_materno: string;
 
   // @Column('date')
@@ -47,16 +57,16 @@ export class User {
 
   // @Column('text')
   // department: string;
-  @Column('text', { nullable: true })
+  @Column('text', { nullable: true, default: null })
   district: string;
 
-  @Column('text', { nullable: true })
+  @Column('text', { nullable: true, default: null })
   address: string;
 
   @Column({ default: false })
   isVerified: boolean;
 
-  @Column('text', { nullable: true })
+  @Column('text', { nullable: true, default: null })
   mobileNumber: string;
 
   @Column('bool', {

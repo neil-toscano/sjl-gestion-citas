@@ -12,6 +12,7 @@ import { UserService } from 'src/user/user.service';
 import { User } from 'src/user/entities/user.entity';
 import { EmailService } from 'src/email/email.service';
 import { AxiosAdapter } from 'src/common/adapters/axios-adapter';
+import { LoginDocumentUserDto } from './dto/login-document.dto';
 
 @Injectable()
 export class AuthService {
@@ -140,6 +141,45 @@ export class AuthService {
         documentNumber: userPlataforma.usuario.numero_documento,
         email: userPlataforma.usuario.email,
         firstName: userPlataforma.usuario.nombres,
+        isActive: true,
+        password: 'P',
+      });
+      delete newUser.password;
+      return {
+        ...newUser,
+        token: this.getJwtToken({ id: newUser.id }),
+      };
+    }
+
+    if (!user.isActive) {
+      throw new UnauthorizedException('Cuenta desactivada');
+    }
+
+    delete user.password;
+    return {
+      ...user,
+      token: this.getJwtToken({ id: user.id }),
+    };
+  }
+
+  async loginDocument(loginDocumentUserDto: LoginDocumentUserDto) {
+    const { documentNumber } = loginDocumentUserDto;
+
+    const user = await this.userService.findByTerm(
+      {
+        field: 'documentNumber',
+        value: documentNumber,
+      },
+      false,
+    );
+
+    if (!user) {
+      const newUser = await this.userService.create({
+        apellido_materno: null,
+        apellido_paterno: null,
+        documentNumber: documentNumber,
+        email: null,
+        firstName: null,
         isActive: true,
         password: 'P',
       });
