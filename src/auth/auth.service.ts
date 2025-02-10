@@ -13,6 +13,7 @@ import { User } from 'src/user/entities/user.entity';
 import { EmailService } from 'src/email/email.service';
 import { AxiosAdapter } from 'src/common/adapters/axios-adapter';
 import { LoginDocumentUserDto } from './dto/login-document.dto';
+import axios from 'axios';
 
 @Injectable()
 export class AuthService {
@@ -21,7 +22,7 @@ export class AuthService {
     private readonly jwtService: JwtService,
     private readonly emailService: EmailService,
     private readonly http: AxiosAdapter,
-  ) {}
+  ) { }
 
   async create(createUserDto: CreateUserDto) {
     const plataformaVirtualUrl = process.env.PLATAFORMA_VIRTUAL_API;
@@ -163,7 +164,22 @@ export class AuthService {
   }
 
   async loginDocument(loginDocumentUserDto: LoginDocumentUserDto) {
-    const { documentNumber } = loginDocumentUserDto;
+    const baseUrlCaptcha = process.env.URL_CAPTCHA_VERIFY;
+    const secretKeyCaptcha = process.env.SECRET_KEY_CAPTCHA;
+
+    const { documentNumber, captchaToken } = loginDocumentUserDto;
+
+    try {
+      const response = await axios.post(
+        `${baseUrlCaptcha}/recaptcha/api/siteverify?secret=${secretKeyCaptcha}&response=${captchaToken}`
+      );
+
+      const { success } = response.data;
+      if (!success) throw new UnauthorizedException('Error al validar Captcha!!');
+    } catch (error) {
+      console.error("Error verificando CAPTCHA:", error);
+      throw new UnauthorizedException('Error al validar Captcha!!');
+    }
 
     const user = await this.userService.findByTerm(
       {
