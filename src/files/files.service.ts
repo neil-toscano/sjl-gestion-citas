@@ -25,6 +25,7 @@ export class FilesService {
         }
       });
     } catch (error) {
+      console.log(error, 'error')
       console.error(`Error al enviar el archivo: ${error.message}`);
       throw new BadRequestException(
         'Error interno al intentar enviar el archivo.',

@@ -73,6 +73,9 @@ export class ProcessStatusRepository {
         user: { id: Not(In(assignedUserIds)) },
       },
       relations: ['user'],
+      order: {
+        createdAt: 'ASC',
+      }
     });
   }
 
@@ -84,6 +87,9 @@ export class ProcessStatusRepository {
         user: { id: Not(In(assignedUserIds)) },
       },
       relations: ['user'],
+      order: {
+        createdAt: 'ASC'
+      }
     });
   }
 
@@ -121,6 +127,7 @@ export class ProcessStatusRepository {
     return await this.processStatusRepository.find({
       where: {
         status: ProcessStatusEnum.UNDER_OBSERVATION,
+        isCompleted: false,
         section: { id: sectionId },
         user: { id: Not(In(assignedUserIds)) },
       },
@@ -198,6 +205,7 @@ export class ProcessStatusRepository {
     //TODO: CAMBIOS
     const result = await this.processStatusRepository
       .createQueryBuilder('processStatus')
+      .where('processStatus.isCompleted = :isCompleted', { isCompleted: false })
       .select('processStatus.sectionId', 'sectionId') // Agrupamos por sectionId
       .addSelect('processStatus.status', 'status')
       .addSelect('COUNT(processStatus.id)', 'count')
