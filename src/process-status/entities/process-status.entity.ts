@@ -5,10 +5,12 @@ import {
   CreateDateColumn,
   Entity,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
 import { ProcessStatusEnum } from '../interfaces/status.enum';
+import { ProcessUser } from 'src/process-user/entities/process-user.entity';
 
 @Entity({ name: 'process-status' })
 export class ProcessStatus {
@@ -23,6 +25,9 @@ export class ProcessStatus {
     (sectionDocument) => sectionDocument.processStatus,
   )
   section: SectionDocument;
+
+  @OneToMany(() => ProcessUser, (processUser) => processUser.processStatus)
+  processUsers: ProcessUser[];
 
   @Column({ type: 'enum', enum: ProcessStatusEnum })
   status: ProcessStatusEnum;
