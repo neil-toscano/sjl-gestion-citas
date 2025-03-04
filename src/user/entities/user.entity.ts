@@ -109,7 +109,4 @@ export class User {
 
   @OneToMany(() => UserPermission, (permission) => permission.user)
   permissions: UserPermission[];
-
-  @OneToMany(() => ProcessUser, (assignment) => assignment.user)
-  assignments: ProcessStatusUser[];
 }

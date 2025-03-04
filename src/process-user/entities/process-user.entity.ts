@@ -4,14 +4,14 @@ import { Entity, PrimaryGeneratedColumn, ManyToOne, JoinColumn } from 'typeorm';
 
 @Entity()
 export class ProcessUser {
-  @PrimaryGeneratedColumn('uuid')
-  id: string;
+//   @PrimaryGeneratedColumn('uuid')
+//   id: string;
 
-  @ManyToOne(() => ProcessStatus, (processStatus) => processStatus.assignments)
-  @JoinColumn({ name: 'process_status_id' })
-  processStatus: ProcessStatus;
+//   @ManyToOne(() => ProcessStatus, (processStatus) => processStatus.assignments)
+//   @JoinColumn({ name: 'process_status_id' })
+//   processStatus: ProcessStatus;
 
-  @ManyToOne(() => User, (user) => user.assignments)
-  @JoinColumn({ name: 'user_id' })
-  user: User;
+//   @ManyToOne(() => User, (user) => user.assignments)
+//   @JoinColumn({ name: 'user_id' })
+//   user: User;
 }
