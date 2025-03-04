@@ -42,7 +42,7 @@ export class ProcessStatusController {
 
   @Get('completed-users/:sectionId')
   @Auth(ValidRoles.superUser, ValidRoles.admin)
-  findCompletedUsers(
+  findCompletedUsersBySection(
     @Param('sectionId') sectionId: string,
     @GetUser() admin: User,
   ) {
@@ -50,6 +50,14 @@ export class ProcessStatusController {
       sectionId,
       admin,
     );
+  }
+  
+  @Get('completed-users')
+  @Auth(ValidRoles.admin)
+  findAllCompletedUsers(
+    @GetUser() admin: User,
+  ) {
+    return this.processStatusService.findAllUsersWithCompletedDocuments();
   }
 
   @Get('corrected/:sectionId')

@@ -29,6 +29,7 @@ import { AppointmentHistoryModule } from './appointment-history/appointment-hist
 import { NotFoundMiddleware } from './common/middlewares/not-found.middleware';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { APP_GUARD } from '@nestjs/core';
+import { ProcessUserModule } from './process-user/process-user.module';
 
 @Module({
   imports: [
@@ -99,6 +100,8 @@ import { APP_GUARD } from '@nestjs/core';
     ProcessHistoryModule,
 
     AppointmentHistoryModule,
+
+    ProcessUserModule,
   ],
   providers: [
     {

@@ -79,6 +79,33 @@ export class ProcessStatusRepository {
     });
   }
 
+  async getAllCompletedProcessStatus() {
+    return await this.processStatusRepository.find({
+      where: {
+        status: ProcessStatusEnum.EN_PROCESO,
+        isAssigned: false,
+      },
+      relations: ['user', 'section'],
+      select: {
+        id: true,
+      status: true,
+      createdAt: true,
+      isAssigned: true,
+      user: {
+        id: true,
+        documentNumber: true,
+      },
+      section: {
+        id: true,
+        sectionName: true,
+      },
+      },
+      order: {
+        createdAt: 'ASC',
+      }
+    });
+  }
+
   async findOneForReview(sectionId: string, assignedUserIds: string[]) {
     return await this.processStatusRepository.findOne({
       where: {

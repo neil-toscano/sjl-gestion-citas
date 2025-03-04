@@ -42,6 +42,9 @@ export class ProcessStatus {
   })
   isRescheduled: boolean;
 
+  @Column({ type: 'boolean', default: false })
+  isAssigned: boolean;
+
   @Column({ type: 'timestamptz', nullable: true })
   verifiedAt: Date;
 }

@@ -14,6 +14,7 @@ import {
   ObservedDocumentsQuery,
   UnresolvedDocumentsQuery,
   ListCompletedStatusQuery,
+  ListAllCompletedStatusQuery,
   NextUserCorrectedDocumentsQuery,
   CorrectedDocumentsQuery,
   NextUserForReviewQuery,
@@ -38,6 +39,12 @@ export class ProcessStatusService {
   async findUsersWithCompletedDocuments(sectionId: string, admin: User) {
     return this.queryBus.execute(
       new ListCompletedStatusQuery(admin, sectionId),
+    );
+  }
+  
+  async findAllUsersWithCompletedDocuments() {
+    return this.queryBus.execute(
+      new ListAllCompletedStatusQuery(),
     );
   }
 

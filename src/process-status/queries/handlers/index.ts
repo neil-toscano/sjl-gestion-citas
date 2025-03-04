@@ -3,6 +3,7 @@ import { CheackStatusHandler } from './checkStatus.query';
 import { CorrectedDocumentsStatusHandler } from './corrected-documents.handler';
 import { CountByStatusHandler } from './count-status.handler';
 import { FindOneByUserSectionHandler } from './find-by-user.handler';
+import { ListAllCompletedStatusHandler } from './list-all-completed-status.handler';
 import { ListCompletedStatusHandler } from './list-completed-status.handler';
 import { NextUserCorrectedDocumentsHandler } from './next-corrected.handler';
 import { NextUserForReviewHandler } from './next-user-review.handler';
@@ -20,4 +21,5 @@ export const QueryHandlers = [
   FindOneByUserSectionHandler,
   CountByStatusHandler,
   CheackStatusHandler,
+  ListAllCompletedStatusHandler,
 ];
