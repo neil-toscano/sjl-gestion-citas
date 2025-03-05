@@ -67,7 +67,6 @@ export class ProcessUserService {
   async findAllHistory() {
     const now = new Date();
     const firstDayOfLastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
-    const lastDayOfLastMonth = new Date(now.getFullYear(), now.getMonth(), 0);
 
     return await this.processUserRepository
       .createQueryBuilder('processUser')
@@ -88,9 +87,9 @@ export class ProcessUserService {
       .leftJoin('processStatus.user', 'processStatusUser')
       .leftJoin('processStatus.section', 'section')
       .leftJoin('processUser.user', 'user')
-      .where('processUser.createdAt BETWEEN :firstDayOfLastMonth AND :lastDayOfLastMonth', {
+      .where('processUser.createdAt BETWEEN :firstDayOfLastMonth AND :now', {
         firstDayOfLastMonth,
-        lastDayOfLastMonth,
+        now,
       })
       .getMany();
   }
