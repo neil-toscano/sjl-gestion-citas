@@ -2,6 +2,7 @@ import { CheckEligibilityHandler } from './check-eligibility.handler';
 import { CheackStatusHandler } from './checkStatus.query';
 import { CorrectedDocumentsStatusHandler } from './corrected-documents.handler';
 import { CountByStatusHandler } from './count-status.handler';
+import { FindOneByIdHandler } from './find-by-id.handler';
 import { FindOneByUserSectionHandler } from './find-by-user.handler';
 import { ListAllCompletedStatusHandler } from './list-all-completed-status.handler';
 import { ListCompletedStatusHandler } from './list-completed-status.handler';
@@ -22,4 +23,5 @@ export const QueryHandlers = [
   CountByStatusHandler,
   CheackStatusHandler,
   ListAllCompletedStatusHandler,
+  FindOneByIdHandler,
 ];

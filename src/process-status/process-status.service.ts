@@ -18,6 +18,7 @@ import {
   NextUserCorrectedDocumentsQuery,
   CorrectedDocumentsQuery,
   NextUserForReviewQuery,
+  FindOneByIdQuery,
 } from './queries';
 
 import { UpdateProcessStatusDto } from './dto/update-process-status.dto';
@@ -93,6 +94,14 @@ export class ProcessStatusService {
   ) {
     return this.queryBus.execute(
       new FindOneByUserSectionQuery(sectionId, user, throwErrorIfNotFound),
+    );
+  }
+  
+  async findOneById(
+    id: string,
+  ) {
+    return this.queryBus.execute(
+      new FindOneByIdQuery(id),
     );
   }
 

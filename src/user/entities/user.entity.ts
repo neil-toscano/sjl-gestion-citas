@@ -84,6 +84,9 @@ export class User {
   @OneToMany(() => Document, (document) => document.user)
   document: Document;
 
+  @OneToMany(() => ProcessUser, (processUser) => processUser.user)
+  processUsers: ProcessUser[]; 
+
   @BeforeInsert()
   checkFieldsBeforeInsert() {
     this.email = this.email?.toLowerCase().trim() || null; // Aplica trim solo si no es null

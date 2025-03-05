@@ -40,7 +40,7 @@ export class ProcessStatusRepository {
   }
 
   async update(id: string, updateProcessStatusDto: UpdateProcessStatusDto) {
-    const { status, isRescheduled } = updateProcessStatusDto;
+    const { status } = updateProcessStatusDto;
 
     const currentProcessStatus = await this.processStatusRepository.findOneBy({
       id,
@@ -54,8 +54,7 @@ export class ProcessStatusRepository {
       .createQueryBuilder()
       .update(ProcessStatus)
       .set({
-        status: status,
-        isRescheduled: isRescheduled,
+        ...updateProcessStatusDto,
         ...verifiedAtUpdate,
       })
       .where('id = :id', { id: id })
@@ -88,9 +87,9 @@ export class ProcessStatusRepository {
       relations: ['user', 'section'],
       select: {
         id: true,
-      status: true,
-      createdAt: true,
-      isAssigned: true,
+        status: true,
+        createdAt: true,
+        isAssigned: true,
       user: {
         id: true,
         documentNumber: true,

@@ -16,6 +16,11 @@ export class ProcessUserController {
   findAll() {
     return this.processUserService.findAll();
   }
+  
+  @Get('history')
+  findAllHistory() {
+    return this.processUserService.findAllHistory();
+  }
 
   @Get(':id')
   findOne(@Param('id') id: string) {
@@ -29,6 +34,6 @@ export class ProcessUserController {
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.processUserService.remove(+id);
+    return this.processUserService.remove(id);
   }
 }
