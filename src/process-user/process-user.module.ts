@@ -9,6 +9,7 @@ import { ProcessStatusModule } from 'src/process-status/process-status.module';
 @Module({
   imports: [TypeOrmModule.forFeature([ProcessUser]), UserModule, ProcessStatusModule],
   controllers: [ProcessUserController],
-  providers: [ProcessUserService]
+  providers: [ProcessUserService],
+  exports: [ProcessUserService]
 })
 export class ProcessUserModule {}

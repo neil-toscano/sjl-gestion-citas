@@ -80,10 +80,23 @@ export class ProcessStatusRepository {
 
   async getAllCompletedProcessStatus() {
     return await this.processStatusRepository.find({
-      where: {
-        status: ProcessStatusEnum.EN_PROCESO,
-        isAssigned: false,
-      },
+      where: [
+        { 
+          status: ProcessStatusEnum.EN_PROCESO,
+          isAssigned: false,
+          isCompleted: false,
+        },
+        { 
+          status: ProcessStatusEnum.UNDER_OBSERVATION,
+          isAssigned: false,
+          isCompleted: false,
+        },
+        { 
+          status: ProcessStatusEnum.CORRECTED,
+          isAssigned: false,
+          isCompleted: false,
+        }
+      ],
       relations: ['user', 'section'],
       select: {
         id: true,

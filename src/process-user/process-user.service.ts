@@ -6,6 +6,8 @@ import { ProcessUser } from './entities/process-user.entity';
 import { Repository } from 'typeorm';
 import { UserService } from 'src/user/user.service';
 import { ProcessStatusService } from 'src/process-status/process-status.service';
+import { User } from 'src/user/entities/user.entity';
+import { ProcessStatusEnum } from 'src/process-status/interfaces/status.enum';
 
 @Injectable()
 export class ProcessUserService {
@@ -49,6 +51,7 @@ export class ProcessUserService {
         'processUser.updatedAt',
         'processUser.isActive',
         'processStatus.id',
+        'processStatus.status',
         'user.id',
         'user.firstName',
         'processStatusUser.id',
@@ -61,13 +64,13 @@ export class ProcessUserService {
       .leftJoin('processStatus.section', 'section')
       .leftJoin('processUser.user', 'user')
       .where('processUser.isActive = :isActive', { isActive: true })
+      .andWhere('processStatus.isCompleted = :isCompleted', { isCompleted: false })
       .getMany();
   }
 
   async findAllHistory() {
     const now = new Date();
     const firstDayOfLastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
-
     return await this.processUserRepository
       .createQueryBuilder('processUser')
       .select([
@@ -82,16 +85,103 @@ export class ProcessUserService {
         'processStatusUser.documentNumber',
         'section.id',
         'section.sectionName',
+        'processStatus.status',
       ])
       .leftJoin('processUser.processStatus', 'processStatus')
       .leftJoin('processStatus.user', 'processStatusUser')
       .leftJoin('processStatus.section', 'section')
       .leftJoin('processUser.user', 'user')
-      .where('processUser.createdAt BETWEEN :firstDayOfLastMonth AND :now', {
-        firstDayOfLastMonth,
-        now,
+      .where('processUser.createdAt >= :startDate', {
+        startDate: firstDayOfLastMonth
       })
+      .andWhere('processUser.isActive = :isActive', { isActive: true })
       .getMany();
+  }
+
+  async findAllAsignados() {
+    const estadisticaNuevos = await this.processStatusService.findAllUsersWithCompletedDocuments();
+    const estadisticaAsignado = await this.findAll();
+    
+    return {
+        nuevos_tramites: estadisticaNuevos.length,  // <- Aquí el length
+        tramites_asignados: estadisticaAsignado.length
+    };
+}
+
+  async findAllNewAssigned(sectionId: string, user: User) {
+    return this.processUserRepository.find({
+      where: {
+        user: {
+          id: user.id,
+        },
+        isActive: true,
+        processStatus: {
+          section: {
+            id: sectionId
+          },
+          status: ProcessStatusEnum.EN_PROCESO
+        },
+
+      },
+      relations: ['processStatus', 'processStatus.user', 'processStatus.section']
+    })
+  };
+
+  async findAllCorrected(sectionId: string, user: User) {
+    return this.processUserRepository.find({
+      where: {
+        user: {
+          id: user.id,
+        },
+        isActive: true,
+        processStatus: {
+          section: {
+            id: sectionId
+          },
+          status: ProcessStatusEnum.CORRECTED
+        },
+      },
+      relations: ['processStatus', 'processStatus.user', 'processStatus.section']
+    })
+  };
+
+  async findAllUnresolved(sectionId: string, user: User) {
+    return this.processUserRepository.find({
+      where: {
+        user: {
+          id: user.id,
+        },
+        isActive: true,
+        processStatus: {
+          section: {
+            id: sectionId
+          },
+          status: ProcessStatusEnum.UNDER_OBSERVATION,
+        },
+      },
+      relations: ['processStatus', 'processStatus.user', 'processStatus.section']
+    })
+  };
+
+  async countByUser(userId: string) {
+    const result = await this.processUserRepository
+      .createQueryBuilder('processUser')
+      .innerJoin('processUser.processStatus', 'processStatus')
+      .innerJoin('processStatus.section', 'section')
+      .where('processUser.userId = :userId', { userId })
+      .andWhere('processUser.isActive = :isActive', { isActive: true })
+      .select([
+        'section.sectionName as "sectionName"',
+        'processStatus.sectionId as "sectionId"',
+        'processStatus.status as status',
+        'COUNT(processUser.id) as count'
+      ])
+      .groupBy('section.sectionName')
+      .addGroupBy('processStatus.sectionId')
+      .addGroupBy('processStatus.status')
+      .getRawMany();
+
+    return result;
   }
 
   findOne(id: number) {
@@ -115,6 +205,10 @@ export class ProcessUserService {
 
     await this.processStatusService.update(processUser.processStatus.id, {
       isAssigned: false,
+    });
+
+    await this.processStatusService.update(processUser.processStatus.id, {
+      isAssigned: false
     });
 
     await this.processUserRepository.update(id, { isActive: false });

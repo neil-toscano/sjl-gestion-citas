@@ -6,6 +6,7 @@ import { SectionTypeDocument } from './entities/section-type-document.entity';
 import { AuthModule } from 'src/auth/auth.module';
 import { UserPermissionsModule } from 'src/user-permissions/user-permissions.module';
 import { ProcessStatusModule } from 'src/process-status/process-status.module';
+import { ProcessUserModule } from 'src/process-user/process-user.module';
 
 @Module({
   controllers: [SectionTypeDocumentController],
@@ -16,6 +17,7 @@ import { ProcessStatusModule } from 'src/process-status/process-status.module';
     AuthModule,
     UserPermissionsModule,
     ProcessStatusModule,
+    ProcessUserModule,
   ],
 })
 export class SectionTypeDocumentModule {}
