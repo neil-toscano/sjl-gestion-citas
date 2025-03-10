@@ -51,6 +51,7 @@ export class ProcessUserService {
         'processUser.updatedAt',
         'processUser.isActive',
         'processStatus.id',
+        'processStatus.updatedAt',
         'processStatus.status',
         'user.id',
         'user.firstName',
@@ -156,6 +157,7 @@ export class ProcessUserService {
           section: {
             id: sectionId
           },
+          isCompleted: false,
           status: ProcessStatusEnum.UNDER_OBSERVATION,
         },
       },
@@ -170,6 +172,7 @@ export class ProcessUserService {
       .innerJoin('processStatus.section', 'section')
       .where('processUser.userId = :userId', { userId })
       .andWhere('processUser.isActive = :isActive', { isActive: true })
+      .andWhere('processStatus.isCompleted = :isCompleted', { isCompleted: false })
       .select([
         'section.sectionName as "sectionName"',
         'processStatus.sectionId as "sectionId"',

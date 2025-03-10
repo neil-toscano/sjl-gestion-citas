@@ -182,6 +182,7 @@ export class ProcessStatusRepository {
       where: {
         status: ProcessStatusEnum.UNDER_OBSERVATION,
         updatedAt: LessThan(dateLimit),
+        isCompleted: false,
       },
       relations: ['user', 'section'],
     });

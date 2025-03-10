@@ -61,6 +61,7 @@ export class ProcessHistoryService {
       queryBuilder.andWhere('section.id = :sectionId', { sectionId });
     }
 
+    queryBuilder.orderBy('processHistory.createdAt', 'DESC');
     queryBuilder.take(pageSize).skip(offset);
 
     const [processHistory, totalCount] = await queryBuilder.getManyAndCount();
