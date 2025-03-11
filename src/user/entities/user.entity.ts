@@ -13,6 +13,7 @@ import { Appointment } from 'src/appointment/entities/appointment.entity';
 import { Assignment } from 'src/assignments/entities/assignment.entity';
 import { ProcessStatus } from 'src/process-status/entities/process-status.entity';
 import { UserPermission } from 'src/user-permissions/entities/user-permission.entity';
+import { ProcessUser } from 'src/process-user/entities/process-user.entity';
 
 @Entity('users')
 export class User {
@@ -82,6 +83,9 @@ export class User {
 
   @OneToMany(() => Document, (document) => document.user)
   document: Document;
+
+  @OneToMany(() => ProcessUser, (processUser) => processUser.user)
+  processUsers: ProcessUser[]; 
 
   @BeforeInsert()
   checkFieldsBeforeInsert() {

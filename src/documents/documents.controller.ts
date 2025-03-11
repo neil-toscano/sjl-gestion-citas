@@ -16,7 +16,7 @@ import { ValidRoles } from 'src/auth/interfaces';
 
 @Controller('documents')
 export class DocumentsController {
-  constructor(private readonly documentsService: DocumentsService) {}
+  constructor(private readonly documentsService: DocumentsService) { }
   @Post()
   @Auth()
   create(@GetUser() user: User, @Body() createDocumentDto: CreateDocumentDto) {

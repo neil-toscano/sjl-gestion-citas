@@ -8,3 +8,5 @@ export * from './check-eligibility.query';
 export * from './corrected-documents.query';
 export * from './find-by-user.query';
 export * from './count-status.query';
+export * from './list-all-completed-status.query';
+export * from './find-by-id.query';

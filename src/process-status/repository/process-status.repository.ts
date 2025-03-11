@@ -40,7 +40,7 @@ export class ProcessStatusRepository {
   }
 
   async update(id: string, updateProcessStatusDto: UpdateProcessStatusDto) {
-    const { status, isRescheduled } = updateProcessStatusDto;
+    const { status } = updateProcessStatusDto;
 
     const currentProcessStatus = await this.processStatusRepository.findOneBy({
       id,
@@ -54,8 +54,7 @@ export class ProcessStatusRepository {
       .createQueryBuilder()
       .update(ProcessStatus)
       .set({
-        status: status,
-        isRescheduled: isRescheduled,
+        ...updateProcessStatusDto,
         ...verifiedAtUpdate,
       })
       .where('id = :id', { id: id })
@@ -73,6 +72,49 @@ export class ProcessStatusRepository {
         user: { id: Not(In(assignedUserIds)) },
       },
       relations: ['user'],
+      order: {
+        createdAt: 'ASC',
+      }
+    });
+  }
+
+  async getAllCompletedProcessStatus() {
+    return await this.processStatusRepository.find({
+      where: [
+        { 
+          status: ProcessStatusEnum.EN_PROCESO,
+          isAssigned: false,
+          isCompleted: false,
+        },
+        { 
+          status: ProcessStatusEnum.UNDER_OBSERVATION,
+          isAssigned: false,
+          isCompleted: false,
+        },
+        { 
+          status: ProcessStatusEnum.CORRECTED,
+          isAssigned: false,
+          isCompleted: false,
+        }
+      ],
+      relations: ['user', 'section'],
+      select: {
+        id: true,
+        status: true,
+        createdAt: true,
+        isAssigned: true,
+      user: {
+        id: true,
+        documentNumber: true,
+      },
+      section: {
+        id: true,
+        sectionName: true,
+      },
+      },
+      order: {
+        createdAt: 'ASC',
+      }
     });
   }
 
@@ -84,6 +126,9 @@ export class ProcessStatusRepository {
         user: { id: Not(In(assignedUserIds)) },
       },
       relations: ['user'],
+      order: {
+        createdAt: 'ASC'
+      }
     });
   }
 
@@ -121,6 +166,7 @@ export class ProcessStatusRepository {
     return await this.processStatusRepository.find({
       where: {
         status: ProcessStatusEnum.UNDER_OBSERVATION,
+        isCompleted: false,
         section: { id: sectionId },
         user: { id: Not(In(assignedUserIds)) },
       },
@@ -136,6 +182,7 @@ export class ProcessStatusRepository {
       where: {
         status: ProcessStatusEnum.UNDER_OBSERVATION,
         updatedAt: LessThan(dateLimit),
+        isCompleted: false,
       },
       relations: ['user', 'section'],
     });
@@ -198,6 +245,7 @@ export class ProcessStatusRepository {
     //TODO: CAMBIOS
     const result = await this.processStatusRepository
       .createQueryBuilder('processStatus')
+      .where('processStatus.isCompleted = :isCompleted', { isCompleted: false })
       .select('processStatus.sectionId', 'sectionId') // Agrupamos por sectionId
       .addSelect('processStatus.status', 'status')
       .addSelect('COUNT(processStatus.id)', 'count')

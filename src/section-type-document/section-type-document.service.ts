@@ -8,6 +8,7 @@ import { SectionType } from './interfaces/document';
 import { User } from 'src/user/entities/user.entity';
 import { UserPermissionsService } from 'src/user-permissions/user-permissions.service';
 import { ProcessStatusService } from 'src/process-status/process-status.service';
+import { ProcessUserService } from 'src/process-user/process-user.service';
 
 @Injectable()
 export class SectionTypeDocumentService {
@@ -16,6 +17,7 @@ export class SectionTypeDocumentService {
     private readonly sectionTypeDocumentRepository: Repository<SectionTypeDocument>,
     private readonly userPermissionService: UserPermissionsService,
     private readonly processStatusService: ProcessStatusService,
+    private readonly processUserService: ProcessUserService,
   ) {}
 
   create(createSectionTypeDocumentDto: CreateSectionTypeDocumentDto) {
@@ -66,6 +68,74 @@ export class SectionTypeDocumentService {
       }
 
       const statusCounts = await this.processStatusService.countByStatus();
+
+      const result = await this.sectionTypeDocumentRepository
+        .createQueryBuilder('sectionTypeDocument')
+        .leftJoinAndSelect('sectionTypeDocument.section', 'section')
+        .leftJoinAndSelect('sectionTypeDocument.typeDocument', 'typeDocument')
+        .select([
+          'sectionTypeDocument.id AS sectionTypeDocumentId',
+          'section.id AS sectionId',
+          'section.sectionName AS sectionName',
+          'section.sectionSlug AS sectionSlug',
+          'typeDocument.id AS typeDocumentId',
+          'typeDocument.name AS typeDocumentName',
+        ])
+        .where('section.id IN (:...accessibleSectionIds)', {
+          accessibleSectionIds,
+        })
+        .orderBy('section.sectionName', 'ASC')
+        .getRawMany();
+
+      const statusCountMap = this.mapStatusCounts(statusCounts);
+
+      const organizedData: any[] = Object.values(this.organizeData(result));
+      const finalResult = organizedData.map((section) => ({
+        ...section,
+        statusCounts: statusCountMap[section.sectionId] || [],
+      }));
+
+      return finalResult;
+    }
+  }
+
+  async findByAssignedUser(user: User): Promise<SectionType[]> {
+    if (user.roles.includes('user') || user.roles.includes('administrator')) {
+      const statusCounts = await this.processUserService.countByUser(user.id);
+
+      const result = await this.sectionTypeDocumentRepository
+        .createQueryBuilder('sectionTypeDocument')
+        .leftJoinAndSelect('sectionTypeDocument.section', 'section')
+        .leftJoinAndSelect('sectionTypeDocument.typeDocument', 'typeDocument')
+        .select([
+          'sectionTypeDocument.id AS sectionTypeDocumentId',
+          'section.id AS sectionId',
+          'section.sectionName AS sectionName',
+          'section.sectionSlug AS sectionSlug',
+          'typeDocument.id AS typeDocumentId',
+          'typeDocument.name AS typeDocumentName',
+        ])
+        .orderBy('section.sectionName', 'ASC')
+        .getRawMany();
+
+      const statusCountMap = this.mapStatusCounts(statusCounts);
+
+      const organizedData: any[] = Object.values(this.organizeData(result));
+      const finalResult = organizedData.map((section) => ({
+        ...section,
+        statusCounts: statusCountMap[section.sectionId] || [],
+      }));
+
+      return finalResult;
+    } else if (user.roles.includes('platform-operator')) {
+      const permissions = await this.userPermissionService.findByUser(user.id);
+      const accessibleSectionIds = this.getAccessibleSections(permissions);
+
+      if (accessibleSectionIds.length === 0) {
+        return [];
+      }
+
+      const statusCounts = await this.processUserService.countByUser(user.id);
 
       const result = await this.sectionTypeDocumentRepository
         .createQueryBuilder('sectionTypeDocument')

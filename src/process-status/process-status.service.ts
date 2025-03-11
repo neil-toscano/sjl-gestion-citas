@@ -14,9 +14,11 @@ import {
   ObservedDocumentsQuery,
   UnresolvedDocumentsQuery,
   ListCompletedStatusQuery,
+  ListAllCompletedStatusQuery,
   NextUserCorrectedDocumentsQuery,
   CorrectedDocumentsQuery,
   NextUserForReviewQuery,
+  FindOneByIdQuery,
 } from './queries';
 
 import { UpdateProcessStatusDto } from './dto/update-process-status.dto';
@@ -38,6 +40,12 @@ export class ProcessStatusService {
   async findUsersWithCompletedDocuments(sectionId: string, admin: User) {
     return this.queryBus.execute(
       new ListCompletedStatusQuery(admin, sectionId),
+    );
+  }
+  
+  async findAllUsersWithCompletedDocuments() {
+    return this.queryBus.execute(
+      new ListAllCompletedStatusQuery(),
     );
   }
 
@@ -86,6 +94,14 @@ export class ProcessStatusService {
   ) {
     return this.queryBus.execute(
       new FindOneByUserSectionQuery(sectionId, user, throwErrorIfNotFound),
+    );
+  }
+  
+  async findOneById(
+    id: string,
+  ) {
+    return this.queryBus.execute(
+      new FindOneByIdQuery(id),
     );
   }
 

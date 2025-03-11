@@ -24,10 +24,17 @@ export class SectionTypeDocumentController {
     return this.sectionTypeDocumentService.create(createSectionTypeDocumentDto);
   }
 
+  
   @Get()
   @Auth()
   findAll(@GetUser() user: User) {
     return this.sectionTypeDocumentService.findAll(user);
+  }
+  
+  @Get('by-user')
+  @Auth()
+  findByAssignedUser(@GetUser() user: User) {
+    return this.sectionTypeDocumentService.findByAssignedUser(user);
   }
 
   @Get(':id')
