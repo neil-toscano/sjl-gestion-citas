@@ -24,7 +24,7 @@ export class DocumentsService {
     private readonly sectionService: SectionDocumentService,
     private readonly typeDocumentService: TypeDocumentService,
     private readonly processStatusService: ProcessStatusService,
-  ) {}
+  ) { }
 
   async create(user: User, createDocumentDto: CreateDocumentDto) {
     const { id } = user;
@@ -253,6 +253,7 @@ export class DocumentsService {
         user: {
           id: user.id,
         },
+        isDeleted: false,
       },
     });
 
