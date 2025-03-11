@@ -116,7 +116,6 @@ export class DocumentsService {
   }
 
   async update(id: string, updateDocumentDto: UpdateDocumentDto) {
-    console.log('llega');
     const document = await this.documentRepository.findOne({
       where: {
         id: id,
@@ -147,9 +146,10 @@ export class DocumentsService {
         user: {
           id: user.id,
         },
+        isDeleted: false,
       },
     });
-    console.log(documents.length, 'lenght')
+
     const section = await this.sectionService.findOne(document.section.id);
     const processStatus = await this.processStatusService.findOneByUserSection(
       document.section.id,

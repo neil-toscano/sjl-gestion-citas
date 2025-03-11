@@ -38,6 +38,7 @@ export class DocumentsController {
     @Param('id', new ParseUUIDPipe()) id: string,
     @Body() updateDocumentDto: UpdateDocumentDto,
   ) {
+    console.log(updateDocumentDto, 'dto')
     return this.documentsService.update(id, updateDocumentDto);
   }
 
