@@ -19,6 +19,7 @@ import {
   CorrectedDocumentsQuery,
   NextUserForReviewQuery,
   FindOneByIdQuery,
+  ScheduledProcessQuery,
 } from './queries';
 
 import { UpdateProcessStatusDto } from './dto/update-process-status.dto';
@@ -68,6 +69,12 @@ export class ProcessStatusService {
   async getAllUsersWithUnresolvedDocuments(sectionId: string, admin: User) {
     return this.queryBus.execute(
       new UnresolvedDocumentsQuery(sectionId, admin),
+    );
+  }
+  
+  async getAllUsersWithScheduledProcess(sectionId: string) {
+    return this.queryBus.execute(
+      new ScheduledProcessQuery(sectionId),
     );
   }
 
