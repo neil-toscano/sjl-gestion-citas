@@ -24,10 +24,16 @@ export class ProcessUserController {
   findAllHistory() {
     return this.processUserService.findAllHistory();
   }
-  
+
   @Get('cantidad-asignados')
   findAllAsignados() {
     return this.processUserService.findAllAsignados();
+  }
+
+  @Get('scheduled-appointments/:sectionId')
+  @Auth(ValidRoles.superUser, ValidRoles.admin)
+  findAllWithScheduledAppointments(@Param('sectionId') sectionId: string, @GetUser() user: User) {
+    return this.processUserService.findAllWithScheduledAppointments(user, sectionId);
   }
 
   @Get('new-assigned/:sectionId')

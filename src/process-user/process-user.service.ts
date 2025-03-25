@@ -8,6 +8,7 @@ import { UserService } from 'src/user/user.service';
 import { ProcessStatusService } from 'src/process-status/process-status.service';
 import { User } from 'src/user/entities/user.entity';
 import { ProcessStatusEnum } from 'src/process-status/interfaces/status.enum';
+import { AppointmentService } from 'src/appointment/appointment.service';
 
 @Injectable()
 export class ProcessUserService {
@@ -16,6 +17,7 @@ export class ProcessUserService {
     private readonly processUserRepository: Repository<ProcessUser>,
     private readonly userService: UserService,
     private readonly processStatusService: ProcessStatusService,
+    private readonly appointmentService: AppointmentService,
   ) {
 
   }
@@ -102,12 +104,60 @@ export class ProcessUserService {
   async findAllAsignados() {
     const estadisticaNuevos = await this.processStatusService.findAllUsersWithCompletedDocuments();
     const estadisticaAsignado = await this.findAll();
-    
+
     return {
-        nuevos_tramites: estadisticaNuevos.length,  // <- Aquí el length
-        tramites_asignados: estadisticaAsignado.length
+      nuevos_tramites: estadisticaNuevos.length,  // <- Aquí el length
+      tramites_asignados: estadisticaAsignado.length
     };
-}
+  }
+
+  async findAllWithScheduledAppointments(user: User, sectionId: string) {
+    const appointments = await this.appointmentService.findAll(user, sectionId);
+
+    // id usuario de los que reservaron
+    const reservedByIds = appointments
+      .map(a => a.reservedBy?.id)
+      .filter(id => id);
+
+    const processUsers = await this.processUserRepository
+      .createQueryBuilder('processUser')
+      .select([
+        'processUser.id',
+        'processStatus.id',
+        'processStatusUser.id as psUserId',
+        'section.id as section_id',
+        'user.id',
+        'user.firstName',
+        'user.apellido_paterno'
+      ])
+      .leftJoin('processUser.processStatus', 'processStatus')
+      .leftJoin('processStatus.user', 'processStatusUser')
+      .leftJoin('processStatus.section', 'section')
+      .leftJoin('processUser.user', 'user')
+      .where('processStatusUser.id IN (:...reservedByIds)', { reservedByIds })
+      .andWhere('section.id = :sectionId', { sectionId })
+      .andWhere('processUser.isActive = :isActive', { isActive: true })
+      .andWhere('processStatus.isCompleted = :isCompleted', { isCompleted: false })
+      .andWhere('processStatus.status = :status', {
+        status: ProcessStatusEnum.APPOINTMENT_SCHEDULED
+      })
+      .getRawMany();
+
+    return appointments.map(appointment => {
+      const matchingProcessUser = processUsers.find(pu =>
+        pu.psuserid === appointment.reservedBy?.id &&
+        pu.section_id === appointment.section.id // Comparación de sección
+      );
+
+      return {
+        ...appointment,
+        ASIGNADO: matchingProcessUser ? {
+          id: matchingProcessUser.user_id,
+          nombre: `${matchingProcessUser.user_firstName} ${matchingProcessUser.user_apellido_paterno}`
+        } : null
+      };
+    });
+  }
 
   async findAllNewAssigned(sectionId: string, user: User) {
     return this.processUserRepository.find({

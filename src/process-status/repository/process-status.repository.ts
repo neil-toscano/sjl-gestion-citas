@@ -78,6 +78,22 @@ export class ProcessStatusRepository {
     });
   }
 
+  async getProcessesByScheduledStatus(
+    sectionId: string,
+  ) {
+    return await this.processStatusRepository.find({
+      where: {
+        status: ProcessStatusEnum.APPOINTMENT_SCHEDULED,
+        section: { id: sectionId },
+        isCompleted: false,
+      },
+      relations: ['user'],
+      order: {
+        createdAt: 'ASC',
+      }
+    });
+  }
+
   async getAllCompletedProcessStatus() {
     return await this.processStatusRepository.find({
       where: [
