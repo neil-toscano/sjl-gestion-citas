@@ -119,12 +119,19 @@ export class ProcessUserService {
       .map(a => a.reservedBy?.id)
       .filter(id => id);
 
+    if (!reservedByIds.length) {
+      return appointments.map(appointment => ({
+        ...appointment,
+        ASIGNADO: null,
+      }));
+    }
+
     const processUsers = await this.processUserRepository
       .createQueryBuilder('processUser')
       .select([
         'processUser.id',
         'processStatus.id',
-        'processStatusUser.id as psUserId',
+        'processStatusUser.id as psuserid',
         'section.id as section_id',
         'user.id',
         'user.firstName',
