@@ -17,6 +17,7 @@ import {
   ListExpiredAppointmentsQuery,
   ListAppointmentQuery,
   GetAppointmentsByWeekQuery,
+  ListAllAppointmentQuery,
 } from './queries';
 
 @Injectable()
@@ -44,6 +45,10 @@ export class AppointmentService {
 
   findAll(user: User, sectionId: string) {
     return this.queryBus.execute(new ListAppointmentQuery(user, sectionId));
+  }
+  
+  findAllSection() {
+    return this.queryBus.execute(new ListAllAppointmentQuery());
   }
 
   async findByFilter(filterAppointmentDto: FilterAppointmentDto) {

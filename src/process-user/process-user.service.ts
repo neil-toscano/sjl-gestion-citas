@@ -59,6 +59,7 @@ export class ProcessUserService {
         'user.firstName',
         'processStatusUser.id',
         'processStatusUser.documentNumber',
+        'processStatusUser.mobileNumber',
         'section.id',
         'section.sectionName',
       ])
