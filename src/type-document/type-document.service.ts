@@ -34,7 +34,11 @@ export class TypeDocumentService {
   }
 
   async findAll() {
-    const types = await this.typeDocumentRepository.find({});
+    const types = await this.typeDocumentRepository.find({
+      order: {
+        createdAt: 'DESC',
+      }
+    });
 
     return types;
   }

@@ -18,6 +18,7 @@ export class SectionDocumentService {
   ) {}
 
   async create(createSectionDocumentDto: CreateSectionDocumentDto) {
+
     try {
       const sectionDocument = this.sectionDocumentRepository.create(
         createSectionDocumentDto,
@@ -34,7 +35,11 @@ export class SectionDocumentService {
   }
 
   async findAll() {
-    const sections = await this.sectionDocumentRepository.find({});
+    const sections = await this.sectionDocumentRepository.find({
+      order: {
+        createdAt: 'DESC',
+      }
+    });
 
     return sections;
   }

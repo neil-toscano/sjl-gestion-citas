@@ -1,4 +1,4 @@
-import { IsString, IsNotEmpty, IsOptional } from 'class-validator';
+import { IsString, IsNotEmpty, IsOptional, IsInt, Min } from 'class-validator';
 
 export class CreateSectionDocumentDto {
   @IsString()
@@ -9,4 +9,9 @@ export class CreateSectionDocumentDto {
   @IsNotEmpty()
   @IsOptional()
   sectionSlug?: string;
+
+  @IsOptional()
+  @IsInt()
+  @Min(0)
+  requiredDocumentsCount?: number;
 }

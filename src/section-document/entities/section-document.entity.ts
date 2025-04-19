@@ -5,7 +5,7 @@ import { ProcessStatus } from 'src/process-status/entities/process-status.entity
 import { Schedule } from 'src/schedule/entities/schedule.entity';
 import { SectionTypeDocument } from 'src/section-type-document/entities/section-type-document.entity';
 import { UserPermission } from 'src/user-permissions/entities/user-permission.entity';
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
 
 @Entity({ name: 'section_document' })
 export class SectionDocument {
@@ -28,6 +28,19 @@ export class SectionDocument {
     nullable: false,
   })
   requiredDocumentsCount: number;
+
+  @CreateDateColumn({
+    type: 'timestamp',
+    default: () => 'CURRENT_TIMESTAMP',
+  })
+  createdAt: Date;
+
+  @UpdateDateColumn({
+    type: 'timestamp',
+    default: () => 'CURRENT_TIMESTAMP',
+    onUpdate: 'CURRENT_TIMESTAMP',
+  })
+  updatedAt: Date;
 
   @OneToMany(
     () => SectionTypeDocument,

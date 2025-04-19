@@ -5,6 +5,7 @@ import {
   Body,
   Param,
   ParseUUIDPipe,
+  Delete,
 } from '@nestjs/common';
 import { SectionTypeDocumentService } from './section-type-document.service';
 import { CreateSectionTypeDocumentDto } from './dto/create-section-type-document.dto';
@@ -41,5 +42,17 @@ export class SectionTypeDocumentController {
   @Auth()
   findOne(@Param('id', new ParseUUIDPipe()) id: string) {
     return this.sectionTypeDocumentService.findOne(id);
+  }
+  
+  @Get('section/:id')
+  @Auth()
+  findBySection(@Param('id', new ParseUUIDPipe()) id: string) {
+    return this.sectionTypeDocumentService.findBySection(id);
+  }
+  
+  @Delete(':id')
+  @Auth(ValidRoles.admin)
+  deleteBySection(@Param('id', new ParseUUIDPipe()) sectionId: string) {
+    return this.sectionTypeDocumentService.deleteBySection(sectionId);
   }
 }

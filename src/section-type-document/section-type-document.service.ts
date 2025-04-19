@@ -195,6 +195,29 @@ export class SectionTypeDocumentService {
     }
     return result;
   }
+  
+  async findBySection(id: string) {
+    const result = await this.sectionTypeDocumentRepository.find({
+      where: { section: { id: id } },
+      relations: ['typeDocument'],
+    });
+
+    if (!result) {
+      throw new NotFoundException(`Section-Type id ${id} not found`);
+    }
+    return result;
+  }
+  
+  async deleteBySection(id: string) {
+    const result = await this.sectionTypeDocumentRepository.delete({
+      section: { id: id},
+    })
+
+    if (!result) {
+      throw new NotFoundException(`Section-Type id ${id} not found`);
+    }
+    return result;
+  }
 
   organizeData(data: any) {
     return data.reduce((acc: any, item: any) => {
