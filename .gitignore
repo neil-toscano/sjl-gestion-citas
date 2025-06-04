@@ -6,7 +6,7 @@ postgres/
 /static/pdf/*
 
 .env
-
+.vs
 #log
 # Logs
 logs

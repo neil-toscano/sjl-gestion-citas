@@ -23,12 +23,29 @@ export class SectionDocument {
   })
   sectionSlug?: string;
 
+  @Column('text', {
+    nullable: true,
+  })
+  icon?: string;
+
+  @Column('text', {
+    nullable: true,
+    default: 'Nuevo trámite'
+  })
+  description?: string;
+
   @Column('int', {
     default: 0,
     nullable: false,
   })
   requiredDocumentsCount: number;
 
+  @Column('boolean', {
+    default: true,
+    nullable: false,
+  })
+  isActive: boolean;
+  
   @CreateDateColumn({
     type: 'timestamp',
     default: () => 'CURRENT_TIMESTAMP',

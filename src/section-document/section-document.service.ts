@@ -9,6 +9,7 @@ import { UpdateSectionDocumentDto } from './dto/update-section-document.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { SectionDocument } from './entities/section-document.entity';
 import { Repository } from 'typeorm';
+import { User } from 'src/user/entities/user.entity';
 
 @Injectable()
 export class SectionDocumentService {
@@ -34,13 +35,29 @@ export class SectionDocumentService {
     }
   }
 
-  async findAll() {
+
+  async findAll(user: User) {
+    const isUser = user.roles.includes('user');
+
+    
+    if (isUser) {
+      const sections = await this.sectionDocumentRepository.find({
+        order: {
+          createdAt: 'DESC',
+        },
+        where: {
+          isActive: true,
+        }
+      });
+      
+      return sections;
+    }
     const sections = await this.sectionDocumentRepository.find({
       order: {
         createdAt: 'DESC',
-      }
+      },
     });
-
+    
     return sections;
   }
 
