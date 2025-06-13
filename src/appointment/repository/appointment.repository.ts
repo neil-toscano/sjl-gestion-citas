@@ -218,7 +218,7 @@ export class AppointmentRepository {
     });
     return appointment;
   }
-  
+
   async findAllHistoryAppointment() {
     const appointments = await this.appointmentRepository.find({
       where: { status: AppointmentStatus.OPEN },

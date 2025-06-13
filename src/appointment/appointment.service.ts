@@ -46,7 +46,7 @@ export class AppointmentService {
   findAll(user: User, sectionId: string) {
     return this.queryBus.execute(new ListAppointmentQuery(user, sectionId));
   }
-  
+
   findAllSection() {
     return this.queryBus.execute(new ListAllAppointmentQuery());
   }

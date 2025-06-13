@@ -66,11 +66,10 @@ export class AppointmentController {
   ) {
     return this.appointmentService.findAll(user, sectionId);
   }
-  
+
   @Get('all-section/admin/view')
   @Auth(ValidRoles.superUser, ValidRoles.admin)
-  findAllSection(
-  ) {
+  findAllSection() {
     return this.appointmentService.findAllSection();
   }
 

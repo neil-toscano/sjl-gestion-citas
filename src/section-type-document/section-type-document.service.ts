@@ -112,6 +112,8 @@ export class SectionTypeDocumentService {
           'section.id AS sectionId',
           'section.sectionName AS sectionName',
           'section.sectionSlug AS sectionSlug',
+          'section.icon AS icon',
+          'section.description AS description',
           'typeDocument.id AS typeDocumentId',
           'typeDocument.name AS typeDocumentName',
         ])
@@ -146,6 +148,8 @@ export class SectionTypeDocumentService {
           'section.id AS sectionId',
           'section.sectionName AS sectionName',
           'section.sectionSlug AS sectionSlug',
+          'section.icon AS icon',
+          'section.description AS description',
           'typeDocument.id AS typeDocumentId',
           'typeDocument.name AS typeDocumentName',
         ])
@@ -162,7 +166,6 @@ export class SectionTypeDocumentService {
         ...section,
         statusCounts: statusCountMap[section.sectionId] || [],
       }));
-
       return finalResult;
     }
   }
@@ -196,6 +199,29 @@ export class SectionTypeDocumentService {
     return result;
   }
 
+  async findBySection(id: string) {
+    const result = await this.sectionTypeDocumentRepository.find({
+      where: { section: { id: id } },
+      relations: ['typeDocument'],
+    });
+
+    if (!result) {
+      throw new NotFoundException(`Section-Type id ${id} not found`);
+    }
+    return result;
+  }
+
+  async deleteBySection(id: string) {
+    const result = await this.sectionTypeDocumentRepository.delete({
+      section: { id: id },
+    });
+
+    if (!result) {
+      throw new NotFoundException(`Section-Type id ${id} not found`);
+    }
+    return result;
+  }
+
   organizeData(data: any) {
     return data.reduce((acc: any, item: any) => {
       const {
@@ -205,6 +231,8 @@ export class SectionTypeDocumentService {
         typedocumentid,
         typedocumentname,
         sectiontypedocumentid,
+        description,
+        icon,
       } = item;
 
       if (!acc[sectionid]) {
@@ -212,6 +240,8 @@ export class SectionTypeDocumentService {
           sectionId: sectionid,
           sectionName: sectionname,
           sectionSlug: sectionslug,
+          description: description,
+          icon: icon,
           typedocument: [],
         };
       }

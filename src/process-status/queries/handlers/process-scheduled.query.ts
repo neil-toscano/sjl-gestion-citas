@@ -12,6 +12,8 @@ export class ScheduledProcessHandler
 
   async execute(query: ScheduledProcessQuery) {
     const { sectionId } = query;
-    return this.processStatusRepository.getProcessesByScheduledStatus(sectionId);
+    return this.processStatusRepository.getProcessesByScheduledStatus(
+      sectionId,
+    );
   }
 }

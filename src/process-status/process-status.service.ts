@@ -43,11 +43,9 @@ export class ProcessStatusService {
       new ListCompletedStatusQuery(admin, sectionId),
     );
   }
-  
+
   async findAllUsersWithCompletedDocuments() {
-    return this.queryBus.execute(
-      new ListAllCompletedStatusQuery(),
-    );
+    return this.queryBus.execute(new ListAllCompletedStatusQuery());
   }
 
   async findNextUserForReview(sectionId: string, adminId: string) {
@@ -71,11 +69,9 @@ export class ProcessStatusService {
       new UnresolvedDocumentsQuery(sectionId, admin),
     );
   }
-  
+
   async getAllUsersWithScheduledProcess(sectionId: string) {
-    return this.queryBus.execute(
-      new ScheduledProcessQuery(sectionId),
-    );
+    return this.queryBus.execute(new ScheduledProcessQuery(sectionId));
   }
 
   async getAllUsersWithObservedDocuments() {
@@ -103,13 +99,9 @@ export class ProcessStatusService {
       new FindOneByUserSectionQuery(sectionId, user, throwErrorIfNotFound),
     );
   }
-  
-  async findOneById(
-    id: string,
-  ) {
-    return this.queryBus.execute(
-      new FindOneByIdQuery(id),
-    );
+
+  async findOneById(id: string) {
+    return this.queryBus.execute(new FindOneByIdQuery(id));
   }
 
   async update(id: string, updateProcessStatusDto: UpdateProcessStatusDto) {

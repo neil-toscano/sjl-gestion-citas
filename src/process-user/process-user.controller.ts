@@ -1,4 +1,12 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+} from '@nestjs/common';
 import { ProcessUserService } from './process-user.service';
 import { CreateProcessUserDto } from './dto/create-process-user.dto';
 import { UpdateProcessUserDto } from './dto/update-process-user.dto';
@@ -8,7 +16,7 @@ import { ValidRoles } from 'src/auth/interfaces';
 
 @Controller('process-user')
 export class ProcessUserController {
-  constructor(private readonly processUserService: ProcessUserService) { }
+  constructor(private readonly processUserService: ProcessUserService) {}
 
   @Post()
   create(@Body() createProcessUserDto: CreateProcessUserDto) {
@@ -32,8 +40,14 @@ export class ProcessUserController {
 
   @Get('scheduled-appointments/:sectionId')
   @Auth(ValidRoles.superUser, ValidRoles.admin)
-  findAllWithScheduledAppointments(@Param('sectionId') sectionId: string, @GetUser() user: User) {
-    return this.processUserService.findAllWithScheduledAppointments(user, sectionId);
+  findAllWithScheduledAppointments(
+    @Param('sectionId') sectionId: string,
+    @GetUser() user: User,
+  ) {
+    return this.processUserService.findAllWithScheduledAppointments(
+      user,
+      sectionId,
+    );
   }
 
   @Get('new-assigned/:sectionId')
@@ -69,7 +83,10 @@ export class ProcessUserController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateProcessUserDto: UpdateProcessUserDto) {
+  update(
+    @Param('id') id: string,
+    @Body() updateProcessUserDto: UpdateProcessUserDto,
+  ) {
     return this.processUserService.update(+id, updateProcessUserDto);
   }
 

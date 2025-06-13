@@ -51,12 +51,10 @@ export class ProcessStatusController {
       admin,
     );
   }
-  
+
   @Get('completed-users')
   @Auth(ValidRoles.admin)
-  findAllCompletedUsers(
-    @GetUser() admin: User,
-  ) {
+  findAllCompletedUsers(@GetUser() admin: User) {
     return this.processStatusService.findAllUsersWithCompletedDocuments();
   }
 

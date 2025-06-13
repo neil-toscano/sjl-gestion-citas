@@ -9,7 +9,8 @@ export class ListAllAppointmentHandler
   constructor(private readonly appointmentRepository: AppointmentRepository) {}
 
   async execute(query: ListAllAppointmentQuery) {
-    const appointments = await this.appointmentRepository.findAllHistoryAppointment();
+    const appointments =
+      await this.appointmentRepository.findAllHistoryAppointment();
 
     return appointments;
   }
