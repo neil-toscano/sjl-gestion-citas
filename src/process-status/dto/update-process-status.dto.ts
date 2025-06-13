@@ -12,7 +12,7 @@ export class UpdateProcessStatusDto extends PartialType(
   @IsBoolean()
   @IsOptional()
   isRescheduled?: boolean;
-  
+
   @IsBoolean()
   @IsOptional()
   isAssigned?: boolean;

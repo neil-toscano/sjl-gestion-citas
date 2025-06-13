@@ -317,7 +317,7 @@ export class EmailService {
     try {
       await this.transporter.sendMail(mailOptions);
     } catch (error) {
-      console.log(error); 
+      console.log(error);
       throw new BadRequestException(`Error al enviar el correo`);
     }
     return {

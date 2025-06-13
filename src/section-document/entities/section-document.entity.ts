@@ -5,7 +5,14 @@ import { ProcessStatus } from 'src/process-status/entities/process-status.entity
 import { Schedule } from 'src/schedule/entities/schedule.entity';
 import { SectionTypeDocument } from 'src/section-type-document/entities/section-type-document.entity';
 import { UserPermission } from 'src/user-permissions/entities/user-permission.entity';
-import { Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  OneToMany,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
+} from 'typeorm';
 
 @Entity({ name: 'section_document' })
 export class SectionDocument {
@@ -30,7 +37,7 @@ export class SectionDocument {
 
   @Column('text', {
     nullable: true,
-    default: 'Nuevo trámite'
+    default: 'Nuevo trámite',
   })
   description?: string;
 
@@ -45,7 +52,7 @@ export class SectionDocument {
     nullable: false,
   })
   isActive: boolean;
-  
+
   @CreateDateColumn({
     type: 'timestamp',
     default: () => 'CURRENT_TIMESTAMP',

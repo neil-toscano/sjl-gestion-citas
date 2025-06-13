@@ -14,7 +14,7 @@ export class SeedService {
     private readonly sectionTypeDocumentService: SectionTypeDocumentService,
     @InjectRepository(Schedule)
     private scheduleRepository: Repository<Schedule>,
-  ) { }
+  ) {}
 
   async runSeedSchedule() {
     const schedules = [

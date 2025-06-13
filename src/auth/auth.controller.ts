@@ -25,7 +25,7 @@ export class AuthController {
     console.log('IP del usuario:', ipAddress);
     return this.authService.login(loginUserDto);
   }
-  
+
   @Post('document')
   loginDocumentUser(@Body() loginDocumentUserDto: LoginDocumentUserDto) {
     return this.authService.loginDocument(loginDocumentUserDto);

@@ -59,23 +59,31 @@ export class CreateUserDto {
   })
   mobileNumber?: string;
 
+  @IsOptional()
   @IsString({ message: 'El correo debe ser una cadena de texto' })
   @IsEmail({}, { message: 'El correo electrónico debe ser un email válido' })
-  email: string;
+  email?: string;
+
+  @IsOptional()
+  @IsArray({ message: 'Los roles deben ser un array' })
+  @IsString({ each: true, message: 'Cada rol debe ser una cadena de texto' })
+  @IsIn(['user', 'administrator', 'platform-operator'], {
+    each: true,
+    message: 'Los roles válidos son: user, administrator, platform-operator',
+  })
+  roles?: string[] = ['user'];
 
   @IsOptional()
   @IsBoolean()
   isActive: boolean = true;
 
+  @IsOptional()
   @IsString({ message: 'La contraseña debe ser una cadena de texto' })
   @MinLength(5, {
     message: 'La contraseña debe tener exactamente 5 caracteres',
   })
-  @MaxLength(5, {
+  @MaxLength(50, {
     message: 'La contraseña debe tener exactamente 5 caracteres',
-  })
-  @Matches(/^[a-zA-Z0-9]*$/, {
-    message: 'La contraseña solo puede contener letras y números',
   })
   password: string;
 }

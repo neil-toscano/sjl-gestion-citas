@@ -19,7 +19,6 @@ export class SectionDocumentService {
   ) {}
 
   async create(createSectionDocumentDto: CreateSectionDocumentDto) {
-
     try {
       const sectionDocument = this.sectionDocumentRepository.create(
         createSectionDocumentDto,
@@ -35,11 +34,9 @@ export class SectionDocumentService {
     }
   }
 
-
   async findAll(user: User) {
     const isUser = user.roles.includes('user');
 
-    
     if (isUser) {
       const sections = await this.sectionDocumentRepository.find({
         order: {
@@ -47,9 +44,9 @@ export class SectionDocumentService {
         },
         where: {
           isActive: true,
-        }
+        },
       });
-      
+
       return sections;
     }
     const sections = await this.sectionDocumentRepository.find({
@@ -57,7 +54,7 @@ export class SectionDocumentService {
         createdAt: 'DESC',
       },
     });
-    
+
     return sections;
   }
 

@@ -47,9 +47,37 @@ export class UserService {
     }
   }
 
+  async register(createUserDto: CreateUserDto) {
+    const { documentNumber } = createUserDto;
+
+    const existUserByDni = await this.userRepository.findOne({
+      where: {
+        documentNumber,
+      },
+    });
+
+    if (existUserByDni) {
+      throw new ConflictException('El Documento ya está registrado.');
+    }
+
+    try {
+      const user = this.userRepository.create({
+        ...createUserDto,
+        password: bcrypt.hashSync('******', 10),
+      });
+
+      const newUser = await this.userRepository.save(user);
+
+      return newUser;
+    } catch (error) {
+      this.handleDBErrors(error);
+    }
+  }
+
   async findAll() {
     return await this.userRepository
       .createQueryBuilder('user')
+      .orderBy('user.updatedAt', 'DESC')
       // .where(':role = ANY(user.roles)', { role: 'user' })
       .getMany();
   }

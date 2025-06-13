@@ -18,10 +18,10 @@ export class ProcessUserService {
     private readonly userService: UserService,
     private readonly processStatusService: ProcessStatusService,
     private readonly appointmentService: AppointmentService,
-  ) {
-
-  }
-  async create(createProcessUserDto: CreateProcessUserDto): Promise<ProcessUser> {
+  ) {}
+  async create(
+    createProcessUserDto: CreateProcessUserDto,
+  ): Promise<ProcessUser> {
     const { processStatusId, userId, isActive } = createProcessUserDto;
 
     await this.processStatusService.findOneById(processStatusId);
@@ -29,10 +29,10 @@ export class ProcessUserService {
 
     const processUser = this.processUserRepository.create({
       processStatus: {
-        id: processStatusId
+        id: processStatusId,
       },
       user: {
-        id: userId
+        id: userId,
       },
       isActive: isActive,
     });
@@ -68,13 +68,19 @@ export class ProcessUserService {
       .leftJoin('processStatus.section', 'section')
       .leftJoin('processUser.user', 'user')
       .where('processUser.isActive = :isActive', { isActive: true })
-      .andWhere('processStatus.isCompleted = :isCompleted', { isCompleted: false })
+      .andWhere('processStatus.isCompleted = :isCompleted', {
+        isCompleted: false,
+      })
       .getMany();
   }
 
   async findAllHistory() {
     const now = new Date();
-    const firstDayOfLastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+    const firstDayOfLastMonth = new Date(
+      now.getFullYear(),
+      now.getMonth() - 1,
+      1,
+    );
     return await this.processUserRepository
       .createQueryBuilder('processUser')
       .select([
@@ -96,19 +102,20 @@ export class ProcessUserService {
       .leftJoin('processStatus.section', 'section')
       .leftJoin('processUser.user', 'user')
       .where('processUser.createdAt >= :startDate', {
-        startDate: firstDayOfLastMonth
+        startDate: firstDayOfLastMonth,
       })
       .andWhere('processUser.isActive = :isActive', { isActive: true })
       .getMany();
   }
 
   async findAllAsignados() {
-    const estadisticaNuevos = await this.processStatusService.findAllUsersWithCompletedDocuments();
+    const estadisticaNuevos =
+      await this.processStatusService.findAllUsersWithCompletedDocuments();
     const estadisticaAsignado = await this.findAll();
 
     return {
-      nuevos_tramites: estadisticaNuevos.length,  // <- Aquí el length
-      tramites_asignados: estadisticaAsignado.length
+      nuevos_tramites: estadisticaNuevos.length, // <- Aquí el length
+      tramites_asignados: estadisticaAsignado.length,
     };
   }
 
@@ -117,11 +124,11 @@ export class ProcessUserService {
 
     // id usuario de los que reservaron
     const reservedByIds = appointments
-      .map(a => a.reservedBy?.id)
-      .filter(id => id);
+      .map((a) => a.reservedBy?.id)
+      .filter((id) => id);
 
     if (!reservedByIds.length) {
-      return appointments.map(appointment => ({
+      return appointments.map((appointment) => ({
         ...appointment,
         ASIGNADO: null,
       }));
@@ -136,7 +143,7 @@ export class ProcessUserService {
         'section.id as section_id',
         'user.id',
         'user.firstName',
-        'user.apellido_paterno'
+        'user.apellido_paterno',
       ])
       .leftJoin('processUser.processStatus', 'processStatus')
       .leftJoin('processStatus.user', 'processStatusUser')
@@ -145,24 +152,29 @@ export class ProcessUserService {
       .where('processStatusUser.id IN (:...reservedByIds)', { reservedByIds })
       .andWhere('section.id = :sectionId', { sectionId })
       .andWhere('processUser.isActive = :isActive', { isActive: true })
-      .andWhere('processStatus.isCompleted = :isCompleted', { isCompleted: false })
+      .andWhere('processStatus.isCompleted = :isCompleted', {
+        isCompleted: false,
+      })
       .andWhere('processStatus.status = :status', {
-        status: ProcessStatusEnum.APPOINTMENT_SCHEDULED
+        status: ProcessStatusEnum.APPOINTMENT_SCHEDULED,
       })
       .getRawMany();
 
-    return appointments.map(appointment => {
-      const matchingProcessUser = processUsers.find(pu =>
-        pu.psuserid === appointment.reservedBy?.id &&
-        pu.section_id === appointment.section.id // Comparación de sección
+    return appointments.map((appointment) => {
+      const matchingProcessUser = processUsers.find(
+        (pu) =>
+          pu.psuserid === appointment.reservedBy?.id &&
+          pu.section_id === appointment.section.id, // Comparación de sección
       );
 
       return {
         ...appointment,
-        ASIGNADO: matchingProcessUser ? {
-          id: matchingProcessUser.user_id,
-          nombre: `${matchingProcessUser.user_firstName} ${matchingProcessUser.user_apellido_paterno}`
-        } : null
+        ASIGNADO: matchingProcessUser
+          ? {
+              id: matchingProcessUser.user_id,
+              nombre: `${matchingProcessUser.user_firstName} ${matchingProcessUser.user_apellido_paterno}`,
+            }
+          : null,
       };
     });
   }
@@ -176,15 +188,18 @@ export class ProcessUserService {
         isActive: true,
         processStatus: {
           section: {
-            id: sectionId
+            id: sectionId,
           },
-          status: ProcessStatusEnum.EN_PROCESO
+          status: ProcessStatusEnum.EN_PROCESO,
         },
-
       },
-      relations: ['processStatus', 'processStatus.user', 'processStatus.section']
-    })
-  };
+      relations: [
+        'processStatus',
+        'processStatus.user',
+        'processStatus.section',
+      ],
+    });
+  }
 
   async findAllCorrected(sectionId: string, user: User) {
     return this.processUserRepository.find({
@@ -195,14 +210,18 @@ export class ProcessUserService {
         isActive: true,
         processStatus: {
           section: {
-            id: sectionId
+            id: sectionId,
           },
-          status: ProcessStatusEnum.CORRECTED
+          status: ProcessStatusEnum.CORRECTED,
         },
       },
-      relations: ['processStatus', 'processStatus.user', 'processStatus.section']
-    })
-  };
+      relations: [
+        'processStatus',
+        'processStatus.user',
+        'processStatus.section',
+      ],
+    });
+  }
 
   async findAllUnresolved(sectionId: string, user: User) {
     return this.processUserRepository.find({
@@ -213,15 +232,19 @@ export class ProcessUserService {
         isActive: true,
         processStatus: {
           section: {
-            id: sectionId
+            id: sectionId,
           },
           isCompleted: false,
           status: ProcessStatusEnum.UNDER_OBSERVATION,
         },
       },
-      relations: ['processStatus', 'processStatus.user', 'processStatus.section']
-    })
-  };
+      relations: [
+        'processStatus',
+        'processStatus.user',
+        'processStatus.section',
+      ],
+    });
+  }
 
   async countByUser(userId: string) {
     const result = await this.processUserRepository
@@ -230,12 +253,14 @@ export class ProcessUserService {
       .innerJoin('processStatus.section', 'section')
       .where('processUser.userId = :userId', { userId })
       .andWhere('processUser.isActive = :isActive', { isActive: true })
-      .andWhere('processStatus.isCompleted = :isCompleted', { isCompleted: false })
+      .andWhere('processStatus.isCompleted = :isCompleted', {
+        isCompleted: false,
+      })
       .select([
         'section.sectionName as "sectionName"',
         'processStatus.sectionId as "sectionId"',
         'processStatus.status as status',
-        'COUNT(processUser.id) as count'
+        'COUNT(processUser.id) as count',
       ])
       .groupBy('section.sectionName')
       .addGroupBy('processStatus.sectionId')
@@ -269,7 +294,7 @@ export class ProcessUserService {
     });
 
     await this.processStatusService.update(processUser.processStatus.id, {
-      isAssigned: false
+      isAssigned: false,
     });
 
     await this.processUserRepository.update(id, { isActive: false });

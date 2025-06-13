@@ -1,5 +1,3 @@
 export class ScheduledProcessQuery {
-  constructor(
-    public readonly sectionId: string,
-  ) {}
+  constructor(public readonly sectionId: string) {}
 }

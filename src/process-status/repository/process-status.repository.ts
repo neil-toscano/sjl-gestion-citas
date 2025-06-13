@@ -74,13 +74,11 @@ export class ProcessStatusRepository {
       relations: ['user'],
       order: {
         createdAt: 'ASC',
-      }
+      },
     });
   }
 
-  async getProcessesByScheduledStatus(
-    sectionId: string,
-  ) {
+  async getProcessesByScheduledStatus(sectionId: string) {
     return await this.processStatusRepository.find({
       where: {
         status: ProcessStatusEnum.APPOINTMENT_SCHEDULED,
@@ -90,28 +88,28 @@ export class ProcessStatusRepository {
       relations: ['user'],
       order: {
         createdAt: 'ASC',
-      }
+      },
     });
   }
 
   async getAllCompletedProcessStatus() {
     return await this.processStatusRepository.find({
       where: [
-        { 
+        {
           status: ProcessStatusEnum.EN_PROCESO,
           isAssigned: false,
           isCompleted: false,
         },
-        { 
+        {
           status: ProcessStatusEnum.UNDER_OBSERVATION,
           isAssigned: false,
           isCompleted: false,
         },
-        { 
+        {
           status: ProcessStatusEnum.CORRECTED,
           isAssigned: false,
           isCompleted: false,
-        }
+        },
       ],
       relations: ['user', 'section'],
       select: {
@@ -119,18 +117,18 @@ export class ProcessStatusRepository {
         status: true,
         createdAt: true,
         isAssigned: true,
-      user: {
-        id: true,
-        documentNumber: true,
-      },
-      section: {
-        id: true,
-        sectionName: true,
-      },
+        user: {
+          id: true,
+          documentNumber: true,
+        },
+        section: {
+          id: true,
+          sectionName: true,
+        },
       },
       order: {
         createdAt: 'ASC',
-      }
+      },
     });
   }
 
@@ -143,8 +141,8 @@ export class ProcessStatusRepository {
       },
       relations: ['user'],
       order: {
-        createdAt: 'ASC'
-      }
+        createdAt: 'ASC',
+      },
     });
   }
 

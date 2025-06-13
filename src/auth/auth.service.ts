@@ -22,70 +22,10 @@ export class AuthService {
     private readonly jwtService: JwtService,
     private readonly emailService: EmailService,
     private readonly http: AxiosAdapter,
-  ) { }
+  ) {}
 
   async create(createUserDto: CreateUserDto) {
-    const plataformaVirtualUrl = process.env.PLATAFORMA_VIRTUAL_API;
-    const plataformaVirtualEmail = process.env.PLATAFORMA_VIRTUAL_EMAIL;
-    const plataformaVirtualPassword = process.env.PLATAFORMA_VIRTUAL_PASSWORD;
-
-    try {
-      const response: any = await this.http.post(
-        `${plataformaVirtualUrl}/login-acceso`,
-        {
-          email: plataformaVirtualEmail,
-          password: plataformaVirtualPassword,
-        },
-      );
-
-      const contentHeader = {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${response.access_token}`,
-      };
-
-      const registerUrl = `${plataformaVirtualUrl}/registrar`;
-
-      const platformUser = {
-        numero_documento: createUserDto.documentNumber,
-        correo: createUserDto.email,
-        nombres: createUserDto.firstName,
-        apellido_paterno: createUserDto.apellido_paterno,
-        apellido_materno: createUserDto.apellido_materno,
-        contrasena: createUserDto.password,
-        tipo_documento_identidad: 2,
-      };
-
-      const newPlatformUser: any = await this.http.post(
-        registerUrl,
-        platformUser,
-        contentHeader,
-      );
-
-      if (newPlatformUser.codigo === 401) {
-        throw new Error('Ha ocurrido un error');
-      }
-
-      const user = await this.userService.create(createUserDto);
-      delete user.password;
-      const token = this.getJwtToken({ id: user.id });
-      const verificationLink = `${process.env.APP_URL}/auth/verify-email?token=${token}`;
-      await this.emailService.sendVerificationEmail(
-        user.email,
-        verificationLink,
-      );
-
-      return {
-        ...user,
-        token,
-      };
-    } catch (error) {
-      if (error.message === 'Ha ocurrido un error') {
-        throw new BadRequestException(
-          'Error al crear usuario: El código de estado es 401',
-        );
-      }
-      throw new BadRequestException(error.response.message);
-    }
+    return await this.userService.register(createUserDto);
   }
 
   async login(loginUserDto: LoginUserDto) {
@@ -171,13 +111,14 @@ export class AuthService {
 
     try {
       const response = await axios.post(
-        `${baseUrlCaptcha}/recaptcha/api/siteverify?secret=${secretKeyCaptcha}&response=${captchaToken}`
+        `${baseUrlCaptcha}/recaptcha/api/siteverify?secret=${secretKeyCaptcha}&response=${captchaToken}`,
       );
 
       const { success } = response.data;
-      if (!success) throw new UnauthorizedException('Error al validar Captcha!!');
+      if (!success)
+        throw new UnauthorizedException('Error al validar Captcha!!');
     } catch (error) {
-      console.error("Error verificando CAPTCHA:", error);
+      console.error('Error verificando CAPTCHA:', error);
       throw new UnauthorizedException('Error al validar Captcha!!');
     }
 

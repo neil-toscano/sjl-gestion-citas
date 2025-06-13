@@ -37,7 +37,7 @@ export class TypeDocumentService {
     const types = await this.typeDocumentRepository.find({
       order: {
         createdAt: 'DESC',
-      }
+      },
     });
 
     return types;

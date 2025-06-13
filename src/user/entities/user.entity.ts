@@ -2,9 +2,11 @@ import {
   BeforeInsert,
   BeforeUpdate,
   Column,
+  CreateDateColumn,
   Entity,
   OneToMany,
   PrimaryGeneratedColumn,
+  UpdateDateColumn,
 } from 'typeorm';
 import { Exclude, Type } from 'class-transformer';
 import { Document } from 'src/documents/entities/document.entity';
@@ -81,11 +83,17 @@ export class User {
   })
   roles: string[];
 
+  @CreateDateColumn()
+  createdAt: Date;
+
+  @UpdateDateColumn()
+  updatedAt: Date;
+
   @OneToMany(() => Document, (document) => document.user)
   document: Document;
 
   @OneToMany(() => ProcessUser, (processUser) => processUser.user)
-  processUsers: ProcessUser[]; 
+  processUsers: ProcessUser[];
 
   @BeforeInsert()
   checkFieldsBeforeInsert() {

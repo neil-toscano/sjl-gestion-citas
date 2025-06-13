@@ -198,7 +198,7 @@ export class SectionTypeDocumentService {
     }
     return result;
   }
-  
+
   async findBySection(id: string) {
     const result = await this.sectionTypeDocumentRepository.find({
       where: { section: { id: id } },
@@ -210,11 +210,11 @@ export class SectionTypeDocumentService {
     }
     return result;
   }
-  
+
   async deleteBySection(id: string) {
     const result = await this.sectionTypeDocumentRepository.delete({
-      section: { id: id},
-    })
+      section: { id: id },
+    });
 
     if (!result) {
       throw new NotFoundException(`Section-Type id ${id} not found`);

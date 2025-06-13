@@ -8,9 +8,14 @@ import { ProcessStatusModule } from 'src/process-status/process-status.module';
 import { AppointmentModule } from 'src/appointment/appointment.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([ProcessUser]), UserModule, ProcessStatusModule, AppointmentModule],
+  imports: [
+    TypeOrmModule.forFeature([ProcessUser]),
+    UserModule,
+    ProcessStatusModule,
+    AppointmentModule,
+  ],
   controllers: [ProcessUserController],
   providers: [ProcessUserService],
-  exports: [ProcessUserService]
+  exports: [ProcessUserService],
 })
 export class ProcessUserModule {}

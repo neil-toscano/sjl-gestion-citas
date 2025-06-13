@@ -25,13 +25,12 @@ export class SectionTypeDocumentController {
     return this.sectionTypeDocumentService.create(createSectionTypeDocumentDto);
   }
 
-  
   @Get()
   @Auth()
   findAll(@GetUser() user: User) {
     return this.sectionTypeDocumentService.findAll(user);
   }
-  
+
   @Get('by-user')
   @Auth()
   findByAssignedUser(@GetUser() user: User) {
@@ -43,13 +42,13 @@ export class SectionTypeDocumentController {
   findOne(@Param('id', new ParseUUIDPipe()) id: string) {
     return this.sectionTypeDocumentService.findOne(id);
   }
-  
+
   @Get('section/:id')
   @Auth()
   findBySection(@Param('id', new ParseUUIDPipe()) id: string) {
     return this.sectionTypeDocumentService.findBySection(id);
   }
-  
+
   @Delete(':id')
   @Auth(ValidRoles.admin)
   deleteBySection(@Param('id', new ParseUUIDPipe()) sectionId: string) {
